@@ -163,9 +163,49 @@
          SLIP(K)=1.0
          KWA(K)=0
       ENDDO
+
+      DO K=1,NZ
+         PCOOL(K)=PINLET/2
+         VCOOL(K)=MFLOW/RHOIN/2
+         DCOOL(K)=RHOIN/2
+         DLCOOL(K)=RHOIN/2
+      ENDDO
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
 *----
+      PRINT *, 'PCOOL:', PCOOL
+      PRINT *, 'VCOOL:', VCOOL
+      PRINT *, 'DCOOL:', DCOOL
+
+      ERRV = 1.0
+      ERRP = 1.0
+      I=0
+
+   10 CONTINUE
+
+      IF ((I .GT. 10000) .OR. ((ERRP < 1E-2) .AND. (ERRV < 1E-2 
+     >))) GOTO 20
+
+      I = I + 1
+      PRINT *, 'Valeur de I :', I
+
+         PTEMP = PCOOL
+         VTEMP = VCOOL
+         PRINT *, 'PTEMP avant PV:', PTEMP
+         PRINT *, 'VTEMP avant PV:', VTEMP
+         PRINT *, 'PCOOL avant PV:', PCOOL
+         PRINT *, 'VCOOL avant PV:', VCOOL
+         PRINT *, 'DCOOL avant PV:', DCOOL
+         CALL THMPV(MFLXT, SPEED, PINLET, VCOOL, DCOOL, 
+     >              DCOOL0, PCOOL, ACOOL, MUT, XFL, HD, DV, NZ,
+     >              TCOOL)
+         PRINT *, 'PTEMP après PV:', PTEMP
+          PRINT *, 'VTEMP après PV:', VTEMP
+          PRINT *, 'PCOOL après PV:', PCOOL
+          PRINT *, 'VCOOL après PV:', VCOOL
+
+      PRINT *, 'Boucle while pressure velocity terminée'
+
       K0=0 ! onset of nuclear boiling point
       DO K=1,NZ
 *----
@@ -256,7 +296,7 @@
         DCOOL(K)=RHO
         DLCOOL(K)=RHOL
         HCOOL(K)=HMSUP
-        PCOOL(K)=PINLET
+        !PCOOL(K)=PINLET
         PC(K)=PINLET
         TP(K)=TCLAD(K)
         TLC(K)=TCOOL(K)
@@ -265,8 +305,27 @@
         DO K2=1,NDTOT
           TEMPT(K2,K)=TRE11(K2)
         ENDDO
-        VCOOL(K)=MFLOW/DCOOL(K)
+        !VCOOL(K)=MFLOW/DCOOL(K)
       ENDDO
+
+      ERRV = 0
+      ERRP = 0
+      DO K=1,NZ
+        ERRV = ERRV + ABS(VCOOL(K) - VTEMP(K))/VTEMP(K)
+        ERRP = ERRP + ABS(PCOOL(K) - PTEMP(K))/PTEMP(K)
+      ENDDO
+
+      ERRV = ERRV/NZ
+      ERRP = ERRP/NZ
+
+      GO TO 10
+
+      IF (I == 10000) THEN
+        PRINT *, 'Nombre maximum d''itérations atteint'
+      ENDIF
+      PRINT *, 'Boucle terminée'
+
+   20 CONTINUE
 *----
 *  PRINT THE OUTLET THERMOHYDRAULICAL PARAMETERS
 *----

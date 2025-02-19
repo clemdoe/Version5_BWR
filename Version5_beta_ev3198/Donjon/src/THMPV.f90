@@ -57,6 +57,7 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
 
     g = - 9.81
     DZ = DV / ACOOL
+    PRINT *, 'DZ', DZ
     ALLOCATE(A(2*NZ,2*NZ+1))
     FORALL (I=1:2*NZ, J=1:2*NZ+1) A(I, J) = 0.0
     PRINT *, 'DCOOL', DCOOL
