@@ -72,9 +72,23 @@ Version5_*/Dragon/src/Dragon
 Version5_*/Donjon/bin/Linux_x86_64/Donjon
 Version5_*/Donjon/lib/Linux_x86_64/libDonjon.a
 Version5_*/Donjon/src/Donjon
-Version5_wc/PyGan/data/Resultats_serpent4PyGan/
-Version5_wc/PyGan/data/multiPhysics_proc/_AT10COMPO_1
-Version5_wc/Donjon/data/BWR_DONJON_proc/_AT10Compo
-Version5_wc/PyGan/data/BWR_DONJON_proc/_AT10COMPO_1
+Version5_*/PyGan/data/Resultats_serpent4PyGan/
+Version5_*/PyGan/data/multiPhysics_proc/_AT10COMPO_1
+Version5_*/Donjon/data/BWR_DONJON_proc/_AT10Compo
+Version5_*/PyGan/data/BWR_DONJON_proc/_AT10COMPO_1
+Version5_beta_ev3198/Donjon/data/pincell_mphy_thm_devoir_proc
+Version5_*/Donjon/data/*_proc
+Version5_*/Dragon/data/*_proc
+Version5_*/PyGan/data/*_proc
+Version5_*/doc/
+Version5_*/Donjon/data/Candu6_CPOs/
+Version5_*/Donjon/data/compo/
+Version5_*/Donjon/data/cpo*
+Version5_*/Dragon/data/
+Version5_*/Donjon/data/d2p_xslib/
+Version5_*/Donjon/data/proc/
+Version5_*/Donjon/data/TC_*
+
 
 libraries/l_endian/*
+
