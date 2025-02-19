@@ -198,7 +198,7 @@ QUIT .                                                                          
                   GNU LESSER GENERAL PUBLIC LICENSE
 
  DRVEQU: A LCM OBJECT NAMED 'Cpo         ' WAS IMPORTED FROM FILE '_ACompo     '.
--->>module EQU:        : time spent=        1.046 memory usage= 1.154E+05
+-->>module EQU:        : time spent=        0.940 memory usage= 1.156E+05
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : UTL:        
 ->@DESCRIPTION  : No description available for this module                                
@@ -229,7 +229,7 @@ QUIT .                                                                          
 
  CREATION OF A LEVEL  1 GEOMETRY ON THE DIRECTORY NAMED '/           ' OF THE LCM OBJECT 'Geom        ' WITH TYPE CARTESIAN 3-D   .
 ->@END MODULE   : GEO:        
--->>MODULE GEO:        : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE GEO:        : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> USPLIT:     
@@ -260,7 +260,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        80
 
  @END MODULE -> USPLIT:     
--->>MODULE USPLIT:     : TIME SPENT=        0.000 MEMORY USAGE= 6.240E+02
+-->>MODULE USPLIT:     : TIME SPENT=        0.001 MEMORY USAGE= 4.960E+02
 ->@BEGIN MODULE : TRIVAT:     
 ->@DESCRIPTION  : 3-D diffusion or SPN finite element tracking                            
 ->@CREDITS      : A. Hebert                                                               
@@ -301,7 +301,7 @@ QUIT .                                                                          
  TRICH1: MAXIMUM BANDWIDTH ALONG X AXIS =    1
                            ALONG Y AXIS =    1
                            ALONG Z AXIS =    2
--->>MODULE TRIVAT:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE TRIVAT:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : TRIVAT:     
 
  ~~~~~~~~~~~~~~~
@@ -959,7 +959,7 @@ FRACT-PU
  IPRECI     0   (CALENDF ACCURACY FLAG:1/2/3/4)
  IDF        0   (0=NO INFO/1=ALBS INFO/2=FLUX GAP INFO/3=ADF GAP INFO)
  @END MODULE -> NCR:        
--->>MODULE NCR:        : TIME SPENT=        0.010 MEMORY USAGE= 2.192E+03
+-->>MODULE NCR:        : TIME SPENT=        0.011 MEMORY USAGE= 2.128E+03
 ->@BEGIN MODULE : EQU:        
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -995,7 +995,7 @@ FRACT-PU
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        51
 
  @END MODULE -> MACINI:     
--->>MODULE MACINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE MACINI:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : TRIVAA:     
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1032,7 +1032,7 @@ FRACT-PU
  TRIDIG: ASSEMBLY OF DIAGONAL MATRIX 'B002001     '.
 
  TRIDIG: ASSEMBLY OF DIAGONAL MATRIX 'B002002     '.
--->>MODULE TRIVAA:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE TRIVAA:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : TRIVAA:     
 ->@BEGIN MODULE : FLUD:       
 ->@DESCRIPTION  : No description available for this module                                
@@ -1052,8 +1052,8 @@ FRACT-PU
 
  FLDDIR: CONVERGENCE IN  21 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.001
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.001
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.000
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.001
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 1.3271124363E+00
