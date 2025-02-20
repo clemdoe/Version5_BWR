@@ -90,13 +90,13 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
                 TPMULT0 = 1.0
             ENDIF
 
-            !FRIC = 0.2
-            !FRIC0 = 0.2
+            FRIC = 0.002
+            FRIC0 = 0.002
 
             A(1,1) = 1.0
-            A(K+NZ,K) = - (VCOOL(K)*DCOOL(K))*(1.0 + (TPMULT0*FRIC0*DZ)/(2.0*HD))
+            A(K+NZ,K) = - (VCOOL(K)*DCOOL(K))*(1.0 - (TPMULT0*FRIC0*DZ)/(2.0*HD))
             ! Mult par DZ et chg signe (base + et + mtn: + -)
-            A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 - (TPMULT*FRIC*DZ)/(2.0*HD))
+            A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
 
             A(1, 2*NZ+1) = SPEED
             A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1) - DCOOL(K)) * g)
@@ -120,8 +120,8 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             CALL THMFRI(RET, FRIC, HD)
             CALL THMFRI(RET0, FRIC0,HD)
 
-            !FRIC = 0.2
-            !FRIC0 = 0.2
+            FRIC = 0.002
+            FRIC0 = 0.002
 
             IF (XFL(K) .GT. 0.0) THEN
                 CALL THMPLO(PCOOL(K+1), XFL(K+1), PHIL0)
@@ -138,9 +138,22 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             A(K,K+1) = 0.0
             A(K, 2*NZ+1) = 0.0
 
-            A(K+NZ,K) = - (DCOOL(K)*VCOOL(K))*(1.0+(TPMULT0*FRIC0*DZ)/(2.0*HD))
+            PRINT *, "K", K
+            PRINT *, "(DCOOL(K+1)- DCOOL(K)) * g", (DCOOL(K+1)- DCOOL(K)) * g
+            PRINT *, "A(K+NZ,K)", (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*DZ)/(2.0*HD))
+            PRINT *, "A(K+NZ,K+1)", (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
+            PRINT *, "DCOOL(K+1)", DCOOL(K+1)
+            PRINT *, "DCOOL(K)", DCOOL(K)
+            PRINT *, "VCOOL(K+1)", VCOOL(K+1)
+            PRINT *, "VCOOL(K)", VCOOL(K)
+            PRINT *, "TPMULT", TPMULT
+            PRINT *, "TPMULT0", TPMULT0
+            PRINT *, "FRIC", FRIC
+            PRINT *, "FRIC0", FRIC0
+
+            A(K+NZ,K) = - (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*DZ)/(2.0*HD))
             ! Mult par DZ et chg signe (base + et + mtn: + -)
-            A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 - (TPMULT*FRIC*DZ)/(2.0*HD))
+            A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
 
             A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)- DCOOL(K)) * g)
 

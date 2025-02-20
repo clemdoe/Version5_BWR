@@ -30,12 +30,8 @@
 *  COMPUTE VALUE OF THE FRICTION FACTOR COEFFICIENT AS FUNCTION OF THE 
 *  REYNOLDS NUMBER
 *----
-      IF (REY.LE.1187.0) THEN
-          FRIC=64.0/REY
-      ELSE 
-          FRIC=0.3164/(REY**0.25)
 
-      FRIC = 0.001
-      ENDIF
+      FRIC = 0.079 / (REY ** 0.25)
+
       RETURN
       END
