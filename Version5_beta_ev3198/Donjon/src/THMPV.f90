@@ -58,6 +58,7 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
     g = - 9.81
     DZ = DV / ACOOL
     PRINT *, 'DZ', DZ
+    PRINT *, 'HD', HD
     ALLOCATE(A(2*NZ,2*NZ+1))
     FORALL (I=1:2*NZ, J=1:2*NZ+1) A(I, J) = 0.0
     PRINT *, 'DCOOL', DCOOL
@@ -99,7 +100,7 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
 
             A(1, 2*NZ+1) = SPEED
-            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1) - DCOOL(K)) * g)
+            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1) + DCOOL(K)) * g) /2
 
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0
@@ -155,7 +156,7 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             ! Mult par DZ et chg signe (base + et + mtn: + -)
             A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
 
-            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)- DCOOL(K)) * g)
+            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)+ DCOOL(K)) * g) /2
 
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0
@@ -187,6 +188,18 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
         VCOOL(K) = A(K, 2*NZ+1)
         PCOOL(K) = A(K+NZ, 2*NZ+1)
     END DO
+
+    PRINT *, 'VCOOL(1)', VCOOL(1)
+    PRINT *, 'DCOOL(1)', DCOOL(1)
+    PRINT *, 'FRIC', FRIC
+    PRINT *, 'TPMULT', TPMULT
+    PRINT *, 'HD', HD
+    PRINT *, 'DZ', DZ
+    PRINT *, 'g', g
+
+    PRINT *, 'U^2*rho*f*DZ/Dh + rhog', (VCOOL(1)**2 * DCOOL(1) * TPMULT * FRIC * DZ / ( HD)) + DCOOL(1) * g
+    K = NZ/2
+    PRINT *, PRINT *, "A(K+NZ,K)-A(K¨+NZ, K+1)", (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*DZ)/(2.0*HD)) - (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
 
     RETURN
     END
