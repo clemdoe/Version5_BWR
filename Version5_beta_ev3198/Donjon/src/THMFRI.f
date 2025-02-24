@@ -31,7 +31,7 @@
 *  REYNOLDS NUMBER
 *----
 
-      FRIC = 0.079 / (REY ** 0.25)
+      FRIC = 0.002
 
       RETURN
       END

@@ -198,7 +198,7 @@
          PRINT *, 'DCOOL avant PV:', DCOOL
          CALL THMPV(MFLXT, SPEED, PINLET, VCOOL, DCOOL, 
      >              DCOOL0, PCOOL, ACOOL, MUT, XFL, HD, DV, NZ,
-     >              TCOOL)
+     >              TCOOL, HZ)
          PRINT *, 'PTEMP après PV:', PTEMP
           PRINT *, 'VTEMP après PV:', VTEMP
           PRINT *, 'PCOOL après PV:', PCOOL
@@ -321,6 +321,9 @@
       ERRV = ERRV/NZ
       ERRP = ERRP/NZ
 
+      PRINT *, 'ERRV:', ERRV
+      PRINT *, 'ERRP:', ERRP
+
       GO TO 10
 
       IF (I == 10000) THEN
@@ -331,6 +334,12 @@
    20 CONTINUE
 
 
+      PRINT *, 'PCOOL:', PCOOL
+      PRINT *, 'VCOOL:', VCOOL
+      PRINT *, 'DCOOL:', DCOOL
+      PRINT *, 'HZ:', HZ
+      PRINT *, 'HD:', HD
+      
 *----
 *  PRINT THE OUTLET THERMOHYDRAULICAL PARAMETERS
 *----

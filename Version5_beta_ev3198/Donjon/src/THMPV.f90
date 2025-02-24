@@ -1,5 +1,5 @@
 SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
-                DCOOL0, PCOOL, ACOOL, MUT, XFL, HD, DV, NZ, TCOOL)
+                DCOOL0, PCOOL, ACOOL, MUT, XFL, HD, DV, NZ, TCOOL, HZ)
 !
 !-----------------------------------------------------------------------
 !
@@ -42,7 +42,7 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
 !----
     INTEGER NZ
     REAL MFLXT(NZ), SPEED, POULET, VCOOL(NZ), DCOOL(NZ), DCOOL0, PCOOL(NZ), ACOOL, MUT(NZ), XFL(NZ), HD, DV, TCOOL(NZ)
-    
+    REAL HZ(NZ)
 !----
 !   LOCAL VARIABLES
 !----
@@ -56,8 +56,6 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
     REAL RET, RET0, FRIC, FRIC0, DZ
 
     g = - 9.81
-    DZ = DV / ACOOL
-    PRINT *, 'DZ', DZ
     PRINT *, 'HD', HD
     ALLOCATE(A(2*NZ,2*NZ+1))
     FORALL (I=1:2*NZ, J=1:2*NZ+1) A(I, J) = 0.0
@@ -95,12 +93,12 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             FRIC0 = 0.002
 
             A(1,1) = 1.0
-            A(K+NZ,K) = - (VCOOL(K)*DCOOL(K))*(1.0 - (TPMULT0*FRIC0*DZ)/(2.0*HD))
-            ! Mult par DZ et chg signe (base + et + mtn: + -)
-            A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
+            A(K+NZ,K) = - (VCOOL(K)*DCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
+            ! Mult par HZ(K) et chg signe (base + et + mtn: + -)
+            A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
 
             A(1, 2*NZ+1) = SPEED
-            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1) + DCOOL(K)) * g) /2
+            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1) - DCOOL(K)) * g) /2
 
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0
@@ -141,8 +139,8 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
 
             PRINT *, "K", K
             PRINT *, "(DCOOL(K+1)- DCOOL(K)) * g", (DCOOL(K+1)- DCOOL(K)) * g
-            PRINT *, "A(K+NZ,K)", (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*DZ)/(2.0*HD))
-            PRINT *, "A(K+NZ,K+1)", (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
+            PRINT *, "A(K+NZ,K)", (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
+            PRINT *, "A(K+NZ,K+1)", (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
             PRINT *, "DCOOL(K+1)", DCOOL(K+1)
             PRINT *, "DCOOL(K)", DCOOL(K)
             PRINT *, "VCOOL(K+1)", VCOOL(K+1)
@@ -152,11 +150,11 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             PRINT *, "FRIC", FRIC
             PRINT *, "FRIC0", FRIC0
 
-            A(K+NZ,K) = - (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*DZ)/(2.0*HD))
-            ! Mult par DZ et chg signe (base + et + mtn: + -)
-            A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
+            A(K+NZ,K) = - (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
+            ! Mult par HZ(K) et chg signe (base + et + mtn: + -)
+            A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
 
-            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)+ DCOOL(K)) * g) /2
+            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1) - DCOOL(K)) * g) /2
 
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0
@@ -189,17 +187,19 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
         PCOOL(K) = A(K+NZ, 2*NZ+1)
     END DO
 
-    PRINT *, 'VCOOL(1)', VCOOL(1)
-    PRINT *, 'DCOOL(1)', DCOOL(1)
+    PRINT *, 'INSIDE THMPV'
+    PRINT *, 'VCOOL', VCOOL
+    PRINT *, 'DCOOL', DCOOL
     PRINT *, 'FRIC', FRIC
     PRINT *, 'TPMULT', TPMULT
     PRINT *, 'HD', HD
-    PRINT *, 'DZ', DZ
+    PRINT *, 'HZ', HZ
     PRINT *, 'g', g
 
-    PRINT *, 'U^2*rho*f*DZ/Dh + rhog', (VCOOL(1)**2 * DCOOL(1) * TPMULT * FRIC * DZ / ( HD)) + DCOOL(1) * g
-    K = NZ/2
-    PRINT *, PRINT *, "A(K+NZ,K)-A(K¨+NZ, K+1)", (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*DZ)/(2.0*HD)) - (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*DZ)/(2.0*HD))
+    DO K=1, NZ
+        PRINT *, 'K', K
+        PRINT *, 'a', ((DCOOL(K)*VCOOL(K)**2)*((TPMULT*FRIC*HZ(K))/(HD)) + (DCOOL(K)-DCOOL(K+1))*g/2)
+    END DO
 
     RETURN
     END
