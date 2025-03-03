@@ -173,6 +173,8 @@
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
 *----
+      PRINT *, 'SPEED:', SPEED
+      PRINT *, '830*SPEED:', 830*SPEED
       PRINT *, 'PCOOL:', PCOOL
       PRINT *, 'VCOOL:', VCOOL
       PRINT *, 'DCOOL:', DCOOL
@@ -183,7 +185,7 @@
 
    10 CONTINUE
 
-      IF ((I .GT. 10000) .OR. ((ERRP < 1E-2) .AND. (ERRV < 1E-2 
+      IF ((I .GT. 100) .OR. ((ERRP < 1E-2) .AND. (ERRV < 1E-2 
      >))) GOTO 20
 
       I = I + 1
@@ -271,7 +273,11 @@
      >    KWA(K))
         ENDIF
 
-        DCOOL(K) = RHOIN
+        !DCOOL(K)=RHOIN
+        !DCOOL(K) = 830 - 65 * K * HZ(K)
+        DCOOL(K) = 1.0/((((1.0/700.0)-(1.0/830.0)) * K * 
+     >HZ(K))/2.0 + (1.0/830.0))
+        PRINT *, 'K * HZ(K):', K * HZ(K)
 
 *CGT
 *----
@@ -296,7 +302,12 @@
         TSURF(K)=TRE11(NFD)
         TCLAD(K)=TRE11(NDTOT)
         TCOOL(K)=TCALO
-        DCOOL(K)=RHOIN
+        !DCOOL(K)=RHOIN
+        !DCOOL(K) = 830 - 65 * K * HZ(K)
+        DCOOL(K) = 1.0/((((1.0/700.0)-(1.0/830.0)) * K * 
+     >HZ(K))/2.0 + (1.0/830.0))
+        PRINT *, 'DCOOL:', DCOOL(K)
+        PRINT *, 'K * HZ(K):', K * HZ(K)
         DLCOOL(K)=RHOL
         HCOOL(K)=HMSUP
         !PCOOL(K)=PINLET
@@ -337,6 +348,8 @@
       PRINT *, 'PCOOL:', PCOOL
       PRINT *, 'VCOOL:', VCOOL
       PRINT *, 'DCOOL:', DCOOL
+      PRINT *, 'TCOOL:', TCOOL
+      PRINT *, 'ACOOL' , ACOOL
       PRINT *, 'HZ:', HZ
       PRINT *, 'HD:', HD
       
