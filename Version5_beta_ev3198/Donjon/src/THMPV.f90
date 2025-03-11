@@ -53,29 +53,22 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
     
     INTEGER K, I, J, IER
     REAL PHIL0, TPMULT, TPMULT0
-    REAL RET, RET0, FRIC, FRIC0, DZ
+    REAL REY, REY0, FRIC, FRIC0, DZ
 
     g = - 9.81
-    PRINT *, 'HD', HD
     ALLOCATE(A(2*NZ,2*NZ+1))
     FORALL (I=1:2*NZ, J=1:2*NZ+1) A(I, J) = 0.0
-    PRINT *, 'DCOOL', DCOOL
-    PRINT *, 'VCOOL', VCOOL
-    PRINT *, 'PCOOL', PCOOL
-    
-    PRINT *, "Matrice A :"
-    DO I = 1, 2*NZ
-        PRINT *, (A(I,J), J=1,2*NZ+1)
-    END DO
+
 
     DO K = 1, NZ
         IF (K .EQ. 1) THEN
+            PRINT *, 'XFL=', XFL(K)
+            PRINT *, 'MUT=', MUT(K)
+            REY0 = ABS(VCOOL(K)*DCOOl(K)) * (1.0 - XFL(K)) * HD / MUT(K)
+            REY  = ABS(VCOOL(K+1)*DCOOl(K+1)) * (1.0 - XFL(K+1)) * HD / MUT(K+1)
 
-            RET0 = ABS(VCOOL(K)*DCOOl(K)) * (1.0 - XFL(K)) * HD / MUT(K)
-            RET  = ABS(VCOOL(K+1)*DCOOl(K+1)) * (1.0 - XFL(K+1)) * HD / MUT(K+1)
-
-            CALL THMFRI(RET, FRIC, HD)
-            CALL THMFRI(RET0, FRIC0, HD)
+            CALL THMFRI(REY, FRIC, HD)
+            CALL THMFRI(REY0, FRIC0, HD)
 
 
 
@@ -113,11 +106,11 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             A(2*NZ, 2*NZ) = 1.0
         
         ELSE 
-            RET = ABS(VCOOL(K+1)*DCOOL(K+1)) * (1.0 - XFL(K+1)) * HD / MUT(K+1)
-            RET0 = ABS(VCOOL(K)*DCOOL(K)) * (1.0 - XFL(K)) * HD / MUT(K)
+            REY = ABS(VCOOL(K+1)*DCOOL(K+1)) * (1.0 - XFL(K+1)) * HD / MUT(K+1)
+            REY0 = ABS(VCOOL(K)*DCOOL(K)) * (1.0 - XFL(K)) * HD / MUT(K)
 
-            CALL THMFRI(RET, FRIC, HD)
-            CALL THMFRI(RET0, FRIC0,HD)
+            CALL THMFRI(REY, FRIC, HD)
+            CALL THMFRI(REY0, FRIC0,HD)
 
             !FRIC = 0.002
             !FRIC0 = 0.002
@@ -137,19 +130,6 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             A(K,K+1) = 0.0
             A(K, 2*NZ+1) = 0.0
 
-            PRINT *, "K", K
-            PRINT *, "(DCOOL(K+1)- DCOOL(K)) * g", (DCOOL(K+1)- DCOOL(K)) * g
-            PRINT *, "A(K+NZ,K)", (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
-            PRINT *, "A(K+NZ,K+1)", (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
-            PRINT *, "DCOOL(K+1)", DCOOL(K+1)
-            PRINT *, "DCOOL(K)", DCOOL(K)
-            PRINT *, "VCOOL(K+1)", VCOOL(K+1)
-            PRINT *, "VCOOL(K)", VCOOL(K)
-            PRINT *, "TPMULT", TPMULT
-            PRINT *, "TPMULT0", TPMULT0
-            PRINT *, "FRIC", FRIC
-            PRINT *, "FRIC0", FRIC0
-
             A(K+NZ,K) = - (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
             ! Mult par HZ(K) et chg signe (base + et + mtn: + -)
             A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
@@ -162,19 +142,9 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
         ENDIF
     END DO
 
-    PRINT *, "Matrice A avant ALSBD:"
-    DO I = 1, 2*NZ
-        PRINT *, (A(I,J), J=1,2*NZ+1)
-    END DO
 
   ! Appel de ALSBD
     call ALSBD(2*NZ, 1, A, IER, 2*NZ)
-
-    ! Affichage de la solution X
-    print *, "Solution du système :"
-    do I = 1, 2*NZ
-        print *, A(I, 2*NZ+1)  ! Les solutions sont dans la dernière colonne
-    end do
 
         ! Vérification d'erreur
     if (IER /= 0) then
@@ -187,19 +157,6 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
         PCOOL(K) = A(K+NZ, 2*NZ+1)
     END DO
 
-    PRINT *, 'INSIDE THMPV'
-    PRINT *, 'VCOOL', VCOOL
-    PRINT *, 'DCOOL', DCOOL
-    PRINT *, 'FRIC', FRIC
-    PRINT *, 'TPMULT', TPMULT
-    PRINT *, 'HD', HD
-    PRINT *, 'HZ', HZ
-    PRINT *, 'g', g
-
-    DO K=1, NZ
-        PRINT *, 'K', K
-        PRINT *, 'a', ((DCOOL(K)*VCOOL(K)**2)*((TPMULT*FRIC*HZ(K))/(HD)) + (DCOOL(K)-DCOOL(K+1))*g/2)
-    END DO
 
     RETURN
     END

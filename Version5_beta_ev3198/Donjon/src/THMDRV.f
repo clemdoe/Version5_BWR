@@ -98,7 +98,7 @@
      > HD,PCH,RAD(NDTOT-1,NZ),ERMAXT,SPEED,TINLET,PINLET,FRACPU,
      > KCONDF(NCONDF+3),KCONDC(NCONDC+1),KHGAP,KHCONV,WTEFF,FRO(NFD-1),
      > POW(NZ),TCOMB(NZ),DCOOL(NZ),TCOOL(NZ),TSURF(NZ),HCOOL(NZ),
-     > PCOOL(NZ)
+     > PCOOL(NZ), MUT(NZ)
       CHARACTER UCONDF*12,UCONDC*12
 *----
 *  LOCAL VARIABLES
@@ -154,57 +154,76 @@
       ENDIF
       MFLOW=SPEED*RHOIN
       HMSUP=HINLET
+
 *----
 *  INITIALIZE VALUES OF STEAM QUALITIES, VOID FRACTION AND DENSITY
+*  PRESSURE, VELOCITY AND TEMPERATURE OF THE COOLANT ALONG THE CHANNEL.
 *---
       DO K=1,NZ
          EPS(K)=0.0
          XFL(K)=0.0
          SLIP(K)=1.0
          KWA(K)=0
-      ENDDO
 
-      DO K=1,NZ
          PCOOL(K)=PINLET/2
          VCOOL(K)=MFLOW/RHOIN/2
          DCOOL(K)=RHOIN
          DLCOOL(K)=RHOIN
+         TCOOL(K)=TINLET
+
+         !INITIALIZE MUT
+
+         IF(POW(K).EQ.0.0) CYCLE
+         IF(IFLUID.EQ.0) THEN
+           CALL THMSAT(PCOOL(K),TSAT)
+         ELSE IF(IFLUID.EQ.1) THEN
+           CALL THMHST(PCOOL(K),TSAT)
+         ENDIF
+         TB=TSAT-0.1
+         IF(TCOOL(K).LT.TB) THEN
+           IF(IFLUID.EQ.0) THEN
+            CALL THMPT(PCOOL(K),TCOOL(K),R11,H11,K11,MUT(K),C11)
+           ELSE IF(IFLUID.EQ.1) THEN
+            CALL THMHPT(PCOOL(K),TCOOL(K),R11,H11,K11,MUT(K),C11)
+           ELSE IF(IFLUID.EQ.2) THEN
+            CALL THMSPT(STP,TCOOL(K),R11,H11,K11,MUT(K),C11,IMPX)
+           ENDIF
+         ELSE
+           IF(IFLUID.EQ.0) THEN
+            CALL THMPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
+           ELSE IF(IFLUID.EQ.1) THEN
+            CALL THMHPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
+           ELSE IF(IFLUID.EQ.2) THEN
+            CALL THMSPT(STP,TB,R11,H11,K11,MUT(K),C11,IMPX)
+           ENDIF
+         ENDIF
+
       ENDDO
+
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
 *----
-      PRINT *, 'SPEED:', SPEED
-      PRINT *, '830*SPEED:', 830*SPEED
-      PRINT *, 'PCOOL:', PCOOL
-      PRINT *, 'VCOOL:', VCOOL
-      PRINT *, 'DCOOL:', DCOOL
 
       ERRV = 1.0
       ERRP = 1.0
       I=0
 
    10 CONTINUE
+      PRINT *, 'I:', I
+      PRINT *, 'ERRV:', ERRV
+      PRINT *, 'ERRP:', ERRP
 
-      IF ((I .GT. 100) .OR. ((ERRP < 1E-2) .AND. (ERRV < 1E-2 
-     >))) GOTO 20
+      IF (I .GT. 100) GOTO 20
+      IF ((ERRP < 1E-1) .AND. (ERRV < 1E-1)) GOTO 20
 
       I = I + 1
       PRINT *, 'Valeur de I :', I
 
          PTEMP = PCOOL
          VTEMP = VCOOL
-         PRINT *, 'PTEMP avant PV:', PTEMP
-         PRINT *, 'VTEMP avant PV:', VTEMP
-         PRINT *, 'PCOOL avant PV:', PCOOL
-         PRINT *, 'VCOOL avant PV:', VCOOL
-         PRINT *, 'DCOOL avant PV:', DCOOL
          CALL THMPV(MFLXT, SPEED, PINLET, VCOOL, DCOOL, 
      >              DCOOL0, PCOOL, ACOOL, MUT, XFL, HD, DV, NZ,
      >              TCOOL, HZ)
-         PRINT *, 'PTEMP après PV:', PTEMP
-          PRINT *, 'VTEMP après PV:', VTEMP
-          PRINT *, 'PCOOL après PV:', PCOOL
-          PRINT *, 'VCOOL après PV:', VCOOL
 
       PRINT *, 'Boucle while pressure velocity terminée'
 
@@ -253,7 +272,8 @@
         ENDDO
         HMSUP=HMSUP+DELTH1
 *----
-*  COMPUTE THE VALUE OF THE DENSITY, THE TEMPERATURE IN THE COOLANT
+*  COMPUTE THE VALUE OF THE DENSITY, THE VISCOSITY,
+*  THE TEMPERATURE IN THE COOLANT
 *  AND THE CLAD-COOLANT HEAT TRANSFER COEFFICIENT
 *----
         IF(K.GT.1) THEN
@@ -272,12 +292,37 @@
      >    EPS(K),SLIP(K),HZ(K),TCALO,RHO,RHOL,TRE11(NDTOT),
      >    KWA(K))
         ENDIF
-
-        !DCOOL(K)=RHOIN
+        PRINT *, 'RHOIN AVANT LE UNCLASSIF 1:', RHOIN
+        DCOOL(K)=RHOIN
         !DCOOL(K) = 830 - 65 * K * HZ(K)
-        DCOOL(K) = 1.0/((((1.0/700.0)-(1.0/830.0)) * K * 
-     >HZ(K))/2.0 + (1.0/830.0))
-        PRINT *, 'K * HZ(K):', K * HZ(K)
+        !DCOOL(K) = 1.0/((((1.0/700.0)-(1.0/830.0)) * K * 
+        !>HZ(K))/2.0 + (1.0/830.0))
+         IF(POW(K).EQ.0.0) CYCLE
+         IF(IFLUID.EQ.0) THEN
+            CALL THMSAT(PCOOL(K),TSAT)
+         ELSE IF(IFLUID.EQ.1) THEN
+            CALL THMHST(PCOOL(K),TSAT)
+         ENDIF
+         TB=TSAT-0.1
+         IF(TCOOL(K).LT.TB) THEN
+            IF(IFLUID.EQ.0) THEN
+            CALL THMPT(PCOOL(K),TCOOL(K),R11,H11,K11,MUT(K),C11)
+            ELSE IF(IFLUID.EQ.1) THEN
+            CALL THMHPT(PCOOL(K),TCOOL(K),R11,H11,K11,MUT(K),C11)
+            ELSE IF(IFLUID.EQ.2) THEN
+            CALL THMSPT(SNAME,SCOMP,TCOOL(K),R11,H11,K11,MUT(K),C11
+     >,IMPX)
+            ENDIF
+         ELSE
+            IF(IFLUID.EQ.0) THEN
+            CALL THMPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
+            ELSE IF(IFLUID.EQ.1) THEN
+            CALL THMHPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
+            ELSE IF(IFLUID.EQ.2) THEN
+            CALL THMSPT(SNAME,SCOMP,TB,R11,H11,K11,MUT(K),C11,IMPX)
+            ENDIF
+         ENDIF
+
 
 *CGT
 *----
@@ -302,12 +347,12 @@
         TSURF(K)=TRE11(NFD)
         TCLAD(K)=TRE11(NDTOT)
         TCOOL(K)=TCALO
-        !DCOOL(K)=RHOIN
+        DCOOL(K)=RHOIN
+        
+        PRINT *, 'RHOIN AVANT LE UNCLASSIF:', RHOIN
         !DCOOL(K) = 830 - 65 * K * HZ(K)
-        DCOOL(K) = 1.0/((((1.0/700.0)-(1.0/830.0)) * K * 
-     >HZ(K))/2.0 + (1.0/830.0))
-        PRINT *, 'DCOOL:', DCOOL(K)
-        PRINT *, 'K * HZ(K):', K * HZ(K)
+        !DCOOL(K) = 1.0/((((1.0/700.0)-(1.0/830.0)) * K * 
+        !>HZ(K))/2.0 + (1.0/830.0))
         DLCOOL(K)=RHOL
         HCOOL(K)=HMSUP
         !PCOOL(K)=PINLET
@@ -337,21 +382,17 @@
 
       GO TO 10
 
-      IF (I == 10000) THEN
+   20 CONTINUE
+
+      IF (I == 10) THEN
         PRINT *, 'Nombre maximum d''itérations atteint'
       ENDIF
       PRINT *, 'Boucle terminée'
 
-   20 CONTINUE
-
-
-      PRINT *, 'PCOOL:', PCOOL
-      PRINT *, 'VCOOL:', VCOOL
-      PRINT *, 'DCOOL:', DCOOL
-      PRINT *, 'TCOOL:', TCOOL
-      PRINT *, 'ACOOL' , ACOOL
-      PRINT *, 'HZ:', HZ
-      PRINT *, 'HD:', HD
+      PRINT *, 'PCOOL FINAL:', PCOOL
+      PRINT *, 'VCOOL FINAL:', VCOOL
+      PRINT *, 'DCOOL FINAL:', DCOOL
+      PRINT *, 'TCOOL FINAL:', TCOOL
       
 *----
 *  PRINT THE OUTLET THERMOHYDRAULICAL PARAMETERS
