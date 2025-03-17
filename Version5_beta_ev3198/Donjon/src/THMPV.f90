@@ -48,7 +48,6 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
 !----
 
     REAL g
-    !REAL A(2*NZ, 2*NZ+1)
     REAL(kind=8), ALLOCATABLE, DIMENSION(:,:) :: A
     
     INTEGER K, I, J, IER
@@ -62,14 +61,11 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
 
     DO K = 1, NZ
         IF (K .EQ. 1) THEN
-            PRINT *, 'XFL=', XFL(K)
-            PRINT *, 'MUT=', MUT(K)
             REY0 = ABS(VCOOL(K)*DCOOl(K)) * (1.0 - XFL(K)) * HD / MUT(K)
             REY  = ABS(VCOOL(K+1)*DCOOl(K+1)) * (1.0 - XFL(K+1)) * HD / MUT(K+1)
 
             CALL THMFRI(REY, FRIC, HD)
             CALL THMFRI(REY0, FRIC0, HD)
-
 
 
             IF (XFL(K) .GT. 0.0) THEN
@@ -82,16 +78,13 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
                 TPMULT0 = 1.0
             ENDIF
 
-            !FRIC = 0.002
-            !FRIC0 = 0.002
 
             A(1,1) = 1.0
             A(K+NZ,K) = - (VCOOL(K)*DCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
-            ! Mult par HZ(K) et chg signe (base + et + mtn: + -)
             A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
 
             A(1, 2*NZ+1) = SPEED
-            A(K+NZ, 2*NZ+1) = 0! - ((DCOOL(K+1) - DCOOL(K)) * g) /2
+            A(K+NZ, 2*NZ+1) =  - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2
 
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0
@@ -112,9 +105,6 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             CALL THMFRI(REY, FRIC, HD)
             CALL THMFRI(REY0, FRIC0,HD)
 
-            !FRIC = 0.002
-            !FRIC0 = 0.002
-
             IF (XFL(K) .GT. 0.0) THEN
                 CALL THMPLO(PCOOL(K+1), XFL(K+1), PHIL0)
                 TPMULT = PHIL0
@@ -131,10 +121,10 @@ SUBROUTINE THMPV(MFLXT, SPEED, POULET, VCOOL, DCOOL, &
             A(K, 2*NZ+1) = 0.0
 
             A(K+NZ,K) = - (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
-            ! Mult par HZ(K) et chg signe (base + et + mtn: + -)
+
             A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
 
-            A(K+NZ, 2*NZ+1) = 0!- ((DCOOL(K+1) - DCOOL(K)) * g) /2
+            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2
 
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0

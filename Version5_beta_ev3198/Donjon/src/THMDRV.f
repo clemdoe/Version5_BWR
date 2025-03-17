@@ -112,8 +112,11 @@
       REAL XX2(MAXNPO),XX3(MAXNPO),ZF(2)
       DATA XS/-0.861136,-0.339981,0.339981,0.861136/
 
+      REAL TBUL(NZ)
+
       INTEGER I
       REAL ERRV, ERRP
+      LOGICAL PRESSURE
 *----
 *  ALLOCATABLE ARRAYS
 *----
@@ -127,6 +130,11 @@
 *----
       ALLOCATE(VCOOL(NZ),TEMPT(NDTOT,NZ),TCENT(NZ),DLCOOL(NZ))
       ALLOCATE(PTEMP(NZ), VTEMP(NZ))
+
+
+      PRESSURE = .TRUE.
+
+
 *----
 *  COMPUTE THE INLET FLOW ENTHALPY AND VELOCITY
 *----
@@ -165,8 +173,8 @@
          SLIP(K)=1.0
          KWA(K)=0
 
-         PCOOL(K)=PINLET/2
-         VCOOL(K)=MFLOW/RHOIN/2
+         PCOOL(K)=PINLET
+         VCOOL(K)=MFLOW/RHOIN
          DCOOL(K)=RHOIN
          DLCOOL(K)=RHOIN
          TCOOL(K)=TINLET
@@ -182,9 +190,9 @@
          TB=TSAT-0.1
          IF(TCOOL(K).LT.TB) THEN
            IF(IFLUID.EQ.0) THEN
-            CALL THMPT(PCOOL(K),TCOOL(K),R11,H11,K11,MUT(K),C11)
+            CALL THMPT(PCOOL(K),TCOOL(K),RHOIN,H11,K11,MUT(K),C11)
            ELSE IF(IFLUID.EQ.1) THEN
-            CALL THMHPT(PCOOL(K),TCOOL(K),R11,H11,K11,MUT(K),C11)
+            CALL THMHPT(PCOOL(K),TCOOL(K),RHOIN,H11,K11,MUT(K),C11)
            ELSE IF(IFLUID.EQ.2) THEN
             CALL THMSPT(STP,TCOOL(K),R11,H11,K11,MUT(K),C11,IMPX)
            ENDIF
@@ -213,22 +221,53 @@
       PRINT *, 'ERRV:', ERRV
       PRINT *, 'ERRP:', ERRP
 
-      IF (I .GT. 100) GOTO 20
-      IF ((ERRP < 1E-1) .AND. (ERRV < 1E-1)) GOTO 20
+*----
+*  UPDATE HINLET FUNCTION OF INLET PRESSURE AND TEMPERATURE
+*----
 
-      I = I + 1
-      PRINT *, 'Valeur de I :', I
+      !IF(IFLUID.EQ.0) THEN
+      !   CALL THMPT(PCOOL(1),TINLET,DCOOL(1),HINLET,R3,R4,R5)
+      ! ELSE IF(IFLUID.EQ.1) THEN
+      !   CALL THMHPT(PCOOL(1),TINLET,DCOOL(1),HINLET,R3,R4,R5)
+      !! ELSE IF(IFLUID.EQ.2) THEN
+      !   CALL THMSPT(SNAME,SCOMP,TINLET,DCOOL(1),HINLET,R3,R4,R5,IMPX)
+      ! ENDIF
+       HMSUP=HINLET
 
-         PTEMP = PCOOL
-         VTEMP = VCOOL
-         CALL THMPV(MFLXT, SPEED, PINLET, VCOOL, DCOOL, 
+
+*----
+*  WHILE LOOP FOR PRESSURE AND VELOCITY CONVERGENCE
+*----
+
+      IF (PRESSURE .eqv. .FALSE.) GOTO 30
+
+       PRINT *, 'ITERATION:', I
+       PRINT *, 'HINLET:', HINLET
+
+        IF (I .GT. 100) GOTO 20
+        IF ((ERRP < 1E-3) .AND. (ERRV < 1E-3)) GOTO 20
+
+          I = I + 1
+
+          PTEMP = PCOOL
+          VTEMP = VCOOL
+          CALL THMPV(MFLXT, SPEED, PINLET, VCOOL, DCOOL, 
      >              DCOOL0, PCOOL, ACOOL, MUT, XFL, HD, DV, NZ,
      >              TCOOL, HZ)
 
-      PRINT *, 'Boucle while pressure velocity terminée'
+    
+   30 CONTINUE
 
       K0=0 ! onset of nuclear boiling point
       DO K=1,NZ
+
+        IF(POW(K).EQ.0.0) CYCLE
+        IF(IFLUID.EQ.0) THEN
+          CALL THMSAT(PCOOL(K),TSAT)
+        ELSE IF(IFLUID.EQ.1) THEN
+          CALL THMHST(PCOOL(K),TSAT)
+        ENDIF
+        TBUL(K)=TSAT
 *----
 *  COMPUTE THE LINEAR POWER, THE VOLUMIC POWER AND THE THERMAL EXCHANGE
 *  COEFFICIENT OF THE GAP
@@ -265,6 +304,7 @@
 *  COMPUTE FOUR VALUES OF ENTHALPY IN J/KG TO BE USED IN GAUSSIAN
 *  INTEGRATION. DELTH1 IS THE ENTHALPY INCREASE IN EACH AXIAL MESH.
 *----
+        !MFLOW = VCOOL(K)*DCOOL(K)
         DELTH1=(PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)/MFLOW
         DO I1=1,4
           POINT=(1.0+XS(I1))/2.0
@@ -282,46 +322,18 @@
           SLIP(K)=SLIP(K-1)
         ENDIF
 *CGT
+
         IF ((IFLUID.EQ.0).OR.(IFLUID.EQ.1)) THEN
           CALL THMH2O(0,IX,IY,K,K0,PCOOL(K),MFLOW,HMSUP,ENT,HD,IFLUID,
      >    IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),EPS(K),
-     >    SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,RHOL,TRE11(NDTOT),KWA(K))
+     >    SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,
+     >DLCOOL(K),TRE11(NDTOT),KWA(K))
         ELSEIF (IFLUID.EQ.2) THEN
           CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,SNAME,
      >    SCOMP,IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),
-     >    EPS(K),SLIP(K),HZ(K),TCALO,RHO,RHOL,TRE11(NDTOT),
-     >    KWA(K))
+     >    EPS(K),SLIP(K),HZ(K),TCALO,RHO,
+     >DLCOOL(K),TRE11(NDTOT),KWA(K))
         ENDIF
-        PRINT *, 'RHOIN AVANT LE UNCLASSIF 1:', RHOIN
-        DCOOL(K)=RHOIN
-        !DCOOL(K) = 830 - 65 * K * HZ(K)
-        !DCOOL(K) = 1.0/((((1.0/700.0)-(1.0/830.0)) * K * 
-        !>HZ(K))/2.0 + (1.0/830.0))
-         IF(POW(K).EQ.0.0) CYCLE
-         IF(IFLUID.EQ.0) THEN
-            CALL THMSAT(PCOOL(K),TSAT)
-         ELSE IF(IFLUID.EQ.1) THEN
-            CALL THMHST(PCOOL(K),TSAT)
-         ENDIF
-         TB=TSAT-0.1
-         IF(TCOOL(K).LT.TB) THEN
-            IF(IFLUID.EQ.0) THEN
-            CALL THMPT(PCOOL(K),TCOOL(K),R11,H11,K11,MUT(K),C11)
-            ELSE IF(IFLUID.EQ.1) THEN
-            CALL THMHPT(PCOOL(K),TCOOL(K),R11,H11,K11,MUT(K),C11)
-            ELSE IF(IFLUID.EQ.2) THEN
-            CALL THMSPT(SNAME,SCOMP,TCOOL(K),R11,H11,K11,MUT(K),C11
-     >,IMPX)
-            ENDIF
-         ELSE
-            IF(IFLUID.EQ.0) THEN
-            CALL THMPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
-            ELSE IF(IFLUID.EQ.1) THEN
-            CALL THMHPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
-            ELSE IF(IFLUID.EQ.2) THEN
-            CALL THMSPT(SNAME,SCOMP,TB,R11,H11,K11,MUT(K),C11,IMPX)
-            ENDIF
-         ENDIF
 
 
 *CGT
@@ -342,17 +354,13 @@
 *  ROWLANDS FORMULA TO COMPUTE THE EFFECTIVE FUEL TEMPERATURE, OTHERWISE
 *  USE USER-SPECIFIED WEIGHTING FACTOR.
 *----
+        
         TCOMB(K)=(1.0-WTEFF)*TC1+WTEFF*TRE11(NFD)
         TCENT(K)=TC1
         TSURF(K)=TRE11(NFD)
         TCLAD(K)=TRE11(NDTOT)
         TCOOL(K)=TCALO
-        DCOOL(K)=RHOIN
-        
-        PRINT *, 'RHOIN AVANT LE UNCLASSIF:', RHOIN
-        !DCOOL(K) = 830 - 65 * K * HZ(K)
-        !DCOOL(K) = 1.0/((((1.0/700.0)-(1.0/830.0)) * K * 
-        !>HZ(K))/2.0 + (1.0/830.0))
+        DCOOL(K)=RHO
         DLCOOL(K)=RHOL
         HCOOL(K)=HMSUP
         !PCOOL(K)=PINLET
@@ -364,7 +372,10 @@
         DO K2=1,NDTOT
           TEMPT(K2,K)=TRE11(K2)
         ENDDO
-        !VCOOL(K)=MFLOW/DCOOL(K)
+        IF (PRESSURE .eqv. .FALSE.) THEN
+          PCOOL(K) = PINLET
+          VCOOL(K)=MFLOW/DCOOL(K)
+        ENDIF
       ENDDO
 
       ERRV = 0
@@ -377,8 +388,16 @@
       ERRV = ERRV/NZ
       ERRP = ERRP/NZ
 
+      PRINT *, 'FIN ITERATION', I
       PRINT *, 'ERRV:', ERRV
       PRINT *, 'ERRP:', ERRP
+      PRINT *, 'PCOOL:', PCOOL
+      PRINT *, 'VCOOL:', VCOOL
+      PRINT *, 'DCOOL:', DCOOL
+      PRINT *, 'TCOOL:', TCOOL
+      PRINT *, 'EPS:', EPS
+      PRINT *, 'XFL:', XFL
+      PRINT *, 'DCOOLG:', DLCOOL
 
       GO TO 10
 
@@ -393,6 +412,9 @@
       PRINT *, 'VCOOL FINAL:', VCOOL
       PRINT *, 'DCOOL FINAL:', DCOOL
       PRINT *, 'TCOOL FINAL:', TCOOL
+      PRINT *, 'EPS FINAL:', EPS
+      PRINT *, 'XFL FINAL:', XFL
+      PRINT *, 'TBUL:', TBUL
       
 *----
 *  PRINT THE OUTLET THERMOHYDRAULICAL PARAMETERS
