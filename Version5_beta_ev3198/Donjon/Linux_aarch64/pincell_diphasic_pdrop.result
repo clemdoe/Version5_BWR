@@ -1,0 +1,1475 @@
+* CLE-2000 VERS 3.0 * R.ROY, EPM COPYRIGHT 1999 *                                                                          LINE
+***********************************************************                                                                0001
+* Input file :  pincell_mphy_thm.x2m                      *                                                                0002
+*                                                         *                                                                0003
+* Test of a PWR single pincell                            *                                                                0004
+*                                                         *                                                                0005
+* The aim is to test the THM module of DONJON             *                                                                0006
+***********************************************************                                                                0007
+LINKED_LIST Geom Track Flux Cpo Matex Lib MicroF MacroF Macro2 Fmap                                                        0008
+System Power Burnup Thm DONNEES ;                                                                                          0009
+MODULE      GEO: RESINI: TRIVAT: TRIVAA: GREP: FIND0: NCR: FLUD: FLPOW:                                                    0010
+MACINI: USPLIT: TINST: UTL: DELETE: ABORT: THM: END: ;                                                                     0011
+PROCEDURE   assertS ;                                                                                                      0012
+SEQ_ASCII   _ACompo ;                                                                                                      0013
+INTEGER     maxstep := 67 ;                                                                                                0014
+REAL        Fuelpwr := 30.0796 ; ! W/g ou kW/kg ou MW/t                                                                    0015
+REAL        Mass := 6.464E-3 ; ! kg                                                                                        0016
+*----                                                                                                                      0017
+*  Calculation options                                                                                                     0018
+*----                                                                                                                      0019
+STRING Dir := "EDI2B" ;                                                                                                    0020
+REAL   Tfuel := 900.0 ; (*fuel temperature (K)*)                                                                           0021
+REAL   Tcool := 500.0 ; (*coolant temperature (K)*)                                                                        0022
+REAL   Dfuel := 9.7413951 ; (*fuel density (g/cc)*)                                                                        0023
+REAL   dens_mod_0 := 0.65 ;                                                                                                0024
+REAL   powi := 0.16 ;                                                                                                      0025
+ECHO "total reactor power=" powi "MW" ;                                                                                    0026
+*----                                                                                                                      0027
+*  Recover the Multicompo                                                                                                  0028
+*----                                                                                                                      0029
+Cpo := _ACompo ;                                                                                                           0030
+UTL: Cpo :: DIR ;                                                                                                          0031
+INTEGER MaxR := 10000 ;                                                                                                    0032
+INTEGER Iter := 1 ;                                                                                                        0033
+REAL keff11 keff12 keff1n ;                                                                                                0034
+REAL Y1 Y2 ROOT YNEW ;                                                                                                     0035
+LOGICAL CONV ;                                                                                                             0036
+REAL maxh := 200.0 ;                                                                                                       0037
+REAL z1 := maxh 10.0 / ;                                                                                                   0038
+REAL z2 := maxh 10.0 / z1 + ;                                                                                              0039
+REAL z3 := maxh 10.0 / z2 + ;                                                                                              0040
+REAL z4 := maxh 10.0 / z3 + ;                                                                                              0041
+REAL z5 := maxh 10.0 / z4 + ;                                                                                              0042
+REAL z6 := maxh 10.0 / z5 + ;                                                                                              0043
+REAL z7 := maxh 10.0 / z6 + ;                                                                                              0044
+REAL z8 := maxh 10.0 / z7 + ;                                                                                              0045
+REAL z9 := maxh 10.0 / z8 + ;                                                                                              0046
+REAL z10 := maxh 10.0 / z9 + ;                                                                                             0047
+REAL Cote      := 1.404  ;                                                                                                 0048
+Geom := GEO: :: CAR3D 1 1 10                                                                                               0049
+X- REFL X+ REFL    Y- REFL Y+ REFL    Z- REFL Z+ REFL                                                                      0050
+MESHX 0.0 <<Cote>>                                                                                                         0051
+MESHY 0.0 <<Cote>>                                                                                                         0052
+MESHZ 0.0 <<z1>> <<z2>> <<z3>> <<z4>> <<z5>> <<z6>> <<z7>> <<z8>>                                                          0053
+<<z9>> <<z10>>                                                                                                             0054
+MIX                                                                                                                        0055
+PLANE 1                                                                                                                    0056
+1                                                                                                                          0057
+PLANE 2  SAME 1                                                                                                            0058
+PLANE 3  SAME 1                                                                                                            0059
+PLANE 4  SAME 1                                                                                                            0060
+PLANE 5  SAME 1                                                                                                            0061
+PLANE 6  SAME 1                                                                                                            0062
+PLANE 7  SAME 1                                                                                                            0063
+PLANE 8  SAME 1                                                                                                            0064
+PLANE 9  SAME 1                                                                                                            0065
+PLANE 10 SAME 1                                                                                                            0066
+;                                                                                                                          0067
+Geom Matex := USPLIT: Geom :: NGRP 2 MAXR <<MaxR>>                                                                         0068
+NFUEL 1  FMIX  1                                                                                                           0069
+;                                                                                                                          0070
+Track := TRIVAT: Geom ::                                                                                                   0071
+EDIT 1 MAXR <<MaxR>> MCFD 1 ;                                                                                              0072
+*--                                                                                                                        0073
+* Fuel map definition                                                                                                      0074
+*--                                                                                                                        0075
+Fmap Matex := RESINI: Matex ::                                                                                             0076
+::: GEO: CAR3D 1 1 10                                                                                                      0077
+EDIT  0                                                                                                                    0078
+X- REFL X+ REFL    Y- REFL Y+ REFL    Z- REFL Z+ REFL                                                                      0079
+MESHX 0.0 <<Cote>>                                                                                                         0080
+MESHY 0.0 <<Cote>>                                                                                                         0081
+MESHZ 0.0 <<z1>> <<z2>> <<z3>> <<z4>> <<z5>> <<z6>> <<z7>> <<z8>>                                                          0082
+<<z9>> <<z10>>                                                                                                             0083
+MIX                                                                                                                        0084
+PLANE 1                                                                                                                    0085
+1                                                                                                                          0086
+PLANE 2  SAME 1                                                                                                            0087
+PLANE 3  SAME 1                                                                                                            0088
+PLANE 4  SAME 1                                                                                                            0089
+PLANE 5  SAME 1                                                                                                            0090
+PLANE 6  SAME 1                                                                                                            0091
+PLANE 7  SAME 1                                                                                                            0092
+PLANE 8  SAME 1                                                                                                            0093
+PLANE 9  SAME 1                                                                                                            0094
+PLANE 10 SAME 1                                                                                                            0095
+;                                                                                                                          0096
+!                                                                                                                          0097
+NXNAME '01' NYNAME  'A'                                                                                                    0098
+NCOMB 1                                                                                                                    0099
+B-ZONE 1                                                                                                                   0100
+ADD-PARAM PNAME 'T-FUEL' PARKEY 'TFA' GLOBAL                                                                               0101
+ADD-PARAM PNAME 'T-COOL' PARKEY 'TCA' GLOBAL                                                                               0102
+ADD-PARAM PNAME 'D-FUEL' PARKEY 'DFA' GLOBAL                                                                               0103
+ADD-PARAM PNAME 'D-COOL' PARKEY 'DCA' GLOBAL                                                                               0104
+BTYPE INST-BURN                                                                                                            0105
+INST-BVAL CHAN 0.0                                                                                                         0106
+REACTOR-POW <<powi>> AXIAL-PFORM 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0                                                   0107
+SET-PARAM 'T-FUEL' <<Tfuel>>                                                                                               0108
+SET-PARAM 'T-COOL' <<Tcool>>                                                                                               0109
+SET-PARAM 'D-FUEL' <<Dfuel>>                                                                                               0110
+SET-PARAM 'D-COOL' <<dens_mod_0>>                                                                                          0111
+FUEL WEIGHT <<Mass>>                                                                                                       0112
+;                                                                                                                          0113
+UTL: Fmap :: STEP UP PARAM STEP AT 4 DIR IMPR P-NAME * ;                                                                   0114
+*--                                                                                                                        0115
+* THM single-stage calculation                                                                                             0116
+*--                                                                                                                        0117
+Thm Fmap := THM: Fmap ::                                                                                                   0118
+EDIT 100                                                                                                                   0119
+FLUID H2O                                                                                                                  0120
+FPUISS 1.0                                                                                                                 0121
+INLET 10.8E6 (*Pa*) 550.0 (*K*)                                                                                            0122
+INLET-Q 2.1268E-5 (*m2*) 0.148880 (*inlet mass flow rate kg/s*)                                                            0123
+ASSMB 1 0                                                                                                                  0124
+RADIUS 5.6E-3 6.14E-3 6.52E-3 7.02E-3 (* m *)                                                                              0125
+RODMESH 8 11                                                                                                               0126
+HGAP 10000.0                                                                                                               0127
+CONDC 0 10.0 KELVIN                                                                                                        0128
+CONDF 0 5.0 KELVIN                                                                                                         0129
+BOWR                                                                                                                       0130
+CPRES 0                                                                                                                    0131
+;                                                                                                                          0132
+*--                                                                                                                        0133
+* Dump THM object                                                                                                          0134
+*--                                                                                                                        0135
+UTL: Thm :: DIR DUMP ;                                                                                                     0136
+*--                                                                                                                        0137
+* Cross-section database interpolation                                                                                     0138
+*--                                                                                                                        0139
+MicroF := NCR: Cpo Fmap ::                                                                                                 0140
+EDIT 2                                                                                                                     0141
+MICRO LINEAR                                                                                                               0142
+TABLE Cpo <<Dir>> 'burnup'                                                                                                 0143
+MIX 1 INST-BURN                                                                                                            0144
+SET LINEAR 'burnup' MAP                                                                                                    0145
+SET CUBIC 'DCA' <<dens_mod_0>>                                                                                             0146
+SET CUBIC 'DCAH' <<dens_mod_0>>                                                                                            0147
+ADD 'DCA' <<dens_mod_0>> MAP                                                                                               0148
+REF 'burnup' SAMEASREF                                                                                                     0149
+ENDREF                                                                                                                     0150
+ENDMIX                                                                                                                     0151
+;                                                                                                                          0152
+MacroF := MicroF :: STEP UP 'MACROLIB' ;                                                                                   0153
+Macro2 Matex := MACINI: Matex MacroF :: FUEL ;                                                                             0154
+*--                                                                                                                        0155
+* Steady-state diffusion calculation                                                                                       0156
+*--                                                                                                                        0157
+System := TRIVAA: Macro2 Track ;                                                                                           0158
+Flux := FLUD: System Track :: EDIT 1 ADI 4 ACCE 5 3 ;                                                                      0159
+System MacroF Macro2 := DELETE: System MacroF Macro2 ;                                                                     0160
+GREP: Flux :: GETVAL 'K-EFFECTIVE' 1 >>keff11<< ;                                                                          0161
+ECHO "+++ Burnup= 0.0 Keff=" keff11 ;                                                                                      0162
+*assertS Flux :: 'K-EFFECTIVE' 1 1.354165 ;                                                                                0163
+ECHO "test pincell_mphy_thm.x2m completed" ;                                                                               0164
+END: ;                                                                                                                     0165
+QUIT .                                                                                                                  IMPLICIT
+ 
+>|total reactor power=  1.600000e-01 MW                                                                                   |>0026
+ @@@@@@@     @@@@@   @@     @@   @@@@@@   @@@@@   @@     @@
+ @@@@@@@@   @@@@@@@  @@@    @@       @@  @@@@@@@  @@@    @@
+ @@     @@ @@     @@ @@@@   @@       @@ @@     @@ @@@@   @@
+ @@     @@ @@     @@ @@ @@  @@       @@ @@     @@ @@ @@  @@
+ @@     @@ @@     @@ @@  @@ @@       @@ @@     @@ @@  @@ @@
+ @@     @@ @@     @@ @@   @@@@       @@ @@     @@ @@   @@@@
+ @@@@@@@@   @@@@@@@  @@    @@@ @@    @@  @@@@@@@  @@    @@@
+ @@@@@@@     @@@@@   @@     @@  @@@@@@    @@@@@   @@     @@
+
+           VERSION donjon 5  Version 5.0.10 ($Revision: 3198 $)                  $Date: 2024-03-06 07:29:43 -0500 (Wed, 06 Mar 2024) $           
+           GROUPE D'ANALYSE NUCLEAIRE
+           ECOLE POLYTECHNIQUE DE MONTREAL
+
+
+ COPYRIGHT NOTICE FOR THIS VERSION OF donjon:
+ --------------------------------------------
+ Copyright (C) 2007 Ecole Polytechnique de Montreal 
+ This library is free software; you can redistribute it
+ and/or modify it under the terms of the GNU Lesser General
+ Public License as published by the Free Software Foundation;
+ either version 2.1 of the License, or (at your option) any
+ later version 
+
+
+
+->@BEGIN MODULE : EQU:        
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+ DRVEQU: A LCM OBJECT NAMED 'Cpo         ' WAS IMPORTED FROM FILE '_ACompo     '.
+-->>module EQU:        : time spent=        0.899 memory usage= 1.154E+05
+->@END MODULE   : EQU:        
+->@BEGIN MODULE : UTL:        
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'Cpo         ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'SIGNATURE   '         3    CHARACTER       ='L_MULTICOMPO'
+        2  'EDI2B       '        -1    DIRECTORY       
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =         3
+
+
+ DRVUTL: LEAVING WITH ACTIVE DIRECTORY '/           '.
+-->>module UTL:        : time spent=        0.001 memory usage= 0.000E+00
+->@END MODULE   : UTL:        
+->@BEGIN MODULE : GEO:        
+->@DESCRIPTION  : Geometry definition                                                     
+->@CREDITS      : A. Hebert                                                               
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+ CREATION OF A LEVEL  1 GEOMETRY ON THE DIRECTORY NAMED '/           ' OF THE LCM OBJECT 'Geom        ' WITH TYPE CARTESIAN 3-D   .
+->@END MODULE   : GEO:        
+-->>MODULE GEO:        : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> USPLIT:     
+ @FROM CODE    -> DONJON      
+ @DESCRIPTION  -> LINK MATERIAL INDEX AND REACTOR GEOMETRY                                
+ @CREDITS      -> J. KOCLAS, D. SEKKI                                                     
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'Matex       ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'MAT         '        10    INTEGER         
+        2  'INDEX       '        10    INTEGER         
+        3  'FMIX        '         1    INTEGER         
+        4  'FTOT        '         1    INTEGER         
+        5  'MESHX       '         2    REAL            
+        6  'MESHY       '         2    REAL            
+        7  'MESHZ       '        11    REAL            
+        8  'SIGNATURE   '         3    CHARACTER       ='L_MATEX     '
+        9  'STATE-VECTOR'        40    INTEGER         
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        80
+
+ @END MODULE -> USPLIT:     
+-->>MODULE USPLIT:     : TIME SPENT=        0.000 MEMORY USAGE= 4.960E+02
+->@BEGIN MODULE : TRIVAT:     
+->@DESCRIPTION  : 3-D diffusion or SPN finite element tracking                            
+->@CREDITS      : A. Hebert                                                               
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ EXEC: TRIVAT:      BY A. HEBERT
+
+ TRITRK: DEGREE OF FINITE ELEMENT IELEM =  1
+         TYPE OF QUADRATURE ICOL =  2
+         TYPE OF DISCRETIZATION ICHX =  3
+
+
+ 3-D CARTESIAN GEOMETRY.
++                          BASED ON GEOMETRY Geom        .
+
+
+ NUMBER OF MESH INTERVALS ALONG THE X AXIS =    1     AVAILABLE STORAGE MAXX =  10000
+                          ALONG THE Y AXIS =    1     AVAILABLE STORAGE MAXY =  10000
+                          ALONG THE Z AXIS =   10     AVAILABLE STORAGE MAXZ =  10000
+ NUMBER OF DISTINCT MIXTURES =     10
+
+ INFINITE DOMAIN.
+
+
+ TRIDFC: MESH CENTERED FINITE DIFFERENCE OR NODAL COLLOCATION METHOD.
+
+ NUMBER OF ELEMENTS ALONG X AXIS =  1
+                    ALONG Y AXIS =  1
+                    ALONG Z AXIS = 10
+
+ TRITRK: MESH CENTERED FINITE DIFFERENCES.
+
+ TRITRK: ORDER OF LINEAR SYSTEMS =      10
+         NUMBER OF UNKNOWNS PER ENERGY GROUP =      10
+
+ TRICH1: MAXIMUM BANDWIDTH ALONG X AXIS =    1
+                           ALONG Y AXIS =    1
+                           ALONG Z AXIS =    2
+-->>MODULE TRIVAT:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+->@END MODULE   : TRIVAT:     
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> RESINI:     
+ @FROM CODE    -> DONJON      
+ @DESCRIPTION  -> FUEL LATTICE GEOMETRY AND PROPERTIES                                    
+ @CREDITS      -> E. VARIN, D. SEKKI, R. CHAMBON                                          
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+ @END MODULE -> RESINI:     
+-->>MODULE RESINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+->@BEGIN MODULE : UTL:        
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+ DRVUTL: STEP UP TO LEVEL 'PARAM       '.
+
+ DRVUTL: STEP AT COMPONENT     4.
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '            ' OF THE TABLE    'Fmap        ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'P-NAME      '         3    CHARACTER       ='D-COOL      '
+        2  'PARKEY      '         3    CHARACTER       ='DCA         '
+        3  'P-TYPE      '         1    INTEGER         
+        4  'P-VALUE     '         1    REAL            
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '            ' =         8
+
+
+ DRVUTL: CONTENT OF BLOCK 'P-NAME      '     LENGTH =         3     NUMBER OF NON ZERO TERMS =         0
+
+ D-COOL      
+
+
+
+ DRVUTL: LEAVING WITH ACTIVE DIRECTORY '            '.
+-->>module UTL:        : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : UTL:        
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> THM:        
+ @FROM CODE    -> DONJON      
+ @DESCRIPTION  -> SIMPLIFIED THERMAL-HYDRAULICS CALCULATION                               
+ @CREDITS      -> A. HEBERT                                                               
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+
+ THM: CHANNEL-DEPENDENT DATA
+
+
+ CHANNEL       1      |
+ NB-FUEL      1.00    |
+ NB-TUBE      0.00    |
+ PUFR      0.0000E+00 |
+
+ THM: RADIAL POWER FORM FACTORS
+  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00
+
+ THM: RECOVER GLOBAL PARAMETER = T-FUEL      .
+ I:           0
+ ERRV:   1.00000000    
+ ERRP:   1.00000000    
+ ITERATION:           0
+ HINLET:   1218241.25    
+
+ THMDRV: AXIAL SLICE=    1
+
+ THMROD: ITERT=    1 ERROR=  1.1584E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    2
+
+ THMROD: ITERT=    1 ERROR=  1.1650E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    3
+
+ THMROD: ITERT=    1 ERROR=  1.1713E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    4
+
+ THMROD: ITERT=    1 ERROR=  1.1775E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    5
+
+ THMROD: ITERT=    1 ERROR=  1.1833E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    6
+
+ THMROD: ITERT=    1 ERROR=  1.1889E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    7
+
+ THMROD: ITERT=    1 ERROR=  1.1929E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    8
+
+ THMROD: ITERT=    1 ERROR=  1.2062E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    9
+
+ THMROD: ITERT=    1 ERROR=  1.2047E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=   10
+
+ THMROD: ITERT=    1 ERROR=  1.2014E+03 EPS=  1.0000E+00 POS=    1
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ FIN ITERATION           1
+ ERRV:   0.00000000    
+ ERRP:   9.90309194E-03
+ PCOOL:   11013907.0       10990139.0       10966372.0       10942605.0       10918837.0       10895070.0       10871302.0       10847535.0       10823767.0       10800000.0    
+ VCOOL:   9.17452049       9.17452049       9.17452049       9.17452049       9.17452049       9.17452049       9.17452049       9.17452049       9.17452049       9.17452049    
+ DCOOL:   756.958923       743.965393       730.494568       716.497314       701.915100       686.683777       674.587463       607.191528       553.682861       509.828644    
+ TCOOL:   553.503174       560.361023       567.033325       573.501099       579.742065       585.728271       590.117737       590.184814       590.020630       589.856201    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.109534860      0.197298840      0.269178212    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       1.28408065E-02   2.56597847E-02   3.84569354E-02
+ DCOOLG:   756.958923       743.965393       730.494568       716.497314       701.915100       686.683777       674.587463       674.326538       674.721069       675.115479    
+ I:           1
+ ERRV:   0.00000000    
+ ERRP:   9.90309194E-03
+ ITERATION:           1
+ HINLET:   1218241.25    
+
+ THMDRV: AXIAL SLICE=    1
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    2
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    3
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    4
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    5
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    6
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    7
+
+ THMROD: ITERT=    1 ERROR=  8.2384E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  2.4414E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    8
+
+ THMROD: ITERT=    1 ERROR=  8.2385E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    9
+
+ THMROD: ITERT=    1 ERROR=  8.4136E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=   10
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ FIN ITERATION           2
+ ERRV:  0.151155278    
+ ERRP:   5.46152762E-04
+ PCOOL:   11021842.0       10998146.0       10974311.0       10950331.0       10926195.0       10901894.0       10877439.0       10852461.0       10826621.0       10800000.0    
+ VCOOL:   9.17452049       9.33475590       9.50689507       9.69261837       9.89398193       10.1134396       10.2947884       11.4374704       12.5428028       13.6217041    
+ DCOOL:   756.969482       743.977295       730.507019       716.510132       701.928711       686.697632       674.505737       607.138611       553.653564       509.798401    
+ TCOOL:   553.504028       560.361938       567.034607       573.502808       579.743835       585.730286       590.153076       590.218872       590.040344       589.856201    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.109508663      0.197291210      0.269227535    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       1.28461970E-02   2.56686583E-02   3.84666696E-02
+ DCOOLG:   756.969482       743.977295       730.507019       716.510132       701.928711       686.697632       674.505737       674.244751       674.673706       675.115479    
+ I:           2
+ ERRV:  0.151155278    
+ ERRP:   5.46152762E-04
+ ITERATION:           2
+ HINLET:   1218241.25    
+
+ THMDRV: AXIAL SLICE=    1
+
+ THMROD: ITERT=    1 ERROR=  8.2386E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    2
+
+ THMROD: ITERT=    1 ERROR=  8.2386E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    3
+
+ THMROD: ITERT=    1 ERROR=  8.2386E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    4
+
+ THMROD: ITERT=    1 ERROR=  8.2386E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    5
+
+ THMROD: ITERT=    1 ERROR=  8.2385E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    6
+
+ THMROD: ITERT=    1 ERROR=  8.2385E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    7
+
+ THMROD: ITERT=    1 ERROR=  8.2370E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    8
+
+ THMROD: ITERT=    1 ERROR=  8.4244E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    9
+
+ THMROD: ITERT=    1 ERROR=  8.0632E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=   10
+
+ THMROD: ITERT=    1 ERROR=  8.2388E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ FIN ITERATION           3
+ ERRV:   3.97316689E-05
+ ERRP:   3.58193065E-03
+ PCOOL:   11077435.0       11052461.0       11026923.0       11000774.0       10973959.0       10946413.0       10918555.0       10882080.0       10842557.0       10800000.0    
+ VCOOL:   9.17452049       9.33473682       9.50686550       9.69258022       9.89392757       10.1133766       10.2961798       11.4386272       12.5436420       13.6227026    
+ DCOOL:   757.046631       744.057434       730.590149       716.596924       702.016296       686.787842       674.110779       606.825195       553.487732       509.629333    
+ TCOOL:   553.508850       560.368469       567.042847       573.512451       579.755920       585.743652       590.335693       590.422913       590.150452       589.856201    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.109343834      0.197252437      0.269502819    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       1.28776059E-02   2.57188901E-02   3.85210812E-02
+ DCOOLG:   757.046631       744.057434       730.590149       716.596924       702.016296       686.787842       674.110779       673.753174       674.409180       675.115479    
+ I:           3
+ ERRV:   3.97316689E-05
+ ERRP:   3.58193065E-03
+ ITERATION:           3
+ HINLET:   1218241.25    
+
+ THMDRV: AXIAL SLICE=    1
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    2
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    3
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    4
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    5
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    6
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    7
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    8
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=    9
+
+ THMROD: ITERT=    1 ERROR=  8.4132E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+
+ THMDRV: AXIAL SLICE=   10
+
+ THMROD: ITERT=    1 ERROR=  8.2387E+02 EPS=  1.0000E+00 POS=   10
+
+ THMROD: ITERT=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00 POS=    0
+
+ THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
+
+ THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ FIN ITERATION           4
+ ERRV:   2.23067211E-04
+ ERRP:   3.25626638E-06
+ PCOOL:   11077489.0       11052513.0       11026973.0       11000823.0       10974006.0       10946458.0       10918584.0       10882100.0       10842569.0       10800000.0    
+ VCOOL:   9.17452049       9.33468246       9.50675297       9.69239426       9.89370155       10.1130791       10.3032618       11.4457016       12.5486794       13.6286106    
+ DCOOL:   757.047058       744.057800       730.590393       716.596802       702.016602       686.787964       674.110596       606.825073       553.487549       509.629089    
+ TCOOL:   553.508667       560.368347       567.042725       573.512573       579.755859       585.743652       590.335815       590.423035       590.150513       589.856201    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.109343737      0.197252512      0.269503206    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       1.28776245E-02   2.57189386E-02   3.85211483E-02
+ DCOOLG:   757.047058       744.057800       730.590393       716.596802       702.016602       686.787964       674.110596       673.752930       674.408997       675.115479    
+ I:           4
+ ERRV:   2.23067211E-04
+ ERRP:   3.25626638E-06
+ ITERATION:           4
+ HINLET:   1218241.25    
+ Boucle terminée
+ PCOOL FINAL:   11077489.0       11052513.0       11026973.0       11000823.0       10974006.0       10946458.0       10918584.0       10882100.0       10842569.0       10800000.0    
+ VCOOL FINAL:   9.17452049       9.33468246       9.50675297       9.69239426       9.89370155       10.1130791       10.3032618       11.4457016       12.5486794       13.6286106    
+ DCOOL FINAL:   757.047058       744.057800       730.590393       716.596802       702.016602       686.787964       674.110596       606.825073       553.487549       509.629089    
+ TCOOL FINAL:   553.508667       560.368347       567.042725       573.512573       579.755859       585.743652       590.335815       590.423035       590.150513       589.856201    
+ EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.109343737      0.197252512      0.269503206    
+ XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       1.28776245E-02   2.57189386E-02   3.85211483E-02
+ TBUL:   591.758911       591.589172       591.415283       591.236938       591.053711       590.865112       590.673889       590.423035       590.150513       589.856201    
+
+ THMDRV: CHANNEL     1     1
+ ---------------------------
+  ____________________________________________________________________________________________________________________________________________________________________
+ |     |   TCOMB    |   TSURF    |    DCOOL    |    TCOOL    |    PCOOL    |    HCOOL    |    QFUEL    |    QCOOL    |    VOID   |     QUAL    |     SLIP    |  FLOW  |
+ |     |     K      |     K      |    Kg/m3    |      K      |     Pa      |    J/Kg     |    W/m3     |    W/m3     |           |             |             | REGIME |
+ |_____|____________|____________|_____________|_____________|_____________|_____________|_____________|_____________|___________|_____________|_____________|________|
+ | TOP |    1484.94 |     919.06 |    509.6291 |      589.86 |  108.00E+05 |  1.5778E+06 |  8.1202E+08 |  0.0000E+00 |    0.2695 |  0.3852E-01 |  0.1200E+01 |    2   |
+ |   9 |    1470.86 |     904.97 |    553.4875 |      590.15 |  108.43E+05 |  1.5418E+06 |  8.1202E+08 |  0.0000E+00 |    0.1973 |  0.2572E-01 |  0.1180E+01 |    2   |
+ |   8 |    1471.21 |     905.32 |    606.8251 |      590.42 |  108.82E+05 |  1.5059E+06 |  8.1202E+08 |  0.0000E+00 |    0.1093 |  0.1288E-01 |  0.1161E+01 |    2   |
+ |   7 |    1476.73 |     910.85 |    674.1106 |      590.34 |  109.19E+05 |  1.4699E+06 |  8.1202E+08 |  0.0000E+00 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
+ |   6 |    1472.52 |     906.63 |    686.7880 |      585.74 |  109.46E+05 |  1.4340E+06 |  8.1202E+08 |  0.0000E+00 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
+ |   5 |    1466.94 |     901.06 |    702.0166 |      579.76 |  109.74E+05 |  1.3980E+06 |  8.1202E+08 |  0.0000E+00 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
+ |   4 |    1461.06 |     895.18 |    716.5968 |      573.51 |  110.01E+05 |  1.3621E+06 |  8.1202E+08 |  0.0000E+00 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
+ |   3 |    1454.93 |     889.04 |    730.5904 |      567.04 |  110.27E+05 |  1.3261E+06 |  8.1202E+08 |  0.0000E+00 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
+ |   2 |    1448.57 |     882.69 |    744.0578 |      560.37 |  110.53E+05 |  1.2901E+06 |  8.1202E+08 |  0.0000E+00 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
+ | BOT |    1442.01 |     876.13 |    757.0471 |      553.51 |  110.77E+05 |  1.2542E+06 |  8.1202E+08 |  0.0000E+00 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
+ |_____|____________|____________|_____________|_____________|_____________|_____________|_____________|_____________|___________|_____________|_____________|________|
+ MFLXT=  7.0002E+03 Kg/m2/s
+
+ THM: CORE COOLANT SECTION. COMPUTED= 6.36E-05 GIVEN= 2.13E-05 m2.
+
+ THM: SAVE TIMESTEP0000 AT TIME=  0.0000E+00 S.
+
+ THM: RECOVER GLOBAL PARAMETER = T-FUEL      .
+
+ THM: ERROR ON FUEL TEMPERATURE =     584.944 K  MIN VALUE =    1442.012 K  MAX VALUE =    1484.944 K
+
+ THM: RECOVER GLOBAL PARAMETER = T-COOL      .
+
+ THM: ERROR ON COOLANT TEMPERATURE =      90.423 K  MIN VALUE =     553.509 K  MAX VALUE =     590.423 K
+
+ THM: RECOVER GLOBAL PARAMETER = D-COOL      .
+
+ THM: ERROR ON COOLANT DENSITY =       0.140 g/cc  MIN VALUE =       0.510 g/cc  MAX VALUE =       0.757 g/cc
+
+ STATE VECTOR:
+ NZ            1   (NUMBER OF AXIAL MESHES)
+ NCH          10   (NUMBER OF CHANNELS IN THE RADIAL PLANE)
+ MAXIT1       50   (NUMBER OF CONDUCTION ITERATIONS)
+ MAXIT2       50   (NUMBER OF CENTER-PELLET ITERATIONS)
+ MAXIT3       50   (NUMBER OF FLOW ITERATIONS)
+ NFD           8   (NUMBER OF FUEL RADIAL ZONES)
+ NDTOT        11   (NUMBER OF DISCRETISATION POINTS)
+ ITIME         0   (CALCULATION TYPE)
+ TIMEIT        0   (TRANSIENT ITERATION INDEX)
+ IHGAP         1   (HGAP FLAG (0=DEFAULT/1=FIXED))
+ IHCONV        0   (HCONV FLAG (0=DITTUS-BOELTER/1=FIXED))
+ ICONDF        1   (FUEL CONDUCTIVITY FLAG (0=STORA-CHENEBAULT (UOX), COMETHE (MOX)/1=USER-PROVIDED FUNCTION OF FUEL TEMPERATURE))
+ ICONDC        1   (CLAD CONDUCTIVITY FLAG (0=DEFAULT/1=USER-PROVIDED POLYNOMIAL OF CLAD TEMPERATURE))
+ IFRCDI        0   (FUEL CONDUCTIVITY APPROXIMATION FLAG (0=DEFAULT/1=AVERAGE APPROXIMATION FORCED))
+ ISUBM         1   (BOILING MODEL FLAG (0=ONE-PHASE/1=BOWRING CORRELATION/2=SAHA-ZUBER CORRELATION))
+ NPRAD         0   (RADIAL POWER FORM FACTOR (0=FLAT/NUMBER OF POINTS))
+ NPOWER        0   (NUMBER OF POINTS IN POWER-TABLE)
+ IFLUID        0   (TYPE OF FLUID (0=H2O/1=D2O))
+ NCONDF        0   (DEGREE OF FUEL CONDUCTIVITY POLYNOMIAL)
+
+ REAL PARAM:
+ DTIME   0.0000E+00   (TIME STEP IN S)
+ FPUISS  1.0000E+00   (COOLANT POWER FACTOR)
+ CFLUX   2.0000E+06   (CRITICAL HEAT FLUX IN W/M^2)
+ SPEED   9.1745E+00   (COOLANT VELOCITY IN M/S)
+ POULET  1.0800E+07   (OUTLET COOLANT PRESSURE IN PA)
+ TINLET  5.5000E+02   (INLET COOLANT TEMPERATURE IN K)
+ POROS   5.0000E-02   (OXYDE POROSITY)
+ RC      5.6000E-03   (FUEL PELLET RADIUS IN M)
+ RIG     6.1400E-03   (INTERNAL CLAD ROD RADIUS IN M)
+ RGG     6.5200E-03   (EXTERNAL CLAD ROD RADIUS IN M)
+ RTG     7.0200E-03   (GUIDE TUBE RADIUS IN M)
+ PITCH   0.0000E+00   (HEXAGONAL SIDE IN M)
+ ERMAXT  1.0000E+00   (TEMPERATURE MAXIMUM ERROR IN K)
+ ERMAXC  1.0000E-03   (FLOW MAXIMUM RELATIVE ERROR)
+ RELAX   1.0000E+00   (RELAXATION PARAMETER)
+ RTIME   0.0000E+00   (TIME VALUE IN S)
+ WTEFF   5.5556E-01   (SURFACE TEMPERATURE WEIGHTING FACTOR IN EFFECTIVE FUEL TEMPERATURE)
+ RATIOX  0.0000E+00   (MAXIMUM OF VARIABLE VARIATIONS)
+ EPSR    0.0000E+00   (RUGOSITY IN M OF THE FUEL ROD)
+ THETA   0.0000E+00   (ANGLE IN RADIANS OF THE FUEL CHANNEL)
+ HGAP    1.0000E+04   (HGAP IN W/m^2/K)
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'Thm         ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'MESHZ       '        11    REAL            
+        2  'REF-RAD     '       100    REAL            
+        3  'HISTORY-DATA'        -1    DIRECTORY       
+        4  'AVG-T-FUEL  '         1    REAL            
+        5  'ERROR-T-FUEL'         1    REAL            
+        6  'MIN-T-FUEL  '         1    REAL            
+        7  'MAX-T-FUEL  '         1    REAL            
+        8  'AVG-T-COOL  '         1    REAL            
+        9  'ERROR-T-COOL'         1    REAL            
+       10  'MIN-T-COOL  '         1    REAL            
+       11  'MAX-T-COOL  '         1    REAL            
+       12  'AVG-D-COOL  '         1    REAL            
+       13  'ERROR-D-COOL'         1    REAL            
+       14  'MIN-D-COOL  '         1    REAL            
+       15  'MAX-D-COOL  '         1    REAL            
+       16  'KCONDF      '         3    REAL            
+       17  'UCONDF      '         3    CHARACTER       ='KELVIN      '
+       18  'KCONDC      '         1    REAL            
+       19  'UCONDC      '         3    CHARACTER       ='KELVIN      '
+       20  'SIGNATURE   '         3    CHARACTER       ='L_THM       '
+       21  'STATE-VECTOR'        40    INTEGER         
+       22  'REAL-PARAM  '        40    REAL            
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       216
+
+ @END MODULE -> THM:        
+-->>MODULE THM:        : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
+->@BEGIN MODULE : UTL:        
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'Thm         ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'MESHZ       '        11    REAL            
+        2  'REF-RAD     '       100    REAL            
+        3  'HISTORY-DATA'        -1    DIRECTORY       
+        4  'AVG-T-FUEL  '         1    REAL            
+        5  'ERROR-T-FUEL'         1    REAL            
+        6  'MIN-T-FUEL  '         1    REAL            
+        7  'MAX-T-FUEL  '         1    REAL            
+        8  'AVG-T-COOL  '         1    REAL            
+        9  'ERROR-T-COOL'         1    REAL            
+       10  'MIN-T-COOL  '         1    REAL            
+       11  'MAX-T-COOL  '         1    REAL            
+       12  'AVG-D-COOL  '         1    REAL            
+       13  'ERROR-D-COOL'         1    REAL            
+       14  'MIN-D-COOL  '         1    REAL            
+       15  'MAX-D-COOL  '         1    REAL            
+       16  'KCONDF      '         3    REAL            
+       17  'UCONDF      '         3    CHARACTER       ='KELVIN      '
+       18  'KCONDC      '         1    REAL            
+       19  'UCONDC      '         3    CHARACTER       ='KELVIN      '
+       20  'SIGNATURE   '         3    CHARACTER       ='L_THM       '
+       21  'STATE-VECTOR'        40    INTEGER         
+       22  'REAL-PARAM  '        40    REAL            
+       23  'NB-FUEL     '         1    REAL            
+       24  'NB-TUBE     '         1    REAL            
+       25  'FRACT-PU    '         1    REAL            
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       219
+
+->       1      12       2      11                                 <-   
+MESHZ                                                                           
+  0.00000000E+00  2.00000003E-01  4.00000006E-01  6.00000024E-01  8.00000012E-01
+  1.00000000E+00  1.20000005E+00  1.39999998E+00  1.60000002E+00  1.79999995E+00
+  2.00000000E+00
+->       1      12       2     100                                 <-   
+REF-RAD                                                                         
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+->       1      12       0      -1                                 <-   
+HISTORY-DATA                                                                    
+->       2      12       0      -1                                 <-   
+TIMESTEP0000                                                                    
+->       3      12      10       1                                 <-   
+CHANNEL                                                                         
+->       4       0       0      -1                                 <-   00000001
+->       5      12       2      10                                 <-   
+PRESSURE                                                                        
+  1.10774890E+07  1.10525130E+07  1.10269730E+07  1.10008230E+07  1.09740060E+07
+  1.09464580E+07  1.09185840E+07  1.08821000E+07  1.08425690E+07  1.08000000E+07
+->       5      12       2      10                                 <-   
+DENSITY                                                                         
+  7.57047058E+02  7.44057800E+02  7.30590393E+02  7.16596802E+02  7.02016602E+02
+  6.86787964E+02  6.74110596E+02  6.06825073E+02  5.53487549E+02  5.09629089E+02
+->       5      12       2      10                                 <-   
+LIQUID-DENS                                                                     
+  7.57047058E+02  7.44057800E+02  7.30590393E+02  7.16596802E+02  7.02016602E+02
+  6.86787964E+02  6.74110596E+02  6.73752930E+02  6.74408997E+02  6.75115479E+02
+->       5      12       2      10                                 <-   
+ENTHALPY                                                                        
+  1.25419550E+06  1.29014975E+06  1.32610400E+06  1.36205825E+06  1.39801250E+06
+  1.43396675E+06  1.46992100E+06  1.50587525E+06  1.54182950E+06  1.57778375E+06
+->       5      12       2      10                                 <-   
+VELOCITIES                                                                      
+  9.17452049E+00  9.33468246E+00  9.50675297E+00  9.69239426E+00  9.89370155E+00
+  1.01130791E+01  1.03032618E+01  1.14457016E+01  1.25486794E+01  1.36286106E+01
+->       5      12       2      10                                 <-   
+CENTER-TEMPS                                                                    
+  2.14936816E+03  2.15592554E+03  2.16228491E+03  2.16841968E+03  2.17429541E+03
+  2.17987085E+03  2.18408765E+03  2.17856543E+03  2.17821265E+03  2.19229980E+03
+->       5      12       2      10                                 <-   
+COOLANT-TEMP                                                                    
+  5.53508667E+02  5.60368347E+02  5.67042725E+02  5.73512573E+02  5.79755859E+02
+  5.85743652E+02  5.90335815E+02  5.90423035E+02  5.90150513E+02  5.89856201E+02
+->       5      12       2      10                                 <-   
+POWER                                                                           
+  1.60000000E+04  1.60000000E+04  1.60000000E+04  1.60000000E+04  1.60000000E+04
+  1.60000000E+04  1.60000000E+04  1.60000000E+04  1.60000000E+04  1.60000000E+04
+->       5      12       2     110                                 <-   
+TEMPERATURES                                                                    
+  2.05842236E+03  1.87653101E+03  1.69463965E+03  1.51274829E+03  1.33085681E+03
+  1.14896509E+03  9.67073425E+02  8.76127686E+02  6.58761108E+02  6.18141968E+02
+  5.82119507E+02  2.06497974E+03  1.88308838E+03  1.70119702E+03  1.51930554E+03
+  1.33741406E+03  1.15552234E+03  9.73630737E+02  8.82685059E+02  6.65318481E+02
+  6.24699280E+02  5.88676819E+02  2.07133936E+03  1.88944812E+03  1.70755676E+03
+  1.52566528E+03  1.34377393E+03  1.16188208E+03  9.79990417E+02  8.89044678E+02
+  6.71678101E+02  6.31058960E+02  5.95036499E+02  2.07747388E+03  1.89558252E+03
+  1.71369116E+03  1.53179968E+03  1.34990820E+03  1.16801636E+03  9.86124878E+02
+  8.95179077E+02  6.77812622E+02  6.37193359E+02  6.01170898E+02  2.08334985E+03
+  1.90145850E+03  1.71956714E+03  1.53767578E+03  1.35578430E+03  1.17389246E+03
+  9.92000916E+02  9.01055176E+02  6.83688599E+02  6.43069397E+02  6.07046936E+02
+  2.08892529E+03  1.90703406E+03  1.72514270E+03  1.54325122E+03  1.36135986E+03
+  1.17946802E+03  9.97576416E+02  9.06630737E+02  6.89264160E+02  6.48644897E+02
+  6.12622437E+02  2.09314185E+03  1.91125049E+03  1.72935913E+03  1.54746777E+03
+  1.36557629E+03  1.18368445E+03  1.00179291E+03  9.10847168E+02  6.93480591E+02
+  6.52861389E+02  6.16838928E+02  2.08761963E+03  1.90572815E+03  1.72383679E+03
+  1.54194531E+03  1.36005396E+03  1.17816211E+03  9.96270508E+02  9.05324829E+02
+  6.87958252E+02  6.47338989E+02  6.11316528E+02  2.08726709E+03  1.90537573E+03
+  1.72348438E+03  1.54159277E+03  1.35970142E+03  1.17780957E+03  9.95918030E+02
+  9.04972290E+02  6.87605713E+02  6.46986511E+02  6.10964050E+02  2.10135400E+03
+  1.91946265E+03  1.73757129E+03  1.55567981E+03  1.37378833E+03  1.19189648E+03
+  1.01000494E+03  9.19059204E+02  7.01692627E+02  6.61073425E+02  6.25050964E+02
+->       5      12       2       1                                 <-   
+PINLET                                                                          
+  1.08000000E+07
+->       5      12       2       1                                 <-   
+TINLET                                                                          
+  5.50000000E+02
+->       5      12       2       1                                 <-   
+VINLET                                                                          
+  9.17452049E+00
+->       5      12       2       1                                 <-   
+POULET                                                                          
+  1.08000000E+07
+->       5      12       2     100                                 <-   
+RADII                                                                           
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+->      -5       0       0       0                                 <-   
+->       3      12       2       1                                 <-   
+TIME                                                                            
+  0.00000000E+00
+->      -3       0       0       0                                 <-   
+->      -2       0       0       0                                 <-   
+->       1      12       2       1                                 <-   
+AVG-T-FUEL                                                                      
+  1.46497717E+03
+->       1      12       2       1                                 <-   
+ERROR-T-FUEL                                                                    
+  5.84943848E+02
+->       1      12       2       1                                 <-   
+MIN-T-FUEL                                                                      
+  1.44201233E+03
+->       1      12       2       1                                 <-   
+MAX-T-FUEL                                                                      
+  1.48494385E+03
+->       1      12       2       1                                 <-   
+AVG-T-COOL                                                                      
+  5.78069702E+02
+->       1      12       2       1                                 <-   
+ERROR-T-COOL                                                                    
+  9.04230347E+01
+->       1      12       2       1                                 <-   
+MIN-T-COOL                                                                      
+  5.53508667E+02
+->       1      12       2       1                                 <-   
+MAX-T-COOL                                                                      
+  5.90423035E+02
+->       1      12       2       1                                 <-   
+AVG-D-COOL                                                                      
+  6.68114841E-01
+->       1      12       2       1                                 <-   
+ERROR-D-COOL                                                                    
+  1.40370905E-01
+->       1      12       2       1                                 <-   
+MIN-D-COOL                                                                      
+  5.09629071E-01
+->       1      12       2       1                                 <-   
+MAX-D-COOL                                                                      
+  7.57047057E-01
+->       1      12       2       3                                 <-   
+KCONDF                                                                          
+  5.00000000E+00  0.00000000E+00 -2.73149994E+02
+->       1      12       3       3                                 <-   
+UCONDF                                                                          
+         4         4         4
+KELVIN      
+->       1      12       2       1                                 <-   
+KCONDC                                                                          
+  1.00000000E+01
+->       1      12       3       3                                 <-   
+UCONDC                                                                          
+         4         4         4
+KELVIN      
+->       1      12       3       3                                 <-   
+SIGNATURE                                                                       
+         4         4         4
+L_THM       
+->       1      12       1      40                                 <-   
+STATE-VECTOR                                                                    
+         1        10        50        50        50         8        11         0
+         0         1         0         1         1         0         1         0
+         0         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0         0
+->       1      12       2      40                                 <-   
+REAL-PARAM                                                                      
+  0.00000000E+00  1.00000000E+00  2.00000000E+06  9.17452049E+00  1.08000000E+07
+  5.50000000E+02  5.00000007E-02  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  7.01999990E-03  0.00000000E+00  1.00000000E+00  1.00000005E-03  1.00000000E+00
+  0.00000000E+00  1.00000000E+04  0.00000000E+00  5.55555582E-01  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+->       1      12       2       1                                 <-   
+NB-FUEL                                                                         
+  1.00000000E+00
+->       1      12       2       1                                 <-   
+NB-TUBE                                                                         
+  0.00000000E+00
+->       1      12       2       1                                 <-   
+FRACT-PU                                                                        
+  0.00000000E+00
+->      -1       0       0       0                                 <-   
+
+ DRVUTL: LEAVING WITH ACTIVE DIRECTORY '/           '.
+-->>module UTL:        : time spent=        0.001 memory usage= 0.000E+00
+->@END MODULE   : UTL:        
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> NCR:        
+ @FROM CODE    -> DRAGON      
+ @DESCRIPTION  -> ACCESS MULTI-PARAMETER REACTOR COMPOSITION DATABASE                     
+ @CREDITS      -> A. HEBERT                                                               
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+
+ NCR: INTERPOLATING MULTICOMPO 'Cpo         ' FROM DIRECTORY 'EDI2B       '.
+ NCRRGR: KEY=burnup       TABULATED POINTS=  0.0000E+00  9.3750E+00  1.8750E+01  3.7500E+01  7.5000E+01  1.5000E+02
+                                             2.3750E+02  3.2500E+02  4.1250E+02  5.0000E+02  6.2500E+02  7.5000E+02
+                                             1.0000E+03  1.2500E+03  1.5000E+03  1.7500E+03  2.0000E+03  2.5000E+03
+                                             3.0000E+03  3.5000E+03  4.0000E+03  4.5000E+03  5.0000E+03  5.5000E+03
+                                             6.0000E+03  6.5000E+03  7.0000E+03  7.5000E+03  8.0000E+03  8.5000E+03
+                                             9.0000E+03  9.5000E+03  1.0000E+04  1.0500E+04  1.1000E+04  1.1500E+04
+                                             1.2000E+04  1.2500E+04  1.3000E+04  1.3500E+04  1.4000E+04  1.4500E+04
+                                             1.5000E+04  1.5500E+04  1.6000E+04  1.6500E+04  1.7000E+04  1.7500E+04
+                                             1.8000E+04  1.8500E+04  1.9000E+04  1.9500E+04  2.0000E+04  2.2000E+04
+                                             2.4000E+04  2.6000E+04  2.8000E+04  3.0000E+04  3.2000E+04  3.4000E+04
+                                             3.6000E+04  3.8000E+04  4.0000E+04  5.0000E+04  6.0000E+04  7.0000E+04
+                                             8.0000E+04
+ NCRRGR: KEY=DCA          TABULATED POINTS=  3.0000E-01  5.0000E-01  6.5000E-01  8.0000E-01  1.0000E+00
+ NCRRGR: KEY=DCAH         TABULATED POINTS=  3.0000E-01  5.0000E-01  6.5000E-01  8.0000E-01  1.0000E+00
+ NCRRGR: NUMBER OF CALCULATIONS IN MULTICOMPO= 1675
+ NCRRGR: NUMBER OF MATERIAL MIXTURES IN MULTICOMPO=    1
+ NCRRGR: NUMBER OF MATERIAL MIXTURES IN FUEL MAP=    10
+ evolution burnup pincell                                                        
+ NCRRGR: GLOBAL PARAMETER:burnup       ->LINEAR INTERPOLATION.
+ NCRRGR: GLOBAL PARAMETER:DCA          ->CUBIC INTERPOLATION.
+ NCRRGR: GLOBAL PARAMETER:DCAH         ->CUBIC INTERPOLATION.
+
+ ** PERFORMING THE INSTANTANEOUS INTERPOLATION OVER THE FUEL LATTICE **
+
+ L_MAP values overwritten by the SET option for parameter DCA         
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       1 (<==   1) AND CALCULATION     671. WEIGHT=  3.5813E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       1 (<==   1) AND CALCULATION     738. WEIGHT=  6.9718E-03
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       1 (<==   1) AND CALCULATION     805. WEIGHT= -7.2042E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       1 (<==   1) AND CALCULATION     872. WEIGHT=  7.4374E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       1 (<==   1) AND CALCULATION     939. WEIGHT= -3.6802E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       2 (<==   1) AND CALCULATION     671. WEIGHT=  4.7350E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       2 (<==   1) AND CALCULATION     738. WEIGHT=  8.7838E-03
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       2 (<==   1) AND CALCULATION     805. WEIGHT= -9.0766E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       2 (<==   1) AND CALCULATION     872. WEIGHT=  6.4726E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       2 (<==   1) AND CALCULATION     939. WEIGHT= -3.8779E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       3 (<==   1) AND CALCULATION     671. WEIGHT=  5.8991E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       3 (<==   1) AND CALCULATION     738. WEIGHT=  1.0226E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       3 (<==   1) AND CALCULATION     805. WEIGHT= -1.0567E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       3 (<==   1) AND CALCULATION     872. WEIGHT=  5.4307E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       3 (<==   1) AND CALCULATION     939. WEIGHT= -3.7547E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       4 (<==   1) AND CALCULATION     671. WEIGHT=  7.0325E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       4 (<==   1) AND CALCULATION     738. WEIGHT=  1.1070E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       4 (<==   1) AND CALCULATION     805. WEIGHT= -1.1439E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       4 (<==   1) AND CALCULATION     872. WEIGHT=  4.3356E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       4 (<==   1) AND CALCULATION     939. WEIGHT= -3.3488E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       5 (<==   1) AND CALCULATION     671. WEIGHT=  8.0833E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       5 (<==   1) AND CALCULATION     738. WEIGHT=  1.1033E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       5 (<==   1) AND CALCULATION     805. WEIGHT= -1.1401E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       5 (<==   1) AND CALCULATION     872. WEIGHT=  3.2175E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       5 (<==   1) AND CALCULATION     939. WEIGHT= -2.7101E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       6 (<==   1) AND CALCULATION     671. WEIGHT=  8.9858E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       6 (<==   1) AND CALCULATION     738. WEIGHT=  9.7634E-03
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       6 (<==   1) AND CALCULATION     805. WEIGHT= -1.0089E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       6 (<==   1) AND CALCULATION     872. WEIGHT=  2.1159E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       6 (<==   1) AND CALCULATION     939. WEIGHT= -1.9049E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       7 (<==   1) AND CALCULATION     671. WEIGHT=  9.5445E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       7 (<==   1) AND CALCULATION     738. WEIGHT=  7.5689E-03
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       7 (<==   1) AND CALCULATION     805. WEIGHT= -7.8212E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       7 (<==   1) AND CALCULATION     872. WEIGHT=  1.2820E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       7 (<==   1) AND CALCULATION     939. WEIGHT= -1.2004E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       8 (<==   1) AND CALCULATION     671. WEIGHT=  8.6351E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       8 (<==   1) AND CALCULATION     738. WEIGHT= -2.2533E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       8 (<==   1) AND CALCULATION     805. WEIGHT=  2.5669E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       8 (<==   1) AND CALCULATION     872. WEIGHT= -1.0814E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       8 (<==   1) AND CALCULATION     939. WEIGHT=  1.0465E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       9 (<==   1) AND CALCULATION     671. WEIGHT=  4.5182E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       9 (<==   1) AND CALCULATION     738. WEIGHT= -3.8663E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       9 (<==   1) AND CALCULATION     805. WEIGHT=  6.6588E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       9 (<==   1) AND CALCULATION     872. WEIGHT= -8.7505E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE       9 (<==   1) AND CALCULATION     939. WEIGHT=  8.4682E-03
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE      10 (<==   1) AND CALCULATION     671. WEIGHT=  7.3161E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE      10 (<==   1) AND CALCULATION     738. WEIGHT= -1.3018E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE      10 (<==   1) AND CALCULATION     805. WEIGHT=  9.5403E-01
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE      10 (<==   1) AND CALCULATION     872. WEIGHT= -1.5693E-02
+ NCRLIB: MULTICOMPO ACCESS FOR MIXTURE      10 (<==   1) AND CALCULATION     939. WEIGHT=  1.5187E-03
+ NCRAGF: NMIX=          10
+
+ NCRAGF: PROCESS MULTICOMPO MIXTURE    1
+
+ NCRAGF: PROCESS MULTICOMPO MIXTURE-OUT    1
+
+ OPTIONS
+ -------
+ IMPX       2   (0=NO PRINT/1=SHORT/2=MORE)
+ MAXMIX    10   (MAXIMUM NUMBER OF MIXTURES)
+ NBISO    110   (NUMBER OF ISOTOPES OR MATERIALS)
+ NGRP       2   (NUMBER OF ENERGY GROUPS)
+ NL         2   (NUMBER OF LEGENDRE ORDERS)
+ ITRANC     2   (0=NO TRANSPORT CORRECTION/1=APOLLO TYPE/2=RECOVER FROM LIBRARY/3=WIMS-D TYPE/4=LEAKAGE CORRECTION)
+ IPROB      0   (0=DIRECT/1=ADJOINT)
+ ITIME      1   (1=STEADY-STATE/2=PROMPT)
+ NLIB       0   (NUMBER OF SETS OF LIBRARIES)
+ NGF        0   (NUMBER OF FAST GROUP WITHOUT SELF-SHIELDING)
+ IGRMAX     0   (LAST GROUP INDEX WITH SELF-SHIELDING)
+ NDEPL     11   (NUMBER OF DEPLETING ISOTOPES)
+ NCOMB     10   (NUMBER OF DEPLETING MIXTURES)
+ NEDMAC    12   (NUMBER OF CROSS SECTION EDITS)
+ NBMIX     10   (NUMBER OF MIXTURES)
+ NRES       0   (NUMBER OF SETS OF RESONANT MIXTURES)
+ IPROC      0   (-1=SKIP LIBRARY PROCESSING/0=DILUTION INTERPOLATION/1=USE PHYSICAL TABLES/2=BUILD A DRAGLIB/3=COMPUTE CALENDF TABLES/4=COMPUTE SLOWING-DOWN TABLES)
+ IMAC       1   (0=DO NOT/1=DO BUILD AN EMBEDDED MACROLIB)
+ NDEL       8   (NUMBER OF PRECURSOR GROUPS)
+ NFISS      1   (NUMBER OF FISSILE ISOTOPES)
+ ISOADD     0   (0=COMPLETE BURNUP CHAIN/1=DO NOT)
+ MAXISM   200   (MAX. NUMBER OF ISOTOPES PER MIXTURE)
+ IPRECI     0   (CALENDF ACCURACY FLAG:1/2/3/4)
+ IDF        0   (0=NO INFO/1=ALBS INFO/2=FLUX GAP INFO/3=ADF GAP INFO)
+ @END MODULE -> NCR:        
+-->>MODULE NCR:        : TIME SPENT=        0.010 MEMORY USAGE= 2.192E+03
+->@BEGIN MODULE : EQU:        
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+ DRVEQU: STEP UP TO LEVEL 'MACROLIB                '.
+-->>module EQU:        : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : EQU:        
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> MACINI:     
+ @FROM CODE    -> DONJON      
+ @DESCRIPTION  -> EXPAND MACROLIB OVER THE REACTOR GEOMETRY                               
+ @CREDITS      -> J. KOCLAS, E. VARIN, D. SEKKI                                           
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+ ** TREATING FIRST MACROLIB **
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'Macro2      ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'GROUP       '         2    LIST            
+        2  'LAMBDA-D    '         8    REAL            
+        3  'STATE-VECTOR'        40    INTEGER         
+        4  'SIGNATURE   '         3    CHARACTER       ='L_MACROLIB  '
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        51
+
+ @END MODULE -> MACINI:     
+-->>MODULE MACINI:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+->@BEGIN MODULE : TRIVAA:     
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ EXEC: TRIVAA:      BY A. HEBERT
+
+ TRIASM: ASSEMBLY OF SYMMETRIC MATRIX 'A001001   ' IN COMPRESSED DIAGONAL STORAGE MODE.
+
+ MTLDLF: FACTORIZATION OF LCM MATRIX 'X_A001001   '. CREATION OF MATRIX 'XIA001001   ' LOCATED IN 'System      '.
+
+ MTLDLF: FACTORIZATION OF LCM MATRIX 'Y_A001001   '. CREATION OF MATRIX 'YIA001001   ' LOCATED IN 'System      '.
+
+ MTLDLF: FACTORIZATION OF LCM MATRIX 'Z_A001001   '. CREATION OF MATRIX 'ZIA001001   ' LOCATED IN 'System      '.
+
+ TRIDIG: ASSEMBLY OF DIAGONAL MATRIX 'A001002     '.
+
+ TRIASM: ASSEMBLY OF SYMMETRIC MATRIX 'A002002   ' IN COMPRESSED DIAGONAL STORAGE MODE.
+
+ MTLDLF: FACTORIZATION OF LCM MATRIX 'X_A002002   '. CREATION OF MATRIX 'XIA002002   ' LOCATED IN 'System      '.
+
+ MTLDLF: FACTORIZATION OF LCM MATRIX 'Y_A002002   '. CREATION OF MATRIX 'YIA002002   ' LOCATED IN 'System      '.
+
+ MTLDLF: FACTORIZATION OF LCM MATRIX 'Z_A002002   '. CREATION OF MATRIX 'ZIA002002   ' LOCATED IN 'System      '.
+
+ TRIDIG: ASSEMBLY OF DIAGONAL MATRIX 'A002001     '.
+
+ TRIDIG: ASSEMBLY OF DIAGONAL MATRIX 'B001001     '.
+
+ TRIDIG: ASSEMBLY OF DIAGONAL MATRIX 'B001002     '.
+
+ TRIDIG: ASSEMBLY OF DIAGONAL MATRIX 'B002001     '.
+
+ TRIDIG: ASSEMBLY OF DIAGONAL MATRIX 'B002002     '.
+-->>MODULE TRIVAA:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+->@END MODULE   : TRIVAA:     
+->@BEGIN MODULE : FLUD:       
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ EXEC: FLUD:        BY A. HEBERT
+
+ MTOPEN: NUMBER OF UNKNOWNS =      10. 3-AXIS CARTESIAN ADI POWER METHOD.                                                        
+1
+ FLDDIR: ITERATIVE PROCEDURE BASED ON PRECONDITIONED POWER METHOD ( 4 ADI ITERATIONS PER OUTER ITERATION).
+         DIRECT EQUATION.
+
+ FLDDIR: FAILURE OF THE NEWTON-RAPHTON ALGORIHTHM FOR COMPUTING THE OVERRELAXATION PARAMETERS.
+
+ FLDDIR: CONVERGENCE IN  29 ITERATIONS.
+
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.000
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.001
+
+
+ FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 1.3019701242E+00
+
+
+ OPTIONS
+ -------
+ IMPX          1  (0=NO PRINT/1=SHORT/2=MORE)
+ NGRO          2  (NUMBER OF ENERGY GROUPS)
+ NUN          10  (NUMBER OF UNKNOWNS PER ENERGY GROUP)
+ IADJ          1  (1=DIRECT KEFF OR SOURCE/10=ADJOINT KEFF/100=DIRECT GPT/100=ADJOINT GPT)
+ LMOD          0  (NUMBER OF HARMONICS)
+ NGPT          0  (NUMBER OF GPT EQUATIONS)
+ ITYPE         2  (TYPE OF SOLUTION: 0=FIXED SOURCE/1=FIXED SOURCE EIGENVALUE/2=TYPE K/3=TYPE K BUCK/4=TYPE B/5=TYPE L)
+ ILEAK         0  (TYPE OF LEAKAGE MODEL)
+ ICL1          5  (NUMBER OF FREE ITERATIONS PER ACCELERATION CYCLE)
+ ICL2          3  (NUMBER OF ACCELERATED ITERATIONS PER ACCELE RATION CYCLE)
+ IREBAL        0  (0/1: THERMAL ITERATIONS OFF/ON)
+ MAXINR        0  (MAXIMUM NUMBER OF THERMAL ITERATIONS)
+ MAXOUT      200  (MAXIMUM NUMBER OF OUTER ITERATIONS)
+ NADI          4  (INITIAL NUMBER OF ADI ITERATIONS IN TRIVAC)
+ IBLSZ         0  (BLOCK SIZE OF THE ARNOLDI HESSENBERG MATRIX WITH IRAM)
+ NSTARD        0  (NUMBER OF RESTARTING ITERATIONS WITH GMRES FOR SOLVING THE ADI-PRECONDITIONNED LINEAR SYSTEMS)
+ NBMIX        10  (NUMBER OF MATERIAL MIXTURES)
+ EPSINR 1.00E-05  (THERMAL ITERATION EPSILON)
+ EPSOUT 1.00E-04  (OUTER ITERATION KEFF EPSILON)
+ EPSOUT 1.00E-04  (OUTER ITERATION FLUX EPSILON)
+ EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
+ RELAX  1.00E+00  (RELAXATION FACTOR)
+
+-->>MODULE FLUD:       : TIME SPENT=        0.002 MEMORY USAGE= 0.000E+00
+->@END MODULE   : FLUD:       
+->@BEGIN MODULE : GREP:       
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+-->>module GREP:       : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : GREP:       
+>|+++ Burnup= 0.0 Keff=  1.301970e+00                                                                                     |>0162
+>|test pincell_mphy_thm.x2m completed                                                                                     |>0164
+
+ normal end of execution for donjon 5  Version 5.0.10 ($Revision: 3198 $)              
+ check for warning in listing
+ before assuming your run was successful

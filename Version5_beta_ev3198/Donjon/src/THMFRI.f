@@ -37,7 +37,5 @@
             FRIC=0.3164/(REY**0.25)
       ENDIF
 
-      !FRIC = 0.002
-
       RETURN
       END

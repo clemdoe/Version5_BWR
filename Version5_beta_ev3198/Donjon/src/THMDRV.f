@@ -4,7 +4,7 @@
      > MAXIT1,MAXITL,ERMAXT,SPEED,TINLET,PINLET,FRACPU,ICONDF,NCONDF,
      > KCONDF,UCONDF,ICONDC,NCONDC,KCONDC,UCONDC,IHGAP,KHGAP,IHCONV,
      > KHCONV,WTEFF,IFRCDI,ISUBM,FRO,POW,TCOMB,DCOOL,TCOOL,TSURF,HCOOL,
-     > PCOOL)
+     > PCOOL, IPRES)
 *
 *-----------------------------------------------------------------------
 *
@@ -85,6 +85,7 @@
 * TSURF   surface fuel temperature distribution in K.
 * HCOOL   coolant enthalpty distribution in J/kg.
 * PCOOL   coolant pressure distribution in Pa.
+* IPRES   flag indicating if pressure is to be computed (0=CONSTANT/1=NONCONSTANT).
 *
 *-----------------------------------------------------------------------
 *
@@ -116,7 +117,6 @@
 
       INTEGER I
       REAL ERRV, ERRP
-      LOGICAL PRESSURE
 *----
 *  ALLOCATABLE ARRAYS
 *----
@@ -130,10 +130,6 @@
 *----
       ALLOCATE(VCOOL(NZ),TEMPT(NDTOT,NZ),TCENT(NZ),DLCOOL(NZ))
       ALLOCATE(PTEMP(NZ), VTEMP(NZ))
-
-
-      PRESSURE = .TRUE.
-
 
 *----
 *  COMPUTE THE INLET FLOW ENTHALPY AND VELOCITY
@@ -158,6 +154,7 @@
       ELSE IF(IFLUID.EQ.1) THEN
         CALL THMHPT(PINLET,TINLET,RHOIN,HINLET,R3,R4,R5)
       ELSE IF(IFLUID.EQ.2) THEN
+        PRINT *, 'PREMIER THMSPT'
         CALL THMSPT(SNAME,SCOMP,TINLET,RHOIN,HINLET,R3,R4,R5,IMPX)
       ENDIF
       MFLOW=SPEED*RHOIN
@@ -179,7 +176,7 @@
          DLCOOL(K)=RHOIN
          TCOOL(K)=TINLET
 
-         !INITIALIZE MUT
+        IF (IPRES.EQ.1) THEN
 
          IF(POW(K).EQ.0.0) CYCLE
          IF(IFLUID.EQ.0) THEN
@@ -187,6 +184,7 @@
          ELSE IF(IFLUID.EQ.1) THEN
            CALL THMHST(PCOOL(K),TSAT)
          ENDIF
+
          TB=TSAT-0.1
          IF(TCOOL(K).LT.TB) THEN
            IF(IFLUID.EQ.0) THEN
@@ -205,12 +203,15 @@
             CALL THMSPT(STP,TB,R11,H11,K11,MUT(K),C11,IMPX)
            ENDIF
          ENDIF
+        ENDIF
+
 
       ENDDO
 
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
 *----
+      IF (IPRES .EQ. 0) GOTO 30
 
       ERRV = 1.0
       ERRP = 1.0
@@ -224,22 +225,10 @@
 *----
 *  UPDATE HINLET FUNCTION OF INLET PRESSURE AND TEMPERATURE
 *----
-
-      !IF(IFLUID.EQ.0) THEN
-      !   CALL THMPT(PCOOL(1),TINLET,DCOOL(1),HINLET,R3,R4,R5)
-      ! ELSE IF(IFLUID.EQ.1) THEN
-      !   CALL THMHPT(PCOOL(1),TINLET,DCOOL(1),HINLET,R3,R4,R5)
-      !! ELSE IF(IFLUID.EQ.2) THEN
-      !   CALL THMSPT(SNAME,SCOMP,TINLET,DCOOL(1),HINLET,R3,R4,R5,IMPX)
-      ! ENDIF
        HMSUP=HINLET
-
-
 *----
 *  WHILE LOOP FOR PRESSURE AND VELOCITY CONVERGENCE
 *----
-
-      IF (PRESSURE .eqv. .FALSE.) GOTO 30
 
        PRINT *, 'ITERATION:', I
        PRINT *, 'HINLET:', HINLET
@@ -258,6 +247,9 @@
     
    30 CONTINUE
 
+*----
+*  MAIN LOOP ALONG THE 1D CHANNEL.
+*----
       K0=0 ! onset of nuclear boiling point
       DO K=1,NZ
 
@@ -304,7 +296,6 @@
 *  COMPUTE FOUR VALUES OF ENTHALPY IN J/KG TO BE USED IN GAUSSIAN
 *  INTEGRATION. DELTH1 IS THE ENTHALPY INCREASE IN EACH AXIAL MESH.
 *----
-        !MFLOW = VCOOL(K)*DCOOL(K)
         DELTH1=(PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)/MFLOW
         DO I1=1,4
           POINT=(1.0+XS(I1))/2.0
@@ -322,20 +313,17 @@
           SLIP(K)=SLIP(K-1)
         ENDIF
 *CGT
-
         IF ((IFLUID.EQ.0).OR.(IFLUID.EQ.1)) THEN
           CALL THMH2O(0,IX,IY,K,K0,PCOOL(K),MFLOW,HMSUP,ENT,HD,IFLUID,
      >    IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),EPS(K),
      >    SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,
-     >DLCOOL(K),TRE11(NDTOT),KWA(K))
+     >RHOL,TRE11(NDTOT),KWA(K))
         ELSEIF (IFLUID.EQ.2) THEN
           CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,SNAME,
      >    SCOMP,IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),
      >    EPS(K),SLIP(K),HZ(K),TCALO,RHO,
-     >DLCOOL(K),TRE11(NDTOT),KWA(K))
+     >RHOL,TRE11(NDTOT),KWA(K))
         ENDIF
-
-
 *CGT
 *----
 *  STEADY-STATE SOLUTION OF THE CONDUCTION EQUATIONS IN A FUEL PIN.
@@ -353,8 +341,7 @@
 *  RECOVER MESHWISE TEMPERATURES AND FLUID DENSITY. BY DEFAULT, USE THE
 *  ROWLANDS FORMULA TO COMPUTE THE EFFECTIVE FUEL TEMPERATURE, OTHERWISE
 *  USE USER-SPECIFIED WEIGHTING FACTOR.
-*----
-        
+*----  
         TCOMB(K)=(1.0-WTEFF)*TC1+WTEFF*TRE11(NFD)
         TCENT(K)=TC1
         TSURF(K)=TRE11(NFD)
@@ -372,11 +359,13 @@
         DO K2=1,NDTOT
           TEMPT(K2,K)=TRE11(K2)
         ENDDO
-        IF (PRESSURE .eqv. .FALSE.) THEN
+        IF (IPRES .EQ. 0) THEN
           PCOOL(K) = PINLET
           VCOOL(K)=MFLOW/DCOOL(K)
         ENDIF
       ENDDO
+
+      IF (IPRES .EQ. 0) GOTO 20
 
       ERRV = 0
       ERRP = 0
@@ -403,7 +392,7 @@
 
    20 CONTINUE
 
-      IF (I == 10) THEN
+      IF (I == 100) THEN
         PRINT *, 'Nombre maximum d''itérations atteint'
       ENDIF
       PRINT *, 'Boucle terminée'

@@ -1,0 +1,1665 @@
+* CLE-2000 VERS 3.0 * R.ROY, EPM COPYRIGHT 1999 *                                                                          LINE
+*=====================================================================*                                                    0001
+* FILE:           ssrcell_thm.x2m                                                                                          0002
+* TYPE:           DRAGON/DONJON input file                                                                                 0003
+* AUTHOR:         Cristian Garrido Tamm (cristian.garrido@idom.com)                                                        0004
+* PURPOSE:        TODO                                                                                                     0005
+* CREATION DATE:  Fri 07 Apr 2023 09:47:29 PM CEST                                                                         0006
+* LAST MODIFIED:  Sat 08 Apr 2023 01:07:48 PM CEST                                                                         0007
+*=====================================================================*                                                    0008
+*---                                                                                                                       0009
+* DEFINE MODULES                                                                                                           0010
+*---                                                                                                                       0011
+MODULE END: USPLIT: THM: TRIVAT: TRIVAA: NCR: MACINI: FLUD: ;                                                              0012
+*---                                                                                                                       0013
+* DEFINE PROCEDURES                                                                                                        0014
+*---                                                                                                                       0015
+PROCEDURE HOM_chan HOM_fmap ;                                                                                              0016
+*---                                                                                                                       0017
+* DEFINE DATA STRUCTURES                                                                                                   0018
+*---                                                                                                                       0019
+LINKED_LIST CPO GEOM FMAP MATEX THM TRACK MACRO MACRO2 SYSTEM FLUX ;                                                       0020
+SEQ_ASCII COMPO :: FILE './_COMPO.txt' ;                                                                                   0021
+PROCEDURE assertS ;                                                                                                        0022
+*---                                                                                                                       0023
+* DEFINE VARIABLES                                                                                                         0024
+*---                                                                                                                       0025
+* Constants                                                                                                                0026
+STRING DOUBLE_LINE :=                                                                                                      0027
+"====================================================================" ;                                                   0028
+STRING SINGLE_LINE :=                                                                                                      0029
+"--------------------------------------------------------------------" ;                                                   0030
+LOGICAL True False := $True_L $False_L ;                                                                                   0031
+STRING FILENAME := 'ssrcell_thm' ;                                                                                         0032
+                   ?           ?                                                                                        xKrÀÿÿ
+* Input data                                                                                                               0033
+*GEO                                                                                                                       0034
+REAL Apothem := 10.0 ;                                                                                                     0035
+REAL maxh := 4000.0 ;                                                                                                      0036
+*TEMPERATURES                                                                                                              0037
+REAL Tfuel := 1200.15 ;                                                                                                    0038
+REAL Tcool := 1000.15 ;                                                                                                    0039
+REAL Tmod := 1000.15 ;                                                                                                     0040
+*FUEL MASS                                                                                                                 0041
+REAL Mass := 4.655149E-3 ; ! kg                                                                                            0042
+*FUEL POWER                                                                                                                0043
+REAL Fuelpwr := 38.425 ; ! kW/kg                                                                                           0044
+* Variables                                                                                                                0045
+REAL   powi := Fuelpwr Mass * 1.E3 / ;                                                                                     0046
+ECHO "total reactor power=" powi "MW" ;                                                                                    0047
+*---                                                                                                                       0048
+* BEGIN CALCULATION                                                                                                        0049
+*---                                                                                                                       0050
+ECHO DOUBLE_LINE ;                                                                                                         0051
+ECHO 'BEGIN INPUT ' FILENAME ;                                                                                             0052
+     ?            ?                                                                                                     xKrÀÿÿ
+ECHO DOUBLE_LINE ;                                                                                                         0053
+*---                                                                                                                       0054
+* RECOVER MULTICOMPO                                                                                                       0055
+*---                                                                                                                       0056
+CPO := COMPO ;                                                                                                             0057
+*---                                                                                                                       0058
+* GEOMETRY                                                                                                                 0059
+*---                                                                                                                       0060
+REAL Hside := 2.0 Apothem * 3.0 SQRT / ;                                                                                   0061
+GEOM := HOM_chan ::                                                                                                        0062
+<<Hside>> <<maxh>> ;                                                                                                       0063
+*---                                                                                                                       0064
+* Reactor material index:                                                                                                  0065
+*---                                                                                                                       0066
+GEOM MATEX := USPLIT: GEOM :: NGRP 2 MAXR 400                                                                              0067
+NFUEL 1 FMIX 1 ;                                                                                                           0068
+*--                                                                                                                        0069
+* Fuel map definition                                                                                                      0070
+*--                                                                                                                        0071
+FMAP MATEX := HOM_fmap MATEX ::                                                                                            0072
+<<Hside>> <<maxh>> <<powi>> <<Tfuel>> <<Tcool>> <<Tmod>> <<Mass>> ;                                                        0073
+*--                                                                                                                        0074
+* THM single-stage calculation                                                                                             0075
+*--                                                                                                                        0076
+THM FMAP := THM: FMAP ::                                                                                                   0077
+EDIT 2                                                                                                                     0078
+FPUISS 0.93                                                                                                                0079
+INLET 330000.0 (*Pa*) 318.15 (*K*)                                                                                         0080
+INLET-Q 7.9770045E-5 (*m2*) 0.375 (*inlet mass flow rate kg/s*)                                                            0081
+CRITFL 8.5E6 (* W/m^2 *)                                                                                                   0082
+ASSMB 1 0                                                                                                                  0083
+RADIUS 4.55063E-3 4.60169E-3 5.00184E-3 5.00184E-3 (* m *)                                                                 0084
+RODMESH 15 20                                                                                                              0085
+MONO                                                                                                                       0086
+;                                                                                                                          0087
+*---                                                                                                                       0088
+*TRACKING: Raviart-Thomas-Schneider method                                                                                 0089
+*---                                                                                                                       0090
+TRACK := TRIVAT: GEOM :: EDIT 0                                                                                            0091
+MAXR 400 DUAL 1 3                                                                                                          0092
+SPN 3 SCAT 4 ;                                                                                                             0093
+*---                                                                                                                       0094
+* XS INTERPOLATION                                                                                                         0095
+*---                                                                                                                       0096
+MACRO := NCR: CPO FMAP ::                                                                                                  0097
+EDIT 100                                                                                                                   0098
+MACRO LINEAR                                                                                                               0099
+NMIX 20                                                                                                                    0100
+TABLE CPO EDI2B                                                                                                            0101
+MIX 1                                                                                                                      0102
+SET 'TF' <<Tfuel>>                                                                                                         0103
+SET 'TC' <<Tcool>>                                                                                                         0104
+SET 'TM' <<Tmod>>                                                                                                          0105
+ENDMIX ;                                                                                                                   0106
+MACRO2 MATEX := MACINI: MATEX MACRO :: EDIT 99 FUEL ;                                                                      0107
+*---                                                                                                                       0108
+* FLUX SOLUTION                                                                                                            0109
+*---                                                                                                                       0110
+SYSTEM := TRIVAA: MACRO2 TRACK :: EDIT 0 ;                                                                                 0111
+FLUX := FLUD: SYSTEM TRACK :: EDIT 2                                                                                       0112
+ACCE 3 3 EXTE 1000 1E-04 ADI 6 ;                                                                                           0113
+*---                                                                                                                       0114
+* END CALCULATION                                                                                                          0115
+*---                                                                                                                       0116
+ECHO DOUBLE_LINE ;                                                                                                         0117
+ECHO 'END INPUT ' FILENAME ;                                                                                               0118
+     ?          ?                                                                                                       xKrÀÿÿ
+ECHO DOUBLE_LINE ;                                                                                                         0119
+assertS FLUX :: 'K-EFFECTIVE' 1 1.282791 ;                                                                                 0120
+ECHO "test ssrcell_thm completed" ;                                                                                        0121
+END: ;                                                                                                                     0122
+QUIT .                                                                                                                     0123
+ 
+>|total reactor power=  1.788741e-04 MW                                                                                   |>0047
+>|====================================================================                                                    |>0051
+>|BEGIN INPUT  ssrcell_thm                                                                                                |>0052
+>|====================================================================                                                    |>0053
+ @@@@@@@     @@@@@   @@     @@   @@@@@@   @@@@@   @@     @@
+ @@@@@@@@   @@@@@@@  @@@    @@       @@  @@@@@@@  @@@    @@
+ @@     @@ @@     @@ @@@@   @@       @@ @@     @@ @@@@   @@
+ @@     @@ @@     @@ @@ @@  @@       @@ @@     @@ @@ @@  @@
+ @@     @@ @@     @@ @@  @@ @@       @@ @@     @@ @@  @@ @@
+ @@     @@ @@     @@ @@   @@@@       @@ @@     @@ @@   @@@@
+ @@@@@@@@   @@@@@@@  @@    @@@ @@    @@  @@@@@@@  @@    @@@
+ @@@@@@@     @@@@@   @@     @@  @@@@@@    @@@@@   @@     @@
+
+           VERSION donjon 5  Version 5.0.10 ($Revision: 3198 $)                  $Date: 2024-03-06 07:29:43 -0500 (Wed, 06 Mar 2024) $           
+           GROUPE D'ANALYSE NUCLEAIRE
+           ECOLE POLYTECHNIQUE DE MONTREAL
+
+
+ COPYRIGHT NOTICE FOR THIS VERSION OF donjon:
+ --------------------------------------------
+ Copyright (C) 2007 Ecole Polytechnique de Montreal 
+ This library is free software; you can redistribute it
+ and/or modify it under the terms of the GNU Lesser General
+ Public License as published by the Free Software Foundation;
+ either version 2.1 of the License, or (at your option) any
+ later version 
+
+
+
+->@BEGIN MODULE : EQU:        
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+ DRVEQU: A LCM OBJECT NAMED 'CPO         ' WAS IMPORTED FROM FILE 'COMPO       '.
+-->>module EQU:        : time spent=        1.885 memory usage= 2.160E+05
+->@END MODULE   : EQU:        
+>|====================================================================                                                    |>0059
+>|BEGIN PROCEDURE  HOM_chan                                                                                               |>0060
+>|====================================================================                                                    |>0061
+->@BEGIN MODULE : GEO:        
+->@DESCRIPTION  : Geometry definition                                                     
+->@CREDITS      : A. Hebert                                                               
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+ CREATION OF A LEVEL  1 GEOMETRY ON THE DIRECTORY NAMED '/           ' OF THE LCM OBJECT 'GEOM        ' WITH TYPE HEXAGONE 3-D (Z).
+
+ STATE VECTOR:
+ ITYPE      9   (HEXAGONE 3-D (Z))
+ LR         0   (NUMBER OF TUBES)
+ LX         1   (X-DIMENSION INDEX)
+ LY         1   (Y-DIMENSION INDEX)
+ LZ        20   (Z-DIMENSION INDEX)
+ LREG      20   (NUMBER OF REGIONS)
+ MAXMIX     1   (MAX. NB. OF MIXTURES/0=TRANSPARENT GEOMETRY)
+ ISUB1      0   (1=COMMAND CELL IS USED/0=ELSE)
+ ISUB2      0   (NUMBER OF SUB GEOMETRIES)
+ IMERGE     0   (1=CELL-MERGING/0=ELSE)
+ ISPLIT     1   (1=MESH-SPLITTING/0=ELSE)
+ IBIHET     0   (1=DOUBLE HETEROGENEITY/0=ELSE)
+ ICLUST     0   (NUMBER OF CLUSTER RINGS)
+ ISECT      0   (TYPE OF SECTORIZATION)
+ JSECT      0   (NUMBER OF NON-SECTORIZED ANNULII)
+ IPIN       0   (PIN LOCATION OPTION)
+->@END MODULE   : GEO:        
+-->>MODULE GEO:        : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+>|====================================================================                                                    |>0117
+>|END PROCEDURE  HOM_chan                                                                                                 |>0118
+>|====================================================================                                                    |>0119
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> USPLIT:     
+ @FROM CODE    -> DONJON      
+ @DESCRIPTION  -> LINK MATERIAL INDEX AND REACTOR GEOMETRY                                
+ @CREDITS      -> J. KOCLAS, D. SEKKI                                                     
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'MATEX       ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'MAT         '        60    INTEGER         
+        2  'INDEX       '        60    INTEGER         
+        3  'FMIX        '         1    INTEGER         
+        4  'FTOT        '         1    INTEGER         
+        5  'SIDE        '         1    REAL            
+        6  'MESHZ       '        21    REAL            
+        7  'SIGNATURE   '         3    CHARACTER       ='L_MATEX     '
+        8  'STATE-VECTOR'        40    INTEGER         
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       187
+
+ @END MODULE -> USPLIT:     
+-->>MODULE USPLIT:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+>|====================================================================                                                    |>0063
+>|BEGIN PROCEDURE  HOM_fmap                                                                                               |>0064
+>|====================================================================                                                    |>0065
+>|input Matex                                                                                                             |>0086
+->@BEGIN MODULE : UTL:        
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'MATEX       ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'MAT         '        60    INTEGER         
+        2  'INDEX       '        60    INTEGER         
+        3  'FMIX        '         1    INTEGER         
+        4  'FTOT        '         1    INTEGER         
+        5  'SIDE        '         1    REAL            
+        6  'MESHZ       '        21    REAL            
+        7  'SIGNATURE   '         3    CHARACTER       ='L_MATEX     '
+        8  'STATE-VECTOR'        40    INTEGER         
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       187
+
+
+ DRVUTL: CONTENT OF BLOCK 'STATE-VECTOR'     LENGTH =        40     NUMBER OF NON ZERO TERMS =         9
+
+          2        60         0         1        60         9        60         3         1        20         0         0         0
+          0         0         0         0         0         0         0         0         0         0         0         0         0
+          0         0         0         0         0         0         0         0         0         0         0         0         0
+          0
+
+
+
+ DRVUTL: LEAVING WITH ACTIVE DIRECTORY '/           '.
+-->>module UTL:        : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : UTL:        
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> RESINI:     
+ @FROM CODE    -> DONJON      
+ @DESCRIPTION  -> FUEL LATTICE GEOMETRY AND PROPERTIES                                    
+ @CREDITS      -> E. VARIN, D. SEKKI, R. CHAMBON                                          
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'MATEX       ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'MAT         '        60    INTEGER         
+        2  'INDEX       '        60    INTEGER         
+        3  'FMIX        '         1    INTEGER         
+        4  'FTOT        '         1    INTEGER         
+        5  'SIDE        '         1    REAL            
+        6  'MESHZ       '        21    REAL            
+        7  'SIGNATURE   '         3    CHARACTER       ='L_MATEX     '
+        8  'STATE-VECTOR'        40    INTEGER         
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       187
+
+ @RESDRV: Reading Keyword=:::         
+ ** CREATING FUEL-MAP GEOMETRY **
+
+ CREATION OF A LEVEL  1 GEOMETRY ON THE DIRECTORY NAMED '/           ' OF THE LCM OBJECT 'FMAP        ' WITH TYPE HEXAGONE 3-D (Z).
+
+ STATE VECTOR:
+ ITYPE      9   (HEXAGONE 3-D (Z))
+ LR         0   (NUMBER OF TUBES)
+ LX         1   (X-DIMENSION INDEX)
+ LY         1   (Y-DIMENSION INDEX)
+ LZ        20   (Z-DIMENSION INDEX)
+ LREG      20   (NUMBER OF REGIONS)
+ MAXMIX     1   (MAX. NB. OF MIXTURES/0=TRANSPARENT GEOMETRY)
+ ISUB1      0   (1=COMMAND CELL IS USED/0=ELSE)
+ ISUB2      0   (NUMBER OF SUB GEOMETRIES)
+ IMERGE     0   (1=CELL-MERGING/0=ELSE)
+ ISPLIT     1   (1=MESH-SPLITTING/0=ELSE)
+ IBIHET     0   (1=DOUBLE HETEROGENEITY/0=ELSE)
+ ICLUST     0   (NUMBER OF CLUSTER RINGS)
+ ISECT      0   (TYPE OF SECTORIZATION)
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY 'GEOMAP      ' OF THE TABLE    'FMAP        ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'IHEX        '         1    INTEGER         
+        2  'SIDE        '         1    REAL            
+        3  'SPLITL      '         1    INTEGER         
+        4  'MESHZ       '        21    REAL            
+        5  'MIX         '        20    INTEGER         
+        6  'SIGNATURE   '         3    CHARACTER       ='L_GEOM      '
+        7  'STATE-VECTOR'        40    INTEGER         
+        8  'NCODE       '         6    INTEGER         
+        9  'ZCODE       '         6    REAL            
+       10  'ICODE       '         6    INTEGER         
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY 'GEOMAP      ' =       105
+
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'FMAP        ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'SIGNATURE   '         3    CHARACTER       ='L_MAP       '
+        2  'GEOMAP      '        -1    DIRECTORY       
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =         3
+
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY 'GEOMAP      ' OF THE TABLE    'FMAP        ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'IHEX        '         1    INTEGER         
+        2  'SIDE        '         1    REAL            
+        3  'SPLITL      '         1    INTEGER         
+        4  'MESHZ       '        21    REAL            
+        5  'MIX         '        20    INTEGER         
+        6  'SIGNATURE   '         3    CHARACTER       ='L_GEOM      '
+        7  'STATE-VECTOR'        40    INTEGER         
+        8  'NCODE       '         6    INTEGER         
+        9  'ZCODE       '         6    REAL            
+       10  'ICODE       '         6    INTEGER         
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY 'GEOMAP      ' =       105
+
+
+
+ LX=   3    LY=   1    LZ=  20    NMBLK=   60    NCODE(1)= 2   NCODE(2)= 0   NCODE(3)= 0   NCODE(4)= 0   NCODE(5)= 1   NCODE(6)= 1
+
+
+
+ SIDE
+   1.1547E+01
+
+
+  ZZZ
+   0.0000E+00  2.0000E+02  4.0000E+02  6.0000E+02  8.0000E+02  1.0000E+03  1.2000E+03  1.4000E+03  1.6000E+03  1.8000E+03
+   2.0000E+03  2.2000E+03  2.4000E+03  2.6000E+03  2.8000E+03  3.0000E+03  3.2000E+03  3.4000E+03  3.6000E+03  3.8000E+03
+   4.0000E+03
+
+
+ MAT
+      1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1
+      1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1
+      1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1     1
+
+ 3-D HEXAGONAL GEOMETRY.
++                          BASED ON GEOMETRY FMAP        .
+
+
+ NUMBER OF MESH INTERVALS ALONG THE X AXIS =    3     AVAILABLE STORAGE MAXX =      3
+                          ALONG THE Y AXIS =    1     AVAILABLE STORAGE MAXY =      1
+                          ALONG THE Z AXIS =   20     AVAILABLE STORAGE MAXZ =     20
+ NUMBER OF DISTINCT MIXTURES =      1
+
+ CHECKING FUEL-MAP GEOMETRY
+ SETTING FUEL-MAP MIXTURES
+
+ RESPFM: NUMBER OF FUEL CHANNELS=    1
+         NUMBER OF FUEL BUNDLES PER CHANNEL=   20
+         TOTAL NUMBER OF FUEL BUNDLES=      20
+ STORING FUEL MIXTURES
+
+
+ MAT
+      1     1     1     2     2     2     3     3     3     4     4     4     5     5     5     6     6     6     7     7
+      7     8     8     8     9     9     9    10    10    10    11    11    11    12    12    12    13    13    13    14
+     14    14    15    15    15    16    16    16    17    17    17    18    18    18    19    19    19    20    20    20
+ @RESDRV: Reading Keyword=NHNAME      
+ @RESDRV: Reading Keyword=NCOMB       
+
+ READING INSTANTANEOUS BURNUPS
+
+ READING BUNDLE POWERS IN KW
+
+ INPUT OF NEW PARAMETER: T-FUEL      
+
+ INPUT OF NEW PARAMETER: T-COOL      
+
+ INPUT OF NEW PARAMETER: T-MODE      
+
+ OPTIONS
+ -------
+ IMPX   50000   (0=NO PRINT/1=SHORT/2=MORE)
+ NB        20   (NUMBER OF FUEL BUNDLES PER CHANNEL)
+ NCH        1   (NUMBER OF FUEL CHANNELS)
+ NCOMB      1   (NUMBER OF COMBUSTION ZONES)
+ NGRP       2   (NUMBER OF ENERGY GROUPS)
+ INTER      0   (TYPE OF INTERPOLATION)
+ ISHIFT     0   (NUMBER OF BUNDLE SHIFTS)
+ NFUEL      1   (NUMBER OF FUEL TYPES)
+ NPARM      3   (NUMBER OF PARAMETERS)
+ NTOT      20   (TOTAL NUMBER OF FUEL BUNDLES)
+ IGEO       9   (7=CARTESIAN/9=HEXAGONAL)
+ NSIMS      0   (ASSEMBLY LAYOUT IN SIM: MODULE)
+ NIS        0   (NUMBER OF PARTICULARIZED ISOTOPES)
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'FMAP        ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'SIGNATURE   '         3    CHARACTER       ='L_MAP       '
+        2  'GEOMAP      '        -1    DIRECTORY       
+        3  'FUEL        '         1    LIST            
+        4  'FLMIX       '        20    INTEGER         
+        5  'BMIX        '        20    INTEGER         
+        6  'HNAME       '         2    CHARACTER       
+        7  'B-ZONE      '         1    INTEGER         
+        8  'BURN-INST   '        20    REAL            
+        9  'BUND-PW     '        20    REAL            
+       10  'REACTOR-PW  '         1    REAL            
+       11  'PARAM       '         3    LIST            
+       12  'STATE-VECTOR'        40    INTEGER         
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       127
+
+ @END MODULE -> RESINI:     
+-->>MODULE RESINI:     : TIME SPENT=        0.001 MEMORY USAGE= 8.120E+02
+>|====================================================================                                                    |>0137
+>|END PROCEDURE  HOM_fmap                                                                                                 |>0138
+>|====================================================================                                                    |>0139
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> THM:        
+ @FROM CODE    -> DONJON      
+ @DESCRIPTION  -> SIMPLIFIED THERMAL-HYDRAULICS CALCULATION                               
+ @CREDITS      -> A. HEBERT                                                               
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+
+ THM: CHANNEL-DEPENDENT DATA
+
+
+ CHANNEL       1      |
+ NB-FUEL      1.00    |
+ NB-TUBE      0.00    |
+ PUFR      0.0000E+00 |
+
+ THM: RADIAL POWER FORM FACTORS
+  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00
+  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00
+
+ THM: RECOVER GLOBAL PARAMETER = T-FUEL      .
+ Boucle terminÃ©e
+ PCOOL FINAL:   330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000       330000.000    
+ VCOOL FINAL:   4.74696302       4.74699306       4.74702215       4.74705219       4.74708128       4.74711132       4.74714041       4.74716997       4.74719954       4.74722910       4.74725866       4.74728823       4.74731827       4.74734783       4.74737740       4.74740696       4.74743652       4.74746609       4.74749660       4.74752522    
+ DCOOL FINAL:   990.319946       990.313721       990.307617       990.301331       990.295288       990.289062       990.282959       990.276794       990.270630       990.264404       990.258240       990.252075       990.245850       990.239685       990.233521       990.227356       990.221191       990.215027       990.208679       990.202637    
+ TCOOL FINAL:   318.157288       318.172119       318.186707       318.201538       318.216187       318.230957       318.245575       318.260437       318.275024       318.289886       318.304535       318.319336       318.334137       318.348755       318.363586       318.378204       318.393005       318.407623       318.422455       318.437073    
+ EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
+ XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
+ TBUL:   409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536    
+
+ THM: CORE COOLANT SECTION. COMPUTED= 3.46E-02 GIVEN= 7.98E-05 m2.
+
+ THM: SAVE TIMESTEP0000 AT TIME=  0.0000E+00 S.
+
+ THM: RECOVER GLOBAL PARAMETER = T-FUEL      .
+
+ THM: ERROR ON FUEL TEMPERATURE =     797.630 K  MIN VALUE =     402.520 K  MAX VALUE =     402.747 K
+
+ THM: RECOVER GLOBAL PARAMETER = T-COOL      .
+
+ THM: ERROR ON COOLANT TEMPERATURE =     681.993 K  MIN VALUE =     318.157 K  MAX VALUE =     318.437 K
+
+ STATE VECTOR:
+ NZ            1   (NUMBER OF AXIAL MESHES)
+ NCH          20   (NUMBER OF CHANNELS IN THE RADIAL PLANE)
+ MAXIT1       50   (NUMBER OF CONDUCTION ITERATIONS)
+ MAXIT2       50   (NUMBER OF CENTER-PELLET ITERATIONS)
+ MAXIT3       50   (NUMBER OF FLOW ITERATIONS)
+ NFD          15   (NUMBER OF FUEL RADIAL ZONES)
+ NDTOT        20   (NUMBER OF DISCRETISATION POINTS)
+ ITIME         0   (CALCULATION TYPE)
+ TIMEIT        0   (TRANSIENT ITERATION INDEX)
+ IHGAP         0   (HGAP FLAG (0=DEFAULT/1=FIXED))
+ IHCONV        0   (HCONV FLAG (0=DITTUS-BOELTER/1=FIXED))
+ ICONDF        0   (FUEL CONDUCTIVITY FLAG (0=STORA-CHENEBAULT (UOX), COMETHE (MOX)/1=USER-PROVIDED FUNCTION OF FUEL TEMPERATURE))
+ ICONDC        0   (CLAD CONDUCTIVITY FLAG (0=DEFAULT/1=USER-PROVIDED POLYNOMIAL OF CLAD TEMPERATURE))
+ IFRCDI        0   (FUEL CONDUCTIVITY APPROXIMATION FLAG (0=DEFAULT/1=AVERAGE APPROXIMATION FORCED))
+ ISUBM         0   (BOILING MODEL FLAG (0=ONE-PHASE/1=BOWRING CORRELATION/2=SAHA-ZUBER CORRELATION))
+ NPRAD         0   (RADIAL POWER FORM FACTOR (0=FLAT/NUMBER OF POINTS))
+ NPOWER        0   (NUMBER OF POINTS IN POWER-TABLE)
+ IFLUID        0   (TYPE OF FLUID (0=H2O/1=D2O))
+
+ REAL PARAM:
+ DTIME   0.0000E+00   (TIME STEP IN S)
+ FPUISS  9.3000E-01   (COOLANT POWER FACTOR)
+ CFLUX   8.5000E+06   (CRITICAL HEAT FLUX IN W/M^2)
+ SPEED   4.7469E+00   (COOLANT VELOCITY IN M/S)
+ POULET  3.3000E+05   (OUTLET COOLANT PRESSURE IN PA)
+ TINLET  3.1815E+02   (INLET COOLANT TEMPERATURE IN K)
+ POROS   5.0000E-02   (OXYDE POROSITY)
+ RC      4.5506E-03   (FUEL PELLET RADIUS IN M)
+ RIG     4.6017E-03   (INTERNAL CLAD ROD RADIUS IN M)
+ RGG     5.0018E-03   (EXTERNAL CLAD ROD RADIUS IN M)
+ RTG     5.0018E-03   (GUIDE TUBE RADIUS IN M)
+ PITCH   0.0000E+00   (HEXAGONAL SIDE IN M)
+ ERMAXT  1.0000E+00   (TEMPERATURE MAXIMUM ERROR IN K)
+ ERMAXC  1.0000E-03   (FLOW MAXIMUM RELATIVE ERROR)
+ RELAX   1.0000E+00   (RELAXATION PARAMETER)
+ RTIME   0.0000E+00   (TIME VALUE IN S)
+ WTEFF   5.5556E-01   (SURFACE TEMPERATURE WEIGHTING FACTOR IN EFFECTIVE FUEL TEMPERATURE)
+ RATIOX  0.0000E+00   (MAXIMUM OF VARIABLE VARIATIONS)
+ EPSR    0.0000E+00   (RUGOSITY IN M OF THE FUEL ROD)
+ THETA   0.0000E+00   (ANGLE IN RADIANS OF THE FUEL CHANNEL)
+ @END MODULE -> THM:        
+-->>MODULE THM:        : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
+->@BEGIN MODULE : TRIVAT:     
+->@DESCRIPTION  : 3-D diffusion or SPN finite element tracking                            
+->@CREDITS      : A. Hebert                                                               
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ EXEC: TRIVAT:      BY A. HEBERT
+-->>MODULE TRIVAT:     : TIME SPENT=        0.002 MEMORY USAGE= 0.000E+00
+->@END MODULE   : TRIVAT:     
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> NCR:        
+ @FROM CODE    -> DRAGON      
+ @DESCRIPTION  -> ACCESS MULTI-PARAMETER REACTOR COMPOSITION DATABASE                     
+ @CREDITS      -> A. HEBERT                                                               
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+
+ NCR: INTERPOLATING MULTICOMPO 'CPO         ' FROM DIRECTORY 'EDI2B       '.
+ NCRRGR: KEY=TF           TABULATED POINTS=  8.0015E+02  1.0002E+03  1.2002E+03  1.4002E+03  1.6002E+03
+ NCRRGR: KEY=TC           TABULATED POINTS=  6.0015E+02  8.0015E+02  1.0002E+03  1.2002E+03  1.4002E+03
+ NCRRGR: KEY=TM           TABULATED POINTS=  6.0015E+02  8.0015E+02  1.0002E+03  1.2002E+03  1.4002E+03
+ NCRRGR: NUMBER OF CALCULATIONS IN MULTICOMPO=  125
+ NCRRGR: NUMBER OF MATERIAL MIXTURES IN MULTICOMPO=    1
+ NCRRGR: NUMBER OF MATERIAL MIXTURES IN FUEL MAP=    20
+ LiF-UF4 SSR Multicompo for Fuel Axial thermal expansion                         
+ NCRRGR: GLOBAL PARAMETER:TF           ->LINEAR INTERPOLATION.
+ NCRRGR: GLOBAL PARAMETER:TC           ->LINEAR INTERPOLATION.
+ NCRRGR: GLOBAL PARAMETER:TM           ->LINEAR INTERPOLATION.
+ L_MAP values overwritten by the SET option for parameter TF          
+ L_MAP values overwritten by the SET option for parameter TC          
+ L_MAP values overwritten by the SET option for parameter TM          
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE    1.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE    2.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE    3.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE    4.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE    5.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE    6.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE    7.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE    8.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE    9.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   10.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   11.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   12.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   13.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   14.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   15.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   16.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   17.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   18.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   19.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+ NCRRGR: COMPUTE TERP FACTORS IN NEW MIXTURE   20.
+ NCRTRP: MUPLET=   3   3   3
+ NCRTRP:   0-DIMENSIONAL INTERPOLATION IN COMPO MIXTURE    1.
+ NCRTRP: TERP PARAMETERS IN MIXTURE   1:
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  1.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+   0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00  0.0000E+00
+
+ NCRRGR: INTERPOLATION FACTORS
+ CALC=      63 TERP=  1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00
+                      1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00
+                      1.00000E+00  1.00000E+00  1.00000E+00  1.00000E+00
+
+ NCRMAC: PROCESS MULTICOMPO MIXTURE    1
+ NCRMAC: MULTICOMPO ACCESS FOR MIXTURE       1 AND CALCULATION      63. WEIGHT=  1.0000E+00
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    '*ELEMENTARY*':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'ISOTOPESLIST'       309    LIST            
+        2  'SIGNATURE   '         3    CHARACTER       ='L_LIBRARY   '
+        3  'STATE-VECTOR'        40    INTEGER         
+        4  'ISOTOPESMIX '       309    INTEGER         
+        5  'ISOTOPESUSED'       927    CHARACTER       
+        6  'ISOTOPERNAME'       927    CHARACTER       
+        7  'ISOTOPESDENS'       309    REAL            
+        8  'ISOTOPESTYPE'       309    INTEGER         
+        9  'ISOTOPESTODO'       309    INTEGER         
+       10  'ISOTOPESVOL '       309    REAL            
+       11  'ISOTOPESTEMP'       309    REAL            
+       12  'MIXTURESVOL '         1    REAL            
+       13  'K-EFFECTIVE '         1    REAL            
+       14  'K-INFINITY  '         1    REAL            
+       15  'ADDXSNAME-P0'        34    CHARACTER       
+       16  'ENERGY      '         3    REAL            
+       17  'DELTAU      '         2    REAL            
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =      3793
+
+ NCRAGF: NMIX=          20
+
+ NCRAGF: PROCESS MULTICOMPO MIXTURE    1
+
+ NCRAGF: PROCESS MULTICOMPO MIXTURE-OUT    1
+
+ OPTIONS
+ -------
+ IMPX     100   (0=NO PRINT/1=SHORT/2=MORE)
+ NGROUP     2   (NUMBER OF ENERGY GROUPS)
+ NBMIX     20   (NUMBER OF MIXTURES IN THE MACROLIB)
+ NANISO     2   (MAXIMUM SCATTERING ANISOTROPY)
+ NIFISS     1   (MAXIMUM NUMBER OF FISSILE ISOTOPES IN A MIXTURE)
+ NEDMAC    17   (NUMBER OF CROSS SECTION EDITS)
+ ITRANC     2   (0=NO TRANSPORT CORRECTION/1=APOLLO TYPE/2=RECOVER FROM LIBRARY/4=LEAKAGE CORRECTION)
+ NLG        6   (NUMBER OF DELAYED PRECURSOR GROUPS)
+ NALBP      0   (0: NO PHYSICAL ALBEDO INFO)
+ ILEAK      0   (1=DIFF AVAILABLE; 2=DIFFX AVAILABLE)
+ IDF        0   (0=NO INFO/1=ALBS INFO/2=FLUX GAP INFO/3=ADF GAP INFO)
+ NGFF       0   (0: NO GENERALIZED FORM FACTOR INFO)
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'MACRO       ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'SIGNATURE   '         3    CHARACTER       ='L_MACROLIB  '
+        2  'STATE-VECTOR'        40    INTEGER         
+        3  'ENERGY      '         3    REAL            
+        4  'ADDXSNAME-P0'        34    CHARACTER       
+        5  'LAMBDA-D    '         6    REAL            
+        6  'VOLUME      '        20    REAL            
+        7  'GROUP       '         2    LIST            
+        8  'K-INFINITY  '         1    REAL            
+        9  'K-EFFECTIVE '         1    REAL            
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       108
+
+ @END MODULE -> NCR:        
+-->>MODULE NCR:        : TIME SPENT=        0.006 MEMORY USAGE= 3.312E+03
+
+ ~~~~~~~~~~~~~~~
+ @BEGIN MODULE -> MACINI:     
+ @FROM CODE    -> DONJON      
+ @DESCRIPTION  -> EXPAND MACROLIB OVER THE REACTOR GEOMETRY                               
+ @CREDITS      -> J. KOCLAS, E. VARIN, D. SEKKI                                           
+ @COPYRIGHTS   -> ECOLE POLYTECHNIQUE DE MONTREAL
+                  GNU LESSER GENERAL PUBLIC LICENSE
+ ~~~~~~~~~~~~~~~
+
+ NUMBER OF ENERGY GROUPS             2
+ TOTAL NUMBER OF MIXTURES           60
+ ** TREATING FIRST MACROLIB **
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '            ' OF THE TABLE    'MACRO       ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'FLUX-INTG   '        20    REAL            
+        2  'NTOT0       '        20    REAL            
+        3  'OVERV       '        20    REAL            
+        4  'H-FACTOR    '        20    REAL            
+        5  'NFTOT       '        20    REAL            
+        6  'NG          '        20    REAL            
+        7  'N2N         '        20    REAL            
+        8  'N3N         '        20    REAL            
+        9  'N4N         '        20    REAL            
+       10  'NA          '        20    REAL            
+       11  'NP          '        20    REAL            
+       12  'N2A         '        20    REAL            
+       13  'NNP         '        20    REAL            
+       14  'ND          '        20    REAL            
+       15  'NT          '        20    REAL            
+       16  'TRANC       '        20    REAL            
+       17  'SIGS00      '        20    REAL            
+       18  'SIGS01      '        20    REAL            
+       19  'NUSIGF      '        20    REAL            
+       20  'CHI         '        20    REAL            
+       21  'NUSIGF01    '        20    REAL            
+       22  'CHI01       '        20    REAL            
+       23  'NUSIGF02    '        20    REAL            
+       24  'CHI02       '        20    REAL            
+       25  'NUSIGF03    '        20    REAL            
+       26  'CHI03       '        20    REAL            
+       27  'NUSIGF04    '        20    REAL            
+       28  'CHI04       '        20    REAL            
+       29  'NUSIGF05    '        20    REAL            
+       30  'CHI05       '        20    REAL            
+       31  'NUSIGF06    '        20    REAL            
+       32  'CHI06       '        20    REAL            
+       33  'SCAT00      '        40    REAL            
+       34  'NJJS00      '        20    INTEGER         
+       35  'IJJS00      '        20    INTEGER         
+       36  'IPOS00      '        20    INTEGER         
+       37  'SIGW00      '        20    REAL            
+       38  'SCAT01      '        40    REAL            
+       39  'NJJS01      '        20    INTEGER         
+       40  'IJJS01      '        20    INTEGER         
+       41  'IPOS01      '        20    INTEGER         
+       42  'SIGW01      '        20    REAL            
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '            ' =       880
+
+ ** TREATING ENERGY GROUP #           1
+ PROPERTY NAME : NTOT0       
+ PROPERTY NAME : OVERV       
+ PROPERTY NAME : H-FACTOR    
+ PROPERTY NAME : NFTOT       
+ PROPERTY NAME : SIGS00      
+ PROPERTY NAME : SIGS01      
+ PROPERTY NAME : NUSIGF      
+ PROPERTY NAME : CHI         
+ PROPERTY NAME : NUSIGF01    
+ PROPERTY NAME : CHI01       
+ PROPERTY NAME : NUSIGF02    
+ PROPERTY NAME : CHI02       
+ PROPERTY NAME : NUSIGF03    
+ PROPERTY NAME : CHI03       
+ PROPERTY NAME : NUSIGF04    
+ PROPERTY NAME : CHI04       
+ PROPERTY NAME : NUSIGF05    
+ PROPERTY NAME : CHI05       
+ PROPERTY NAME : NUSIGF06    
+ PROPERTY NAME : CHI06       
+ PROPERTY NAME : SIGW00      
+ PROPERTY NAME : SIGW01      
+ RECOVERING OF SCAT,IJJ,NJJ,IPOS
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '            ' OF THE TABLE    'MACRO2      ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'NTOT0       '        60    REAL            
+        2  'OVERV       '        60    REAL            
+        3  'H-FACTOR    '        60    REAL            
+        4  'NFTOT       '        60    REAL            
+        5  'SIGS00      '        60    REAL            
+        6  'SIGS01      '        60    REAL            
+        7  'NUSIGF      '        60    REAL            
+        8  'CHI         '        60    REAL            
+        9  'NUSIGF01    '        60    REAL            
+       10  'CHI01       '        60    REAL            
+       11  'NUSIGF02    '        60    REAL            
+       12  'CHI02       '        60    REAL            
+       13  'NUSIGF03    '        60    REAL            
+       14  'CHI03       '        60    REAL            
+       15  'NUSIGF04    '        60    REAL            
+       16  'CHI04       '        60    REAL            
+       17  'NUSIGF05    '        60    REAL            
+       18  'CHI05       '        60    REAL            
+       19  'NUSIGF06    '        60    REAL            
+       20  'CHI06       '        60    REAL            
+       21  'SIGW00      '        60    REAL            
+       22  'SIGW01      '        60    REAL            
+       23  'SCAT00      '       120    REAL            
+       24  'IPOS00      '        60    INTEGER         
+       25  'NJJS00      '        60    INTEGER         
+       26  'IJJS00      '        60    INTEGER         
+       27  'SCAT01      '       120    REAL            
+       28  'IPOS01      '        60    INTEGER         
+       29  'NJJS01      '        60    INTEGER         
+       30  'IJJS01      '        60    INTEGER         
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '            ' =      1920
+
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '            ' OF THE TABLE    'MACRO       ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'FLUX-INTG   '        20    REAL            
+        2  'NTOT0       '        20    REAL            
+        3  'OVERV       '        20    REAL            
+        4  'H-FACTOR    '        20    REAL            
+        5  'NFTOT       '        20    REAL            
+        6  'NG          '        20    REAL            
+        7  'N2N         '        20    REAL            
+        8  'N3N         '        20    REAL            
+        9  'N4N         '        20    REAL            
+       10  'NA          '        20    REAL            
+       11  'NP          '        20    REAL            
+       12  'N2A         '        20    REAL            
+       13  'NNP         '        20    REAL            
+       14  'ND          '        20    REAL            
+       15  'NT          '        20    REAL            
+       16  'TRANC       '        20    REAL            
+       17  'SIGS00      '        20    REAL            
+       18  'SIGS01      '        20    REAL            
+       19  'NUSIGF      '        20    REAL            
+       20  'CHI         '        20    REAL            
+       21  'NUSIGF01    '        20    REAL            
+       22  'CHI01       '        20    REAL            
+       23  'NUSIGF02    '        20    REAL            
+       24  'CHI02       '        20    REAL            
+       25  'NUSIGF03    '        20    REAL            
+       26  'CHI03       '        20    REAL            
+       27  'NUSIGF04    '        20    REAL            
+       28  'CHI04       '        20    REAL            
+       29  'NUSIGF05    '        20    REAL            
+       30  'CHI05       '        20    REAL            
+       31  'NUSIGF06    '        20    REAL            
+       32  'CHI06       '        20    REAL            
+       33  'SCAT00      '        40    REAL            
+       34  'NJJS00      '        20    INTEGER         
+       35  'IJJS00      '        20    INTEGER         
+       36  'IPOS00      '        20    INTEGER         
+       37  'SIGW00      '        20    REAL            
+       38  'SCAT01      '        40    REAL            
+       39  'NJJS01      '        20    INTEGER         
+       40  'IJJS01      '        20    INTEGER         
+       41  'IPOS01      '        20    INTEGER         
+       42  'SIGW01      '        20    REAL            
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '            ' =       880
+
+ ** TREATING ENERGY GROUP #           2
+ PROPERTY NAME : NTOT0       
+ PROPERTY NAME : OVERV       
+ PROPERTY NAME : H-FACTOR    
+ PROPERTY NAME : NFTOT       
+ PROPERTY NAME : SIGS00      
+ PROPERTY NAME : SIGS01      
+ PROPERTY NAME : NUSIGF      
+ PROPERTY NAME : CHI         
+ PROPERTY NAME : NUSIGF01    
+ PROPERTY NAME : CHI01       
+ PROPERTY NAME : NUSIGF02    
+ PROPERTY NAME : CHI02       
+ PROPERTY NAME : NUSIGF03    
+ PROPERTY NAME : CHI03       
+ PROPERTY NAME : NUSIGF04    
+ PROPERTY NAME : CHI04       
+ PROPERTY NAME : NUSIGF05    
+ PROPERTY NAME : CHI05       
+ PROPERTY NAME : NUSIGF06    
+ PROPERTY NAME : CHI06       
+ PROPERTY NAME : SIGW00      
+ PROPERTY NAME : SIGW01      
+ RECOVERING OF SCAT,IJJ,NJJ,IPOS
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '            ' OF THE TABLE    'MACRO2      ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'NTOT0       '        60    REAL            
+        2  'OVERV       '        60    REAL            
+        3  'H-FACTOR    '        60    REAL            
+        4  'NFTOT       '        60    REAL            
+        5  'SIGS00      '        60    REAL            
+        6  'SIGS01      '        60    REAL            
+        7  'NUSIGF      '        60    REAL            
+        8  'CHI         '        60    REAL            
+        9  'NUSIGF01    '        60    REAL            
+       10  'CHI01       '        60    REAL            
+       11  'NUSIGF02    '        60    REAL            
+       12  'CHI02       '        60    REAL            
+       13  'NUSIGF03    '        60    REAL            
+       14  'CHI03       '        60    REAL            
+       15  'NUSIGF04    '        60    REAL            
+       16  'CHI04       '        60    REAL            
+       17  'NUSIGF05    '        60    REAL            
+       18  'CHI05       '        60    REAL            
+       19  'NUSIGF06    '        60    REAL            
+       20  'CHI06       '        60    REAL            
+       21  'SIGW00      '        60    REAL            
+       22  'SIGW01      '        60    REAL            
+       23  'SCAT00      '       120    REAL            
+       24  'IPOS00      '        60    INTEGER         
+       25  'NJJS00      '        60    INTEGER         
+       26  'IJJS00      '        60    INTEGER         
+       27  'SCAT01      '       120    REAL            
+       28  'IPOS01      '        60    INTEGER         
+       29  'NJJS01      '        60    INTEGER         
+       30  'IJJS01      '        60    INTEGER         
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '            ' =      1920
+
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'MACRO2      ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'GROUP       '         2    LIST            
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =         0
+
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'MACRO2      ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'GROUP       '         2    LIST            
+        2  'LAMBDA-D    '         6    REAL            
+        3  'STATE-VECTOR'        40    INTEGER         
+        4  'SIGNATURE   '         3    CHARACTER       ='L_MACROLIB  '
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        49
+
+ @END MODULE -> MACINI:     
+-->>MODULE MACINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+->@BEGIN MODULE : TRIVAA:     
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ EXEC: TRIVAA:      BY A. HEBERT
+-->>MODULE TRIVAA:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+->@END MODULE   : TRIVAA:     
+->@BEGIN MODULE : FLUD:       
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ EXEC: FLUD:        BY A. HEBERT
+
+ MTOPEN: NUMBER OF UNKNOWNS =     366. 4-AXIS HEXAGONAL ADI POWER METHOD.                                                        
+1
+ FLDDIR: ITERATIVE PROCEDURE BASED ON PRECONDITIONED POWER METHOD ( 6 ADI ITERATIONS PER OUTER ITERATION).
+         DIRECT EQUATION.
+
+
+     BILINEAR PRODUCTS                                                ALPHA   BETA   EIGENVALUE..            ACCURACY...........  N
+   1  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  5.5E+05   1.000   0.000  0.117394E+01  0.00E+00  0.10E+01             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.4E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+   2  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  1.5E+06   1.000   0.000  0.619114E+00  0.00E+00  0.90E+00             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  9.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+   3  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  7.7E+05   1.000   0.000  0.810629E+00  0.00E+00  0.24E+00             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.2E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+   4  9.9E+05 -4.3E+05 -3.2E+06  3.7E+05  2.8E+06  2.1E+07  8.2E+05   1.286  -0.014  0.782100E+00  0.44E+09  0.36E-01             3
+      7.8E+02  2.9E+04  2.2E+02  7.8E+02  5.5E+03  6.4E+05 -7.6E+00
+      1.9E+04 -7.1E+00  6.1E+02  3.7E+03  2.0E+04  2.7E+03  2.0E+04
+   5  5.0E+05 -4.9E+02  3.2E+02  4.5E+02  4.2E+02  4.9E+05  8.2E+05   1.119  -0.001  0.781064E+00  0.47E+08  0.13E-02             2
+      9.9E+01  8.1E+02  8.4E+01  1.3E+02  3.3E+02  6.4E+05 -1.0E+00
+      5.3E+02 -9.1E-01  7.8E+01  1.0E+02  5.1E+02  1.2E+02  8.7E+02
+   6  5.0E+05 -5.6E+01  1.8E+01  5.5E+01  6.4E+01  5.7E+02  8.2E+05   1.802  -0.001  0.780869E+00  0.28E+08  0.25E-03             3
+      7.0E+01  2.2E+02  6.1E+01  7.9E+01  1.1E+02  6.4E+05 -6.7E-01
+      9.5E+01 -6.4E-01  5.5E+01  7.2E+01  9.6E+01  7.2E+01  9.7E+01
+   7  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.2E+05   1.000   0.000  0.780655E+00  0.00E+00  0.27E-03             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.4E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+   8  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.2E+05   1.000   0.000  0.780574E+00  0.00E+00  0.10E-03             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.4E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+   9  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.2E+05   1.000   0.000  0.780506E+00  0.00E+00  0.86E-04             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.4E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  10  5.0E+05 -1.8E+01 -4.5E-01  1.7E+01  1.9E+01  2.1E+01  8.2E+05  34.465  -0.630  0.780449E+00  0.43E+07  0.73E-04             3
+      2.7E+01  6.0E+01  2.5E+01  2.7E+01  2.9E+01  6.4E+05 -2.7E-01
+      2.4E+01 -2.6E-01  2.1E+01  2.2E+01  2.4E+01  2.2E+01  2.4E+01
+  11  5.0E+05 -5.1E+00  1.5E+03  4.9E+00  6.5E+01  2.1E+03  8.3E+05   1.574   0.063  0.780065E+00  0.32E+07  0.49E-03             3
+      6.9E+00  2.7E+03  6.6E+00  1.0E+02  3.1E+03  6.4E+05 -5.7E-02
+      2.1E+03 -5.7E-02  5.4E+00  8.3E+01  2.1E+03  8.3E+01  2.6E+03
+  12  5.0E+05 -3.9E+00  2.0E+02  3.8E+00  1.1E+01  5.4E+01  8.3E+05   4.658   0.142  0.780027E+00  0.24E+07  0.49E-04             3
+      5.9E+00  3.6E+02  5.7E+00  1.8E+01  8.0E+01  6.4E+05 -5.3E-02
+      2.7E+02 -5.4E-02  4.6E+00  1.4E+01  2.7E+02  1.4E+01  6.5E+01
+  13  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779959E+00  0.00E+00  0.87E-04             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.4E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  14  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779952E+00  0.00E+00  0.97E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.4E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  15  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779944E+00  0.00E+00  0.93E-05  0.44E-02   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.4E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  16  5.0E+05 -2.2E+00 -6.8E-02  2.2E+00  2.2E+00  2.3E+00  8.3E+05  42.647  -0.364  0.779937E+00  0.91E+06  0.89E-05             4
+      3.5E+00  7.3E+00  3.5E+00  3.5E+00  3.6E+00  6.4E+05 -2.2E-02
+      2.8E+00 -2.3E-02  2.8E+00  2.8E+00  2.8E+00  2.8E+00  2.9E+00
+  17  5.0E+05 -1.1E+00  1.5E+03  1.1E+00  2.9E+01  1.6E+03  8.3E+05   2.503   0.048  0.779801E+00  0.79E+06  0.17E-03             3
+      1.7E+00  2.5E+03  1.6E+00  4.8E+01  2.5E+03  6.5E+05 -3.1E-03
+      1.9E+03 -2.4E-03  1.3E+00  3.7E+01  1.9E+03  3.7E+01  2.0E+03
+  18  5.0E+05 -9.6E-01  2.2E+02  9.3E-01  5.4E+00  4.7E+01  8.3E+05   4.954   0.379  0.779783E+00  0.57E+06  0.23E-04             3
+      1.4E+00  3.8E+02  1.4E+00  8.8E+00  7.5E+01  6.5E+05 -1.3E-02
+      2.9E+02 -1.4E-02  1.1E+00  6.9E+00  2.9E+02  6.9E+00  5.9E+01
+  19  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779744E+00  0.00E+00  0.50E-04             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  20  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779742E+00  0.00E+00  0.23E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  21  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779741E+00  0.00E+00  0.22E-05  0.16E-02   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  22  5.1E+05 -5.6E-01 -2.8E-02  5.4E-01  5.4E-01  5.5E-01  8.3E+05  52.839  -0.453  0.779739E+00  0.34E+06  0.21E-05             3
+      8.7E-01  1.8E+00  8.7E-01  8.8E-01  8.8E-01  6.5E+05 -1.5E-02
+      6.7E-01 -1.5E-02  6.8E-01  6.9E-01  6.7E-01  6.9E-01  7.0E-01
+  23  5.1E+05 -3.9E-01  4.1E+02  3.9E-01  1.1E+01  4.4E+02  8.3E+05   1.774   0.156  0.779698E+00  0.30E+06  0.53E-04             3
+      6.2E-01  7.2E+02  5.9E-01  1.9E+01  7.1E+02  6.5E+05  7.4E-03
+      5.4E+02  7.9E-03  4.7E-01  1.4E+01  5.4E+02  1.4E+01  5.6E+02
+  24  5.1E+05 -3.4E-01  1.6E+02  3.5E-01  3.4E+00  4.6E+01  8.3E+05   6.137   0.194  0.779686E+00  0.25E+06  0.14E-04             3
+      5.8E-01  2.8E+02  5.5E-01  5.6E+00  7.5E+01  6.5E+05  1.1E-02
+      2.1E+02  1.1E-02  4.4E-01  4.4E+00  2.1E+02  4.4E+00  5.9E+01
+  25  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779669E+00  0.00E+00  0.23E-04             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  26  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779668E+00  0.00E+00  0.11E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  27  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779667E+00  0.00E+00  0.10E-05  0.11E-02   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  28  5.1E+05 -2.7E-01 -2.3E-02  2.5E-01  2.5E-01  2.6E-01  8.3E+05  38.167  -0.444  0.779666E+00  0.18E+06  0.98E-06             3
+      3.9E-01  8.0E-01  4.1E-01  4.1E-01  4.1E-01  6.5E+05 -1.6E-02
+      3.0E-01 -1.6E-02  3.2E-01  3.2E-01  3.0E-01  3.2E-01  3.3E-01
+  29  5.1E+05 -2.1E-01  1.0E+02  2.1E-01  4.4E+00  1.1E+02  8.3E+05   2.004   0.111  0.779651E+00  0.17E+06  0.19E-04             3
+      3.4E-01  1.8E+02  3.3E-01  7.2E+00  1.8E+02  6.5E+05  1.7E-03
+      1.4E+02  1.7E-03  2.6E-01  5.6E+00  1.4E+02  5.6E+00  1.4E+02
+  30  5.1E+05 -1.9E-01  3.3E+01  2.0E-01  1.3E+00  1.0E+01  8.3E+05   8.890   0.250  0.779647E+00  0.15E+06  0.54E-05             3
+      3.4E-01  5.8E+01  3.1E-01  2.2E+00  1.7E+01  6.5E+05  1.5E-02
+      4.3E+01  1.5E-02  2.5E-01  1.7E+00  4.3E+01  1.7E+00  1.3E+01
+  31  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779633E+00  0.00E+00  0.17E-04             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  32  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779633E+00  0.00E+00  0.60E-06             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  33  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.3E+05   1.000   0.000  0.779632E+00  0.00E+00  0.61E-06  0.83E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  34  5.1E+05 -1.5E-01 -2.5E-03  1.5E-01  1.5E-01  1.5E-01  8.3E+05  51.857  -0.457  0.779632E+00  0.11E+06  0.61E-06             3
+      2.5E-01  5.0E-01  2.5E-01  2.5E-01  2.5E-01  6.5E+05 -1.6E-03
+      2.0E-01 -1.6E-03  1.9E-01  1.9E-01  2.0E-01  1.9E-01  2.0E-01
+  35  5.1E+05 -1.4E-01  1.1E+02  1.3E-01  3.6E+00  1.2E+02  8.4E+05   2.061   0.165  0.779620E+00  0.98E+05  0.16E-04             3
+      2.0E-01  2.0E+02  2.0E-01  5.9E+00  1.9E+02  6.5E+05 -7.6E-03
+      1.5E+02 -7.9E-03  1.6E-01  4.6E+00  1.5E+02  4.6E+00  1.5E+02
+  36  5.1E+05 -1.2E-01  5.7E+01  1.2E-01  1.4E+00  1.9E+01  8.4E+05   5.615   0.209  0.779615E+00  0.93E+05  0.57E-05             3
+      1.9E-01  9.8E+01  1.9E-01  2.3E+00  3.2E+01  6.5E+05 -1.8E-03
+      7.5E+01 -1.5E-03  1.5E-01  1.8E+00  7.5E+01  1.8E+00  2.5E+01
+
+ FLDDIR: INCREASING THE NUMBER OF INNER ITERATIONS TO  7 ADI ITERATIONS PER OUTER ITERATION.
+
+  37  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779608E+00  0.00E+00  0.89E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  38  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779608E+00  0.00E+00  0.44E-06             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  39  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779608E+00  0.00E+00  0.36E-06  0.53E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  40  5.1E+05 -9.9E-02 -1.5E-02  1.0E-01  1.0E-01  1.0E-01  8.4E+05  53.502  -0.514  0.779607E+00  0.74E+05  0.38E-06             3
+      1.7E-01  3.1E-01  1.6E-01  1.6E-01  1.7E-01  6.5E+05  2.8E-03
+      1.1E-01  2.8E-03  1.3E-01  1.3E-01  1.1E-01  1.3E-01  1.3E-01
+  41  5.1E+05 -1.0E-01  6.2E+01  8.5E-02  2.2E+00  6.7E+01  8.4E+05   2.266   0.063  0.779600E+00  0.74E+05  0.95E-05             3
+      1.2E-01  1.1E+02  1.4E-01  3.6E+00  1.1E+02  6.5E+05 -1.8E-02
+      8.2E+01 -1.8E-02  1.1E-01  2.8E+00  8.2E+01  2.8E+00  8.5E+01
+  42  5.1E+05 -7.1E-02  1.2E+01  8.3E-02  4.9E-01  3.2E+00  8.4E+05  12.389   0.395  0.779598E+00  0.66E+05  0.19E-05             3
+      1.6E-01  2.1E+01  1.3E-01  8.1E-01  5.2E+00  6.5E+05  1.7E-02
+      1.6E+01  1.6E-02  1.0E-01  6.3E-01  1.6E+01  6.3E-01  4.1E+00
+  43  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779588E+00  0.00E+00  0.13E-04             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  44  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779588E+00  0.00E+00  0.26E-06             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  45  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779588E+00  0.00E+00  0.29E-06  0.51E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  46  5.1E+05 -6.0E-02 -1.3E-02  6.3E-02  6.4E-02  6.4E-02  8.4E+05  48.014  -0.507  0.779588E+00  0.45E+05  0.24E-06             3
+      1.1E-01  1.9E-01  1.0E-01  1.0E-01  1.0E-01  6.5E+05  5.8E-03
+      6.7E-02  5.8E-03  8.1E-02  8.1E-02  6.7E-02  8.1E-02  8.2E-02
+  47  5.1E+05 -5.9E-02  3.3E+01  5.6E-02  1.3E+00  3.5E+01  8.4E+05   2.245   0.126  0.779583E+00  0.43E+05  0.56E-05             3
+      8.7E-02  5.8E+01  9.0E-02  2.2E+00  5.7E+01  6.5E+05 -3.6E-03
+      4.3E+01 -3.7E-03  7.1E-02  1.7E+00  4.3E+01  1.7E+00  4.5E+01
+  48  5.1E+05 -7.3E-02  1.4E+01  5.4E-02  4.8E-01  4.8E+00  8.4E+05   6.485   0.318  0.779582E+00  0.44E+05  0.20E-05             3
+      5.9E-02  2.4E+01  8.7E-02  7.9E-01  7.8E+00  6.5E+05 -2.3E-02
+      1.8E+01 -2.3E-02  6.8E-02  6.2E-01  1.8E+01  6.2E-01  6.1E+00
+  49  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779578E+00  0.00E+00  0.51E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  50  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779578E+00  0.00E+00  0.16E-06             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  51  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779578E+00  0.00E+00  0.21E-06  0.36E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  52  5.1E+05 -5.0E-02 -2.0E-02  4.7E-02  4.7E-02  4.7E-02  8.4E+05  61.373  -0.576  0.779577E+00  0.37E+05  0.15E-06             3
+      7.3E-02  1.2E-01  7.6E-02  7.6E-02  7.7E-02  6.5E+05 -3.4E-03
+      3.5E-02 -3.4E-03  5.9E-02  6.0E-02  3.5E-02  6.0E-02  6.0E-02
+  53  5.1E+05 -2.4E-02  2.9E+01  4.0E-02  1.1E+00  3.1E+01  8.4E+05   2.283   0.116  0.779574E+00  0.27E+05  0.45E-05             3
+      9.5E-02  5.1E+01  6.5E-02  1.7E+00  5.1E+01  6.5E+05  2.2E-02
+      3.8E+01  2.2E-02  5.1E-02  1.4E+00  3.8E+01  1.4E+00  4.0E+01
+  54  5.1E+05 -5.2E-02  1.1E+01  3.9E-02  3.6E-01  3.7E+00  8.4E+05   6.659   0.312  0.779573E+00  0.38E+05  0.15E-05             3
+      4.4E-02  2.0E+01  6.3E-02  5.9E-01  6.0E+00  6.5E+05 -1.6E-02
+      1.5E+01 -1.6E-02  5.0E-02  4.6E-01  1.5E+01  4.6E-01  4.7E+00
+  55  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779570E+00  0.00E+00  0.39E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  56  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779570E+00  0.00E+00  0.15E-06             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  57  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779570E+00  0.00E+00  0.13E-06  0.34E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  58  5.1E+05 -5.1E-02 -1.8E-02  3.4E-02  3.4E-02  3.4E-02  8.4E+05  47.686  -0.470  0.779570E+00  0.25E+05  0.12E-06             3
+      2.9E-02  8.5E-02  5.5E-02  5.6E-02  5.6E-02  6.5E+05 -2.2E-02
+      2.2E-02 -2.2E-02  4.3E-02  4.4E-02  2.2E-02  4.4E-02  4.4E-02
+  59  5.1E+05 -2.5E-02  2.0E+01  3.0E-02  7.5E-01  2.2E+01  8.4E+05   3.232   0.073  0.779567E+00  0.21E+05  0.31E-05             3
+      5.6E-02  3.5E+01  4.8E-02  1.2E+00  3.5E+01  6.5E+05  5.7E-03
+      2.6E+01  5.8E-03  3.8E-02  9.6E-01  2.6E+01  9.6E-01  2.8E+01
+  60  5.1E+05 -2.6E-02  7.2E+00  2.9E-02  2.6E-01  2.7E+00  8.4E+05   5.085   0.369  0.779566E+00  0.23E+05  0.11E-05             3
+      5.2E-02  1.3E+01  4.6E-02  4.4E-01  4.4E+00  6.5E+05  3.7E-03
+      9.6E+00  3.6E-03  3.6E-02  3.4E-01  9.6E+00  3.4E-01  3.4E+00
+  61  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779564E+00  0.00E+00  0.25E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  62  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779564E+00  0.00E+00  0.15E-06             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  63  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779564E+00  0.00E+00  0.84E-07  0.27E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  64  5.1E+05 -5.0E-02  3.8E-03  2.5E-02  2.5E-02  2.6E-02  8.4E+05  49.239  -0.518  0.779564E+00  0.24E+05  0.12E-06             3
+      1.4E-03  9.0E-02  4.1E-02  4.1E-02  4.2E-02  6.5E+05 -3.2E-02
+      3.8E-02 -3.2E-02  3.2E-02  3.2E-02  3.8E-02  3.2E-02  3.3E-02
+  65  5.1E+05 -3.4E-02  1.1E+01  2.2E-02  5.3E-01  1.4E+01  8.4E+05   3.176   0.106  0.779562E+00  0.22E+05  0.22E-05             3
+      1.8E-02  2.1E+01  3.6E-02  8.7E-01  2.3E+01  6.5E+05 -1.4E-02
+      1.5E+01 -1.4E-02  2.8E-02  6.8E-01  1.5E+01  6.8E-01  1.8E+01
+  66  5.1E+05 -4.0E-03  6.7E+00  2.1E-02  2.4E-01  3.0E+00  8.4E+05   4.564   0.345  0.779562E+00  0.15E+05  0.95E-06             3
+      6.4E-02  1.2E+01  3.5E-02  3.9E-01  4.8E+00  6.5E+05  2.3E-02
+      8.9E+00  2.3E-02  2.7E-02  3.1E-01  8.9E+00  3.1E-01  3.8E+00
+  67  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779560E+00  0.00E+00  0.19E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  68  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779560E+00  0.00E+00  0.35E-07             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  69  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779560E+00  0.00E+00  0.13E-06  0.24E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  70  5.1E+05 -6.9E-03 -1.9E-02  1.9E-02  1.9E-02  1.9E-02  8.4E+05  49.688  -0.438  0.779560E+00  0.85E+04  0.25E-07             3
+      5.1E-02  3.3E-02  3.1E-02  3.1E-02  3.1E-02  6.5E+05  1.6E-02
+      8.2E-04  1.6E-02  2.4E-02  2.4E-02  8.2E-04  2.4E-02  2.4E-02
+  71  5.1E+05 -8.1E-03  1.5E+01  1.6E-02  4.6E-01  1.5E+01  8.4E+05   4.575   0.054  0.779558E+00  0.15E+05  0.20E-05             3
+      4.1E-02  2.6E+01  2.7E-02  7.5E-01  2.4E+01  6.5E+05  1.1E-02
+      1.9E+01  1.1E-02  2.1E-02  5.9E-01  1.9E+01  5.9E-01  1.9E+01
+  72  5.1E+05 -2.6E-02  5.9E+00  1.6E-02  1.8E-01  2.3E+00  8.4E+05   3.109   0.452  0.779558E+00  0.13E+05  0.74E-06             3
+      8.8E-03  1.0E+01  2.5E-02  3.0E-01  3.7E+00  6.5E+05 -1.3E-02
+      7.8E+00 -1.3E-02  2.0E-02  2.3E-01  7.8E+00  2.3E-01  2.9E+00
+
+ FLDDIR: INCREASING THE NUMBER OF INNER ITERATIONS TO  8 ADI ITERATIONS PER OUTER ITERATION.
+
+  73  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779557E+00  0.00E+00  0.11E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  74  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779557E+00  0.00E+00  0.78E-07             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  75  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779557E+00  0.00E+00  0.62E-07  0.20E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  76  5.1E+05 -2.7E-02 -7.4E-03  1.4E-02  1.4E-02  1.4E-02  8.4E+05  50.328  -0.510  0.779557E+00  0.17E+05  0.57E-07             3
+      2.8E-03  3.4E-02  2.3E-02  2.3E-02  2.3E-02  6.5E+05 -1.6E-02
+      8.7E-03 -1.6E-02  1.8E-02  1.8E-02  8.7E-03  1.8E-02  1.8E-02
+  77  5.1E+05 -3.1E-02  7.3E+00  1.2E-02  3.0E-01  8.4E+00  8.4E+05   3.204   0.106  0.779556E+00  0.14E+05  0.13E-05             2
+     -1.0E-02  1.3E+01  2.0E-02  5.0E-01  1.4E+01  6.5E+05 -2.4E-02
+      9.7E+00 -2.4E-02  1.6E-02  3.9E-01  9.7E+00  3.9E-01  1.1E+01
+  78  5.1E+05 -1.9E-02  4.1E+00  1.2E-02  1.4E-01  1.8E+00  8.4E+05   5.860   0.257  0.779555E+00  0.89E+04  0.52E-06             3
+      7.2E-03  7.3E+00  1.9E-02  2.3E-01  2.9E+00  6.5E+05 -9.5E-03
+      5.5E+00 -9.6E-03  1.5E-02  1.8E-01  5.5E+00  1.8E-01  2.3E+00
+  79  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779555E+00  0.00E+00  0.10E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  80  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779554E+00  0.00E+00  0.89E-08             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  81  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779554E+00  0.00E+00  0.51E-07  0.17E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  82  5.1E+05  3.5E-03 -1.6E-02  1.0E-02  1.0E-02  1.0E-02  8.4E+05  85.003  -0.649  0.779554E+00  0.37E+04  0.25E-07             3
+      4.0E-02  8.5E-03  1.7E-02  1.7E-02  1.7E-02  6.5E+05  1.8E-02
+     -6.8E-03  1.8E-02  1.3E-02  1.3E-02 -6.8E-03  1.3E-02  1.3E-02
+  83  5.1E+05 -7.7E-03  1.0E+01  8.8E-03  2.7E-01  9.1E+00  8.4E+05   2.414   0.090  0.779554E+00  0.79E+04  0.12E-05             2
+      1.7E-02  1.8E+01  1.4E-02  4.4E-01  1.5E+01  6.5E+05  1.6E-03
+      1.3E+01  1.6E-03  1.1E-02  3.4E-01  1.3E+01  3.4E-01  1.2E+01
+  84  5.1E+05 -1.8E-03  3.0E+00  8.6E-03  7.7E-02  7.6E-01  8.4E+05   2.332   0.250  0.779553E+00  0.11E+05  0.33E-06             2
+      2.6E-02  5.1E+00  1.4E-02  1.3E-01  1.2E+00  6.5E+05  8.9E-03
+      3.9E+00  8.8E-03  1.1E-02  9.9E-02  3.9E+00  9.9E-02  9.7E-01
+  85  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779553E+00  0.00E+00  0.29E-06             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  86  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779553E+00  0.00E+00  0.24E-08             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  87  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779553E+00  0.00E+00  0.49E-07  0.15E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  88  5.1E+05 -3.8E-03 -1.4E-02  8.0E-03  8.1E-03  8.1E-03  8.4E+05  62.317  -0.380  0.779553E+00  0.12E+05  0.13E-07             3
+      2.0E-02  3.3E-03  1.3E-02  1.3E-02  1.3E-02  6.5E+05  5.5E-03
+     -7.9E-03  5.5E-03  1.0E-02  1.0E-02 -7.9E-03  1.0E-02  1.0E-02
+  89  5.1E+05 -8.7E-03  1.2E+01  6.9E-03  2.6E-01  1.2E+01  8.4E+05   2.757   0.044  0.779552E+00  0.70E+04  0.11E-05             2
+      8.6E-03  2.1E+01  1.1E-02  4.3E-01  2.0E+01  6.5E+05 -2.1E-03
+      1.6E+01 -2.2E-03  8.7E-03  3.4E-01  1.6E+01  3.4E-01  1.5E+01
+  90  5.1E+05  1.4E-02  1.8E+00  6.7E-03  5.0E-02  4.1E-01  8.4E+05  11.351   0.481  0.779552E+00 -0.36E+04  0.18E-06             3
+      4.6E-02  3.2E+00  1.1E-02  8.2E-02  6.7E-01  6.5E+05  2.7E-02
+      2.4E+00  2.7E-02  8.4E-03  6.4E-02  2.4E+00  6.4E-02  5.2E-01
+  91  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779551E+00  0.00E+00  0.13E-05             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  92  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779551E+00  0.00E+00  0.70E-07             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  93  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779551E+00  0.00E+00  0.17E-07  0.11E-03   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  94  5.1E+05  1.0E-02  7.3E-03  4.9E-03  4.9E-03  5.0E-03  8.4E+05  33.375  -0.606  0.779551E+00 -0.24E+04  0.27E-07             3
+      3.3E-02  2.8E-02  7.9E-03  8.0E-03  8.0E-03  6.5E+05  2.0E-02
+      1.6E-02  2.0E-02  6.2E-03  6.3E-03  1.6E-02  6.3E-03  6.3E-03
+  95  5.1E+05 -2.4E-02  1.0E+00  4.5E-03  5.9E-02  8.2E-01  8.4E+05   2.227   0.168  0.779551E+00  0.86E+04  0.27E-06             2
+     -2.5E-02  1.9E+00  7.3E-03  9.7E-02  1.3E+00  6.5E+05 -2.5E-02
+      1.4E+00 -2.5E-02  5.7E-03  7.6E-02  1.4E+00  7.6E-02  1.1E+00
+  96  5.1E+05 -5.5E-03  5.7E-01  4.4E-03  3.1E-02  2.4E-01  8.4E+05   9.003   0.268  0.779551E+00  0.49E+04  0.77E-07             3
+      5.4E-03  1.0E+00  7.0E-03  5.1E-02  3.9E-01  6.5E+05 -1.4E-03
+      7.7E-01 -1.4E-03  5.5E-03  4.0E-02  7.7E-01  4.0E-02  3.0E-01
+  97  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779550E+00  0.00E+00  0.43E-06             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  98  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779550E+00  0.00E+00  0.22E-07             0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+  99  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  8.4E+05   1.000   0.000  0.779550E+00  0.00E+00  0.97E-08  0.96E-04   0
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
+      0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
+
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.041
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.031                    TOTAL CPU TIME =     0.072
+
+
+ FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 1.2827908993E+00
+
+
+ OPTIONS
+ -------
+ IMPX          2  (0=NO PRINT/1=SHORT/2=MORE)
+ NGRO          2  (NUMBER OF ENERGY GROUPS)
+ NUN         366  (NUMBER OF UNKNOWNS PER ENERGY GROUP)
+ IADJ          1  (1=DIRECT KEFF OR SOURCE/10=ADJOINT KEFF/100=DIRECT GPT/100=ADJOINT GPT)
+ LMOD          0  (NUMBER OF HARMONICS)
+ NGPT          0  (NUMBER OF GPT EQUATIONS)
+ ITYPE         2  (TYPE OF SOLUTION: 0=FIXED SOURCE/1=FIXED SOURCE EIGENVALUE/2=TYPE K/3=TYPE K BUCK/4=TYPE B/5=TYPE L)
+ ILEAK         0  (TYPE OF LEAKAGE MODEL)
+ ICL1          3  (NUMBER OF FREE ITERATIONS PER ACCELERATION CYCLE)
+ ICL2          3  (NUMBER OF ACCELERATED ITERATIONS PER ACCELE RATION CYCLE)
+ IREBAL        0  (0/1: THERMAL ITERATIONS OFF/ON)
+ MAXINR        0  (MAXIMUM NUMBER OF THERMAL ITERATIONS)
+ MAXOUT     1000  (MAXIMUM NUMBER OF OUTER ITERATIONS)
+ NADI          6  (INITIAL NUMBER OF ADI ITERATIONS IN TRIVAC)
+ IBLSZ         0  (BLOCK SIZE OF THE ARNOLDI HESSENBERG MATRIX WITH IRAM)
+ NSTARD        0  (NUMBER OF RESTARTING ITERATIONS WITH GMRES FOR SOLVING THE ADI-PRECONDITIONNED LINEAR SYSTEMS)
+ NBMIX        60  (NUMBER OF MATERIAL MIXTURES)
+ EPSINR 1.00E-05  (THERMAL ITERATION EPSILON)
+ EPSOUT 1.00E-04  (OUTER ITERATION KEFF EPSILON)
+ EPSOUT 1.00E-04  (OUTER ITERATION FLUX EPSILON)
+ EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
+ RELAX  1.00E+00  (RELAXATION FACTOR)
+
+-->>MODULE FLUD:       : TIME SPENT=        0.075 MEMORY USAGE= 0.000E+00
+->@END MODULE   : FLUD:       
+>|====================================================================                                                    |>0117
+>|END INPUT  ssrcell_thm                                                                                                  |>0118
+>|====================================================================                                                    |>0119
+->@BEGIN MODULE : GREP:       
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+-->>module GREP:       : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : GREP:       
+->@BEGIN MODULE : GREP:       
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+-->>module GREP:       : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : GREP:       
+>|TEST SUCCESSFUL; DELTA=  9.292962e-08                                                                                   |>0028
+>|test ssrcell_thm completed                                                                                              |>0121
+
+ normal end of execution for donjon 5  Version 5.0.10 ($Revision: 3198 $)              
+ check for warning in listing
+ before assuming your run was successful
