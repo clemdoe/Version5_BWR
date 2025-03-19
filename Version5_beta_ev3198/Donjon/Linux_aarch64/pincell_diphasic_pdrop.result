@@ -129,7 +129,7 @@ HGAP 10000.0                                                                    
 CONDC 0 10.0 KELVIN                                                                                                        0128
 CONDF 0 5.0 KELVIN                                                                                                         0129
 BOWR                                                                                                                       0130
-CPRES 0                                                                                                                    0131
+PDROP 1                                                                                                                    0131
 ;                                                                                                                          0132
 *--                                                                                                                        0133
 * Dump THM object                                                                                                          0134
@@ -159,9 +159,9 @@ Macro2 Matex := MACINI: Matex MacroF :: FUEL ;                                  
 System := TRIVAA: Macro2 Track ;                                                                                           0158
 Flux := FLUD: System Track :: EDIT 1 ADI 4 ACCE 5 3 ;                                                                      0159
 System MacroF Macro2 := DELETE: System MacroF Macro2 ;                                                                     0160
-GREP: Flux :: GETVAL 'K-EFFECTIVE' 1 >>keff11<< ;                                                                          0161
-ECHO "+++ Burnup= 0.0 Keff=" keff11 ;                                                                                      0162
-*assertS Flux :: 'K-EFFECTIVE' 1 1.354165 ;                                                                                0163
+UTL: Thm :: DIR DUMP ;                                                                                                     0161
+assertS Thm :: 'AVG-T-FUEL' 1 1.46497717E+03 ;                                                                             0162
+assertS Thm :: 'AVG-T-COOL' 1 5.78069702E+02 ;                                                                             0163
 ECHO "test pincell_mphy_thm.x2m completed" ;                                                                               0164
 END: ;                                                                                                                     0165
 QUIT .                                                                                                                  IMPLICIT
@@ -199,7 +199,7 @@ QUIT .                                                                          
                   GNU LESSER GENERAL PUBLIC LICENSE
 
  DRVEQU: A LCM OBJECT NAMED 'Cpo         ' WAS IMPORTED FROM FILE '_ACompo     '.
--->>module EQU:        : time spent=        0.899 memory usage= 1.154E+05
+-->>module EQU:        : time spent=        0.889 memory usage= 1.154E+05
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : UTL:        
 ->@DESCRIPTION  : No description available for this module                                
@@ -220,7 +220,7 @@ QUIT .                                                                          
 
 
  DRVUTL: LEAVING WITH ACTIVE DIRECTORY '/           '.
--->>module UTL:        : time spent=        0.001 memory usage= 0.000E+00
+-->>module UTL:        : time spent=        0.000 memory usage= 0.000E+00
 ->@END MODULE   : UTL:        
 ->@BEGIN MODULE : GEO:        
 ->@DESCRIPTION  : Geometry definition                                                     
@@ -261,7 +261,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        80
 
  @END MODULE -> USPLIT:     
--->>MODULE USPLIT:     : TIME SPENT=        0.000 MEMORY USAGE= 4.960E+02
+-->>MODULE USPLIT:     : TIME SPENT=        0.000 MEMORY USAGE= 6.240E+02
 ->@BEGIN MODULE : TRIVAT:     
 ->@DESCRIPTION  : 3-D diffusion or SPN finite element tracking                            
 ->@CREDITS      : A. Hebert                                                               
@@ -957,7 +957,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       216
 
  @END MODULE -> THM:        
--->>MODULE THM:        : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
+-->>MODULE THM:        : TIME SPENT=        0.005 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : UTL:        
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1186,7 +1186,7 @@ L_THM
 STATE-VECTOR                                                                    
          1        10        50        50        50         8        11         0
          0         1         0         1         1         0         1         0
-         0         0         0         0         0         0         0         0
+         0         0         0         0         1         0         0         0
          0         0         0         0         0         0         0         0
          0         0         0         0         0         0         0         0
 ->       1      12       2      40                                 <-   
@@ -1211,7 +1211,7 @@ FRACT-PU
 ->      -1       0       0       0                                 <-   
 
  DRVUTL: LEAVING WITH ACTIVE DIRECTORY '/           '.
--->>module UTL:        : time spent=        0.001 memory usage= 0.000E+00
+-->>module UTL:        : time spent=        0.000 memory usage= 0.000E+00
 ->@END MODULE   : UTL:        
 
  ~~~~~~~~~~~~~~~
@@ -1333,7 +1333,7 @@ FRACT-PU
  IPRECI     0   (CALENDF ACCURACY FLAG:1/2/3/4)
  IDF        0   (0=NO INFO/1=ALBS INFO/2=FLUX GAP INFO/3=ADF GAP INFO)
  @END MODULE -> NCR:        
--->>MODULE NCR:        : TIME SPENT=        0.010 MEMORY USAGE= 2.192E+03
+-->>MODULE NCR:        : TIME SPENT=        0.011 MEMORY USAGE= 2.252E+03
 ->@BEGIN MODULE : EQU:        
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1460,6 +1460,261 @@ FRACT-PU
 
 -->>MODULE FLUD:       : TIME SPENT=        0.002 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
+->@BEGIN MODULE : UTL:        
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+
+
+ LCMLIB: CONTENT OF ACTIVE DIRECTORY '/           ' OF THE TABLE    'Thm         ':
+
+     BLOCK NAME----------    LENGTH    TYPE
+
+        1  'MESHZ       '        11    REAL            
+        2  'REF-RAD     '       100    REAL            
+        3  'HISTORY-DATA'        -1    DIRECTORY       
+        4  'AVG-T-FUEL  '         1    REAL            
+        5  'ERROR-T-FUEL'         1    REAL            
+        6  'MIN-T-FUEL  '         1    REAL            
+        7  'MAX-T-FUEL  '         1    REAL            
+        8  'AVG-T-COOL  '         1    REAL            
+        9  'ERROR-T-COOL'         1    REAL            
+       10  'MIN-T-COOL  '         1    REAL            
+       11  'MAX-T-COOL  '         1    REAL            
+       12  'AVG-D-COOL  '         1    REAL            
+       13  'ERROR-D-COOL'         1    REAL            
+       14  'MIN-D-COOL  '         1    REAL            
+       15  'MAX-D-COOL  '         1    REAL            
+       16  'KCONDF      '         3    REAL            
+       17  'UCONDF      '         3    CHARACTER       ='KELVIN      '
+       18  'KCONDC      '         1    REAL            
+       19  'UCONDC      '         3    CHARACTER       ='KELVIN      '
+       20  'SIGNATURE   '         3    CHARACTER       ='L_THM       '
+       21  'STATE-VECTOR'        40    INTEGER         
+       22  'REAL-PARAM  '        40    REAL            
+       23  'NB-FUEL     '         1    REAL            
+       24  'NB-TUBE     '         1    REAL            
+       25  'FRACT-PU    '         1    REAL            
+
+
+ TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       219
+
+->       1      12       2      11                                 <-   
+MESHZ                                                                           
+  0.00000000E+00  2.00000003E-01  4.00000006E-01  6.00000024E-01  8.00000012E-01
+  1.00000000E+00  1.20000005E+00  1.39999998E+00  1.60000002E+00  1.79999995E+00
+  2.00000000E+00
+->       1      12       2     100                                 <-   
+REF-RAD                                                                         
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+->       1      12       0      -1                                 <-   
+HISTORY-DATA                                                                    
+->       2      12       0      -1                                 <-   
+TIMESTEP0000                                                                    
+->       3      12      10       1                                 <-   
+CHANNEL                                                                         
+->       4       0       0      -1                                 <-   00000001
+->       5      12       2      10                                 <-   
+PRESSURE                                                                        
+  1.10774890E+07  1.10525130E+07  1.10269730E+07  1.10008230E+07  1.09740060E+07
+  1.09464580E+07  1.09185840E+07  1.08821000E+07  1.08425690E+07  1.08000000E+07
+->       5      12       2      10                                 <-   
+DENSITY                                                                         
+  7.57047058E+02  7.44057800E+02  7.30590393E+02  7.16596802E+02  7.02016602E+02
+  6.86787964E+02  6.74110596E+02  6.06825073E+02  5.53487549E+02  5.09629089E+02
+->       5      12       2      10                                 <-   
+LIQUID-DENS                                                                     
+  7.57047058E+02  7.44057800E+02  7.30590393E+02  7.16596802E+02  7.02016602E+02
+  6.86787964E+02  6.74110596E+02  6.73752930E+02  6.74408997E+02  6.75115479E+02
+->       5      12       2      10                                 <-   
+ENTHALPY                                                                        
+  1.25419550E+06  1.29014975E+06  1.32610400E+06  1.36205825E+06  1.39801250E+06
+  1.43396675E+06  1.46992100E+06  1.50587525E+06  1.54182950E+06  1.57778375E+06
+->       5      12       2      10                                 <-   
+VELOCITIES                                                                      
+  9.17452049E+00  9.33468246E+00  9.50675297E+00  9.69239426E+00  9.89370155E+00
+  1.01130791E+01  1.03032618E+01  1.14457016E+01  1.25486794E+01  1.36286106E+01
+->       5      12       2      10                                 <-   
+CENTER-TEMPS                                                                    
+  2.14936816E+03  2.15592554E+03  2.16228491E+03  2.16841968E+03  2.17429541E+03
+  2.17987085E+03  2.18408765E+03  2.17856543E+03  2.17821265E+03  2.19229980E+03
+->       5      12       2      10                                 <-   
+COOLANT-TEMP                                                                    
+  5.53508667E+02  5.60368347E+02  5.67042725E+02  5.73512573E+02  5.79755859E+02
+  5.85743652E+02  5.90335815E+02  5.90423035E+02  5.90150513E+02  5.89856201E+02
+->       5      12       2      10                                 <-   
+POWER                                                                           
+  1.60000000E+04  1.60000000E+04  1.60000000E+04  1.60000000E+04  1.60000000E+04
+  1.60000000E+04  1.60000000E+04  1.60000000E+04  1.60000000E+04  1.60000000E+04
+->       5      12       2     110                                 <-   
+TEMPERATURES                                                                    
+  2.05842236E+03  1.87653101E+03  1.69463965E+03  1.51274829E+03  1.33085681E+03
+  1.14896509E+03  9.67073425E+02  8.76127686E+02  6.58761108E+02  6.18141968E+02
+  5.82119507E+02  2.06497974E+03  1.88308838E+03  1.70119702E+03  1.51930554E+03
+  1.33741406E+03  1.15552234E+03  9.73630737E+02  8.82685059E+02  6.65318481E+02
+  6.24699280E+02  5.88676819E+02  2.07133936E+03  1.88944812E+03  1.70755676E+03
+  1.52566528E+03  1.34377393E+03  1.16188208E+03  9.79990417E+02  8.89044678E+02
+  6.71678101E+02  6.31058960E+02  5.95036499E+02  2.07747388E+03  1.89558252E+03
+  1.71369116E+03  1.53179968E+03  1.34990820E+03  1.16801636E+03  9.86124878E+02
+  8.95179077E+02  6.77812622E+02  6.37193359E+02  6.01170898E+02  2.08334985E+03
+  1.90145850E+03  1.71956714E+03  1.53767578E+03  1.35578430E+03  1.17389246E+03
+  9.92000916E+02  9.01055176E+02  6.83688599E+02  6.43069397E+02  6.07046936E+02
+  2.08892529E+03  1.90703406E+03  1.72514270E+03  1.54325122E+03  1.36135986E+03
+  1.17946802E+03  9.97576416E+02  9.06630737E+02  6.89264160E+02  6.48644897E+02
+  6.12622437E+02  2.09314185E+03  1.91125049E+03  1.72935913E+03  1.54746777E+03
+  1.36557629E+03  1.18368445E+03  1.00179291E+03  9.10847168E+02  6.93480591E+02
+  6.52861389E+02  6.16838928E+02  2.08761963E+03  1.90572815E+03  1.72383679E+03
+  1.54194531E+03  1.36005396E+03  1.17816211E+03  9.96270508E+02  9.05324829E+02
+  6.87958252E+02  6.47338989E+02  6.11316528E+02  2.08726709E+03  1.90537573E+03
+  1.72348438E+03  1.54159277E+03  1.35970142E+03  1.17780957E+03  9.95918030E+02
+  9.04972290E+02  6.87605713E+02  6.46986511E+02  6.10964050E+02  2.10135400E+03
+  1.91946265E+03  1.73757129E+03  1.55567981E+03  1.37378833E+03  1.19189648E+03
+  1.01000494E+03  9.19059204E+02  7.01692627E+02  6.61073425E+02  6.25050964E+02
+->       5      12       2       1                                 <-   
+PINLET                                                                          
+  1.08000000E+07
+->       5      12       2       1                                 <-   
+TINLET                                                                          
+  5.50000000E+02
+->       5      12       2       1                                 <-   
+VINLET                                                                          
+  9.17452049E+00
+->       5      12       2       1                                 <-   
+POULET                                                                          
+  1.08000000E+07
+->       5      12       2     100                                 <-   
+RADII                                                                           
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  0.00000000E+00  2.11660098E-03  2.99332594E-03  3.66606051E-03  4.23320197E-03
+  4.73286398E-03  5.18459268E-03  5.59999980E-03  6.14000019E-03  6.51999982E-03
+->      -5       0       0       0                                 <-   
+->       3      12       2       1                                 <-   
+TIME                                                                            
+  0.00000000E+00
+->      -3       0       0       0                                 <-   
+->      -2       0       0       0                                 <-   
+->       1      12       2       1                                 <-   
+AVG-T-FUEL                                                                      
+  1.46497717E+03
+->       1      12       2       1                                 <-   
+ERROR-T-FUEL                                                                    
+  5.84943848E+02
+->       1      12       2       1                                 <-   
+MIN-T-FUEL                                                                      
+  1.44201233E+03
+->       1      12       2       1                                 <-   
+MAX-T-FUEL                                                                      
+  1.48494385E+03
+->       1      12       2       1                                 <-   
+AVG-T-COOL                                                                      
+  5.78069702E+02
+->       1      12       2       1                                 <-   
+ERROR-T-COOL                                                                    
+  9.04230347E+01
+->       1      12       2       1                                 <-   
+MIN-T-COOL                                                                      
+  5.53508667E+02
+->       1      12       2       1                                 <-   
+MAX-T-COOL                                                                      
+  5.90423035E+02
+->       1      12       2       1                                 <-   
+AVG-D-COOL                                                                      
+  6.68114841E-01
+->       1      12       2       1                                 <-   
+ERROR-D-COOL                                                                    
+  1.40370905E-01
+->       1      12       2       1                                 <-   
+MIN-D-COOL                                                                      
+  5.09629071E-01
+->       1      12       2       1                                 <-   
+MAX-D-COOL                                                                      
+  7.57047057E-01
+->       1      12       2       3                                 <-   
+KCONDF                                                                          
+  5.00000000E+00  0.00000000E+00 -2.73149994E+02
+->       1      12       3       3                                 <-   
+UCONDF                                                                          
+         4         4         4
+KELVIN      
+->       1      12       2       1                                 <-   
+KCONDC                                                                          
+  1.00000000E+01
+->       1      12       3       3                                 <-   
+UCONDC                                                                          
+         4         4         4
+KELVIN      
+->       1      12       3       3                                 <-   
+SIGNATURE                                                                       
+         4         4         4
+L_THM       
+->       1      12       1      40                                 <-   
+STATE-VECTOR                                                                    
+         1        10        50        50        50         8        11         0
+         0         1         0         1         1         0         1         0
+         0         0         0         0         1         0         0         0
+         0         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0         0
+->       1      12       2      40                                 <-   
+REAL-PARAM                                                                      
+  0.00000000E+00  1.00000000E+00  2.00000000E+06  9.17452049E+00  1.08000000E+07
+  5.50000000E+02  5.00000007E-02  5.59999980E-03  6.14000019E-03  6.51999982E-03
+  7.01999990E-03  0.00000000E+00  1.00000000E+00  1.00000005E-03  1.00000000E+00
+  0.00000000E+00  1.00000000E+04  0.00000000E+00  5.55555582E-01  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+->       1      12       2       1                                 <-   
+NB-FUEL                                                                         
+  1.00000000E+00
+->       1      12       2       1                                 <-   
+NB-TUBE                                                                         
+  0.00000000E+00
+->       1      12       2       1                                 <-   
+FRACT-PU                                                                        
+  0.00000000E+00
+->      -1       0       0       0                                 <-   
+
+ DRVUTL: LEAVING WITH ACTIVE DIRECTORY '/           '.
+-->>module UTL:        : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : UTL:        
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1467,7 +1722,29 @@ FRACT-PU
                   GNU LESSER GENERAL PUBLIC LICENSE
 -->>module GREP:       : time spent=        0.000 memory usage= 0.000E+00
 ->@END MODULE   : GREP:       
->|+++ Burnup= 0.0 Keff=  1.301970e+00                                                                                     |>0162
+->@BEGIN MODULE : GREP:       
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+-->>module GREP:       : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : GREP:       
+>|TEST SUCCESSFUL; DELTA=  0.000000e+00                                                                                   |>0028
+->@BEGIN MODULE : GREP:       
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+-->>module GREP:       : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : GREP:       
+->@BEGIN MODULE : GREP:       
+->@DESCRIPTION  : No description available for this module                                
+->@CREDITS      : No author provided for this module                                      
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
+                  GNU LESSER GENERAL PUBLIC LICENSE
+-->>module GREP:       : time spent=        0.000 memory usage= 0.000E+00
+->@END MODULE   : GREP:       
+>|TEST SUCCESSFUL; DELTA=  0.000000e+00                                                                                   |>0028
 >|test pincell_mphy_thm.x2m completed                                                                                     |>0164
 
  normal end of execution for donjon 5  Version 5.0.10 ($Revision: 3198 $)              

@@ -262,7 +262,7 @@ QUIT .                                                                          
  DRVEQU: A LCM OBJECT NAMED 'DBASE       ' WAS IMPORTED FROM FILE 'macfme5     '.
 
  DRVEQU: 1995 SPECIFICATION IMPORT.
--->>module EQU:        : time spent=        0.045 memory usage= 1.136E+04
+-->>module EQU:        : time spent=        0.049 memory usage= 1.118E+04
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : UTL:        
 ->@DESCRIPTION  : No description available for this module                                
@@ -307,7 +307,7 @@ QUIT .                                                                          
  ~~~~~~~~~~~~~~~
 
  @END MODULE -> USPLIT:     
--->>MODULE USPLIT:     : TIME SPENT=        0.001 MEMORY USAGE= 3.000E+02
+-->>MODULE USPLIT:     : TIME SPENT=        0.001 MEMORY USAGE= 4.200E+02
 ->@BEGIN MODULE : EQU:        
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -317,7 +317,7 @@ QUIT .                                                                          
  DRVEQU: A LCM OBJECT NAMED 'NFUEL       ' WAS IMPORTED FROM FILE 'fnat        '.
 
  DRVEQU: 1995 SPECIFICATION IMPORT.
--->>module EQU:        : time spent=        0.003 memory usage= 5.000E+02
+-->>module EQU:        : time spent=        0.002 memory usage= 5.000E+02
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : EQU:        
 ->@DESCRIPTION  : No description available for this module                                
@@ -328,7 +328,7 @@ QUIT .                                                                          
  DRVEQU: A LCM OBJECT NAMED 'NREFL       ' WAS IMPORTED FROM FILE 'rnat        '.
 
  DRVEQU: 1995 SPECIFICATION IMPORT.
--->>module EQU:        : time spent=        0.000 memory usage= 0.000E+00
+-->>module EQU:        : time spent=        0.008 memory usage= 0.000E+00
 ->@END MODULE   : EQU:        
 
  ~~~~~~~~~~~~~~~
@@ -380,7 +380,7 @@ QUIT .                                                                          
 
 
  EXEC: TRIVAT:      BY A. HEBERT
--->>MODULE TRIVAT:     : TIME SPENT=        0.000 MEMORY USAGE= 7.360E+02
+-->>MODULE TRIVAT:     : TIME SPENT=        0.001 MEMORY USAGE= 8.720E+02
 ->@END MODULE   : TRIVAT:     
 
  ~~~~~~~~~~~~~~~
@@ -454,7 +454,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.023 MEMORY USAGE= 1.292E+03
+-->>MODULE AFM:        : TIME SPENT=        0.025 MEMORY USAGE= 1.228E+03
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -508,8 +508,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.004
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.002                    TOTAL CPU TIME =     0.004
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.3150960207E-01
@@ -599,7 +599,7 @@ QUIT .                                                                          
  CHANNEL-POWER FORM FACTOR  =>  AVG/MAX =   1.0000   (MAX/AVG =   1.0000)
 
  @END MODULE -> FLPOW:      
--->>MODULE FLPOW:      : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE FLPOW:      : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> TAVG:       
@@ -687,7 +687,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       609
 
  @END MODULE -> TAVG:       
--->>MODULE TAVG:       : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE TAVG:       : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -753,7 +753,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 1.288E+03
+-->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 1.096E+03
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -807,8 +807,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2869012356E-01
@@ -1106,8 +1106,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.004
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2996405363E-01
@@ -1138,7 +1138,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.003 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 
  ~~~~~~~~~~~~~~~
@@ -1285,7 +1285,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       609
 
  @END MODULE -> TAVG:       
--->>MODULE TAVG:       : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE TAVG:       : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1351,7 +1351,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 2.800E+01
+-->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 2.800E+01
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -1387,7 +1387,7 @@ QUIT .                                                                          
 
 
  EXEC: TRIVAA:      BY A. HEBERT
--->>MODULE TRIVAA:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE TRIVAA:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : TRIVAA:     
 ->@BEGIN MODULE : FLUD:       
 ->@DESCRIPTION  : No description available for this module                                
@@ -1405,8 +1405,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.003
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2961226702E-01
@@ -1650,7 +1650,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 0.000E+00
+-->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -1686,7 +1686,7 @@ QUIT .                                                                          
 
 
  EXEC: TRIVAA:      BY A. HEBERT
--->>MODULE TRIVAA:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE TRIVAA:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : TRIVAA:     
 ->@BEGIN MODULE : FLUD:       
 ->@DESCRIPTION  : No description available for this module                                
@@ -1704,8 +1704,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.004
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.004
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2969624996E-01
@@ -1736,7 +1736,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.003 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 
  ~~~~~~~~~~~~~~~
@@ -1949,7 +1949,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 0.000E+00
+-->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -1976,7 +1976,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        43
 
  @END MODULE -> MACINI:     
--->>MODULE MACINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE MACINI:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : TRIVAA:     
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -2003,8 +2003,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2964296341E-01
@@ -2248,7 +2248,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 0.000E+00
+-->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -2302,8 +2302,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.004
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2964248657E-01
@@ -2334,7 +2334,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.003 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 
  ~~~~~~~~~~~~~~~
@@ -2846,7 +2846,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 0.000E+00
+-->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -2873,7 +2873,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        43
 
  @END MODULE -> MACINI:     
--->>MODULE MACINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE MACINI:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : TRIVAA:     
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -2900,8 +2900,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.001
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.002                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2963008881E-01
@@ -2932,7 +2932,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.003 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 
  ~~~~~~~~~~~~~~~
@@ -4003,7 +4003,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       328
 
  @END MODULE -> THM:        
--->>MODULE THM:        : TIME SPENT=        0.008 MEMORY USAGE= 0.000E+00
+-->>MODULE THM:        : TIME SPENT=        0.007 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -4065,7 +4065,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 2.000E+02
+-->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 1.360E+02
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -4101,7 +4101,7 @@ QUIT .                                                                          
 
 
  EXEC: TRIVAA:      BY A. HEBERT
--->>MODULE TRIVAA:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE TRIVAA:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : TRIVAA:     
 ->@BEGIN MODULE : FLUD:       
 ->@DESCRIPTION  : No description available for this module                                
@@ -4119,8 +4119,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.003
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.001
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.002
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2962889671E-01
@@ -4210,7 +4210,7 @@ QUIT .                                                                          
  CHANNEL-POWER FORM FACTOR  =>  AVG/MAX =   1.0000   (MAX/AVG =   1.0000)
 
  @END MODULE -> FLPOW:      
--->>MODULE FLPOW:      : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE FLPOW:      : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> TAVG:       
@@ -4514,7 +4514,7 @@ QUIT .                                                                          
 ->@CREDITS      : No author provided for this module                                      
 ->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL  
                   GNU LESSER GENERAL PUBLIC LICENSE
--->>module GREP:       : time spent=        0.001 memory usage= 0.000E+00
+-->>module GREP:       : time spent=        0.000 memory usage= 0.000E+00
 ->@END MODULE   : GREP:       
 >|error on fuel temperature at iteration 3 =  1.207886e-01                                                                |>0204
 >|CONV = .TRUE.                                                                                                           |>0206
@@ -4536,7 +4536,7 @@ QUIT .                                                                          
                   GNU LESSER GENERAL PUBLIC LICENSE
 
  DRVEQU: A LCM OBJECT NAMED 'RESEAU      ' WAS EXPORTED TO FILE 'neutrodata  '.
--->>module EQU:        : time spent=        0.000 memory usage= 0.000E+00
+-->>module EQU:        : time spent=        0.001 memory usage= 0.000E+00
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                

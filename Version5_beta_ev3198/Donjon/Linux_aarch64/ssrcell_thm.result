@@ -31,7 +31,7 @@ STRING SINGLE_LINE :=                                                           
 "--------------------------------------------------------------------" ;                                                   0030
 LOGICAL True False := $True_L $False_L ;                                                                                   0031
 STRING FILENAME := 'ssrcell_thm' ;                                                                                         0032
-                   ?           ?                                                                                        xKrÀÿÿ
+                   ?           ?                                                                                        (XNÂÿÿ
 * Input data                                                                                                               0033
 *GEO                                                                                                                       0034
 REAL Apothem := 10.0 ;                                                                                                     0035
@@ -52,7 +52,7 @@ ECHO "total reactor power=" powi "MW" ;                                         
 *---                                                                                                                       0050
 ECHO DOUBLE_LINE ;                                                                                                         0051
 ECHO 'BEGIN INPUT ' FILENAME ;                                                                                             0052
-     ?            ?                                                                                                     xKrÀÿÿ
+     ?            ?                                                                                                     (XNÂÿÿ
 ECHO DOUBLE_LINE ;                                                                                                         0053
 *---                                                                                                                       0054
 * RECOVER MULTICOMPO                                                                                                       0055
@@ -119,7 +119,7 @@ ACCE 3 3 EXTE 1000 1E-04 ADI 6 ;                                                
 *---                                                                                                                       0116
 ECHO DOUBLE_LINE ;                                                                                                         0117
 ECHO 'END INPUT ' FILENAME ;                                                                                               0118
-     ?          ?                                                                                                       xKrÀÿÿ
+     ?          ?                                                                                                       (XNÂÿÿ
 ECHO DOUBLE_LINE ;                                                                                                         0119
 assertS FLUX :: 'K-EFFECTIVE' 1 1.282791 ;                                                                                 0120
 ECHO "test ssrcell_thm completed" ;                                                                                        0121
@@ -162,7 +162,7 @@ QUIT .                                                                          
                   GNU LESSER GENERAL PUBLIC LICENSE
 
  DRVEQU: A LCM OBJECT NAMED 'CPO         ' WAS IMPORTED FROM FILE 'COMPO       '.
--->>module EQU:        : time spent=        1.885 memory usage= 2.160E+05
+-->>module EQU:        : time spent=        1.876 memory usage= 2.161E+05
 ->@END MODULE   : EQU:        
 >|====================================================================                                                    |>0059
 >|BEGIN PROCEDURE  HOM_chan                                                                                               |>0060
@@ -461,7 +461,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       127
 
  @END MODULE -> RESINI:     
--->>MODULE RESINI:     : TIME SPENT=        0.001 MEMORY USAGE= 8.120E+02
+-->>MODULE RESINI:     : TIME SPENT=        0.001 MEMORY USAGE= 8.320E+02
 >|====================================================================                                                    |>0137
 >|END PROCEDURE  HOM_fmap                                                                                                 |>0138
 >|====================================================================                                                    |>0139
@@ -561,7 +561,7 @@ QUIT .                                                                          
 
 
  EXEC: TRIVAT:      BY A. HEBERT
--->>MODULE TRIVAT:     : TIME SPENT=        0.002 MEMORY USAGE= 0.000E+00
+-->>MODULE TRIVAT:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : TRIVAT:     
 
  ~~~~~~~~~~~~~~~
@@ -1003,7 +1003,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       108
 
  @END MODULE -> NCR:        
--->>MODULE NCR:        : TIME SPENT=        0.006 MEMORY USAGE= 3.312E+03
+-->>MODULE NCR:        : TIME SPENT=        0.006 MEMORY USAGE= 3.248E+03
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -1606,8 +1606,8 @@ QUIT .                                                                          
       0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  6.5E+05  0.0E+00
       0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00  0.0E+00
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.041
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.031                    TOTAL CPU TIME =     0.072
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.047
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.025                    TOTAL CPU TIME =     0.072
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 1.2827908993E+00
@@ -1638,7 +1638,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.075 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.074 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 >|====================================================================                                                    |>0117
 >|END INPUT  ssrcell_thm                                                                                                  |>0118

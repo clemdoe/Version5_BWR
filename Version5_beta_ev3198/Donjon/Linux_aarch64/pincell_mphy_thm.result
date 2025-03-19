@@ -228,7 +228,7 @@ QUIT .                                                                          
                   GNU LESSER GENERAL PUBLIC LICENSE
 
  DRVEQU: A LCM OBJECT NAMED 'Cpo         ' WAS IMPORTED FROM FILE '_ACompo     '.
--->>module EQU:        : time spent=        0.893 memory usage= 1.155E+05
+-->>module EQU:        : time spent=        0.891 memory usage= 1.154E+05
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : UTL:        
 ->@DESCRIPTION  : No description available for this module                                
@@ -259,7 +259,7 @@ QUIT .                                                                          
 
  CREATION OF A LEVEL  1 GEOMETRY ON THE DIRECTORY NAMED '/           ' OF THE LCM OBJECT 'Geom        ' WITH TYPE CARTESIAN 3-D   .
 ->@END MODULE   : GEO:        
--->>MODULE GEO:        : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE GEO:        : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> USPLIT:     
@@ -290,7 +290,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       110
 
  @END MODULE -> USPLIT:     
--->>MODULE USPLIT:     : TIME SPENT=        0.001 MEMORY USAGE= 4.960E+02
+-->>MODULE USPLIT:     : TIME SPENT=        0.000 MEMORY USAGE= 4.960E+02
 ->@BEGIN MODULE : TRIVAT:     
 ->@DESCRIPTION  : 3-D diffusion or SPN finite element tracking                            
 ->@CREDITS      : A. Hebert                                                               
@@ -331,7 +331,7 @@ QUIT .                                                                          
  TRICH1: MAXIMUM BANDWIDTH ALONG X AXIS =    1
                            ALONG Y AXIS =    1
                            ALONG Z AXIS =    2
--->>MODULE TRIVAT:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE TRIVAT:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : TRIVAT:     
 
  ~~~~~~~~~~~~~~~
@@ -1125,7 +1125,7 @@ L_THM
 STATE-VECTOR                                                                    
          1        20        50        50        50        15        20         0
          0         0         0         0         0         0         0         0
-         0         0         0         0         1         0         0         0
+         0         0         0         0         0         0         0         0
          0         0         0         0         0         0         0         0
          0         0         0         0         0         0         0         0
 ->       1      12       2      40                                 <-   
@@ -1322,7 +1322,7 @@ FRACT-PU
  IPRECI     0   (CALENDF ACCURACY FLAG:1/2/3/4)
  IDF        0   (0=NO INFO/1=ALBS INFO/2=FLUX GAP INFO/3=ADF GAP INFO)
  @END MODULE -> NCR:        
--->>MODULE NCR:        : TIME SPENT=        0.020 MEMORY USAGE= 2.924E+03
+-->>MODULE NCR:        : TIME SPENT=        0.018 MEMORY USAGE= 3.100E+03
 ->@BEGIN MODULE : EQU:        
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1330,7 +1330,7 @@ FRACT-PU
                   GNU LESSER GENERAL PUBLIC LICENSE
 
  DRVEQU: STEP UP TO LEVEL 'MACROLIB                '.
--->>module EQU:        : time spent=        0.001 memory usage= 0.000E+00
+-->>module EQU:        : time spent=        0.000 memory usage= 0.000E+00
 ->@END MODULE   : EQU:        
 
  ~~~~~~~~~~~~~~~
@@ -1358,7 +1358,7 @@ FRACT-PU
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        51
 
  @END MODULE -> MACINI:     
--->>MODULE MACINI:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE MACINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : TRIVAA:     
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      

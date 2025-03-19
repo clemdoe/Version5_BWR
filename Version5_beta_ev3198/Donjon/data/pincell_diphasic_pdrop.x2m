@@ -139,7 +139,7 @@ Thm Fmap := THM: Fmap ::
     CONDC 0 10.0 KELVIN
     CONDF 0 5.0 KELVIN
     BOWR
-    PDROP 0
+    PDROP 1
 ;
 
 *--

@@ -78,7 +78,7 @@ tests :
 	./rdonjon -c $(fcompiler) -q thm_salt.x2m
 	./rdonjon -c $(fcompiler) -q vver_test.x2m
 	./rdonjon -c $(fcompiler) -q pincell_diphasic_pdrop.x2m
-	./rdonjon -c $(fcompiler) -q pincell_diphasic_pdrop2.x2m
+	./rdonjon -c $(fcompiler) -q pincell_pdrop.x2m
 ifeq ($(hdf5),1)
 	./rdonjon -c $(fcompiler) -q AFA_180_310_type1_dual.x2m
 	./rdonjon -c $(fcompiler) -q Equivalence_SPH_RT_APEX.x2m
