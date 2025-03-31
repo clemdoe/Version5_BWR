@@ -129,7 +129,8 @@ Thm Fmap := THM: Fmap ::
     HGAP 10000.0
     CONDC 0 10.0 KELVIN
     CONDF 0 5.0 KELVIN
-    MONO
+    BOWR
+    PDROP 1
 ;
 
 *--

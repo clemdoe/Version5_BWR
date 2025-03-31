@@ -1,0 +1,813 @@
+***********************************************************
+* Input file :  pincell_mphy_thm.x2m                      *
+*                                                         *
+* Test of a PWR single pincell                            *
+*                                                         *
+* The aim is to test the THM module of DONJON             *
+***********************************************************
+ 
+LINKED_LIST Geom Track Flux Cpo Matex Lib MicroF MacroF Macro2 Fmap
+            System Power Burnup Thm DONNEES ;
+MODULE      GEO: RESINI: TRIVAT: TRIVAA: GREP: FIND0: NCR: FLUD: FLPOW:
+            MACINI: USPLIT: TINST: UTL: DELETE: ABORT: THM: END: ;
+
+PROCEDURE   assertS ;
+SEQ_ASCII   _ACompo ;
+INTEGER     maxstep := 67 ;
+REAL        Fuelpwr := 30.0796 ; ! W/g ou kW/kg ou MW/t
+REAL        Mass := 6.464E-3 ; ! kg
+
+*----
+*  Calculation options
+*----
+STRING Dir := "EDI2B" ;
+REAL   Tfuel := 900.0 ; (*fuel temperature (K)*)
+REAL   Tcool := 500.0 ; (*coolant temperature (K)*)
+REAL   Dfuel := 9.7413951 ; (*fuel density (g/cc)*)
+REAL   dens_mod_0 := 0.65 ;
+REAL   powi := 0.0591122 ;
+ECHO "total reactor power=" powi "MW" ;
+*----
+*  Recover the Multicompo
+*----
+Cpo := _ACompo ;
+UTL: Cpo :: DIR ;
+
+INTEGER MaxR := 10000 ;
+INTEGER Iter := 1 ;
+REAL keff11 keff12 keff1n ;
+REAL Y1 Y2 ROOT YNEW ;
+LOGICAL CONV ;
+REAL maxh := 200.0 ;
+REAL z1 := 1.0 ;
+REAL z2 := 2.0 ;
+REAL z3 := 3.0 ;
+REAL z4 := 4.0 ;
+REAL z5 := 5.0 ;
+REAL z6 := 6.0 ;
+REAL z7 := 7.0 ;
+REAL z8 := 8.0 ;
+REAL z9 := 9.0 ;
+REAL z10 := 10.0 ;
+REAL z11 := 11.0 ;
+REAL z12 := 12.0 ;
+REAL z13 := 13.0 ;
+REAL z14 := 14.0 ;
+REAL z15 := 15.0 ;
+REAL z16 := 16.0 ;
+REAL z17 := 17.0 ;
+REAL z18 := 18.0 ;
+REAL z19 := 19.0 ;
+REAL z20 := 20.0 ;
+REAL z21 := 21.0 ;
+REAL z22 := 22.0 ;
+REAL z23 := 23.0 ;
+REAL z24 := 24.0 ;
+REAL z25 := 25.0 ;
+REAL z26 := 26.0 ;
+REAL z27 := 27.0 ;
+REAL z28 := 28.0 ;
+REAL z29 := 29.0 ;
+REAL z30 := 30.0 ;
+REAL z31 := 31.0 ;
+REAL z32 := 32.0 ;
+REAL z33 := 33.0 ;
+REAL z34 := 34.0 ;
+REAL z35 := 35.0 ;
+REAL z36 := 36.0 ;
+REAL z37 := 37.0 ;
+REAL z38 := 38.0 ;
+REAL z39 := 39.0 ;
+REAL z40 := 40.0 ;
+REAL z41 := 41.0 ;
+REAL z42 := 42.0 ;
+REAL z43 := 43.0 ;
+REAL z44 := 44.0 ;
+REAL z45 := 45.0 ;
+REAL z46 := 46.0 ;
+REAL z47 := 47.0 ;
+REAL z48 := 48.0 ;
+REAL z49 := 49.0 ;
+REAL z50 := 50.0 ;
+REAL z51 := 51.0 ;
+REAL z52 := 52.0 ;
+REAL z53 := 53.0 ;
+REAL z54 := 54.0 ;
+REAL z55 := 55.0 ;
+REAL z56 := 56.0 ;
+REAL z57 := 57.0 ;
+REAL z58 := 58.0 ;
+REAL z59 := 59.0 ;
+REAL z60 := 60.0 ;
+REAL z61 := 61.0 ;
+REAL z62 := 62.0 ;
+REAL z63 := 63.0 ;
+REAL z64 := 64.0 ;
+REAL z65 := 65.0 ;
+REAL z66 := 66.0 ;
+REAL z67 := 67.0 ;
+REAL z68 := 68.0 ;
+REAL z69 := 69.0 ;
+REAL z70 := 70.0 ;
+REAL z71 := 71.0 ;
+REAL z72 := 72.0 ;
+REAL z73 := 73.0 ;
+REAL z74 := 74.0 ;
+REAL z75 := 75.0 ;
+REAL z76 := 76.0 ;
+REAL z77 := 77.0 ;
+REAL z78 := 78.0 ;
+REAL z79 := 79.0 ;
+REAL z80 := 80.0 ;
+REAL z81 := 81.0 ;
+REAL z82 := 82.0 ;
+REAL z83 := 83.0 ;
+REAL z84 := 84.0 ;
+REAL z85 := 85.0 ;
+REAL z86 := 86.0 ;
+REAL z87 := 87.0 ;
+REAL z88 := 88.0 ;
+REAL z89 := 89.0 ;
+REAL z90 := 90.0 ;
+REAL z91 := 91.0 ;
+REAL z92 := 92.0 ;
+REAL z93 := 93.0 ;
+REAL z94 := 94.0 ;
+REAL z95 := 95.0 ;
+REAL z96 := 96.0 ;
+REAL z97 := 97.0 ;
+REAL z98 := 98.0 ;
+REAL z99 := 99.0 ;
+REAL z100 := 100.0 ;
+REAL z101 := 101.0 ;
+REAL z102 := 102.0 ;
+REAL z103 := 103.0 ;
+REAL z104 := 104.0 ;
+REAL z105 := 105.0 ;
+REAL z106 := 106.0 ;
+REAL z107 := 107.0 ;
+REAL z108 := 108.0 ;
+REAL z109 := 109.0 ;
+REAL z110 := 110.0 ;
+REAL z111 := 111.0 ;
+REAL z112 := 112.0 ;
+REAL z113 := 113.0 ;
+REAL z114 := 114.0 ;
+REAL z115 := 115.0 ;
+REAL z116 := 116.0 ;
+REAL z117 := 117.0 ;
+REAL z118 := 118.0 ;
+REAL z119 := 119.0 ;
+REAL z120 := 120.0 ;
+REAL z121 := 121.0 ;
+REAL z122 := 122.0 ;
+REAL z123 := 123.0 ;
+REAL z124 := 124.0 ;
+REAL z125 := 125.0 ;
+REAL z126 := 126.0 ;
+REAL z127 := 127.0 ;
+REAL z128 := 128.0 ;
+REAL z129 := 129.0 ;
+REAL z130 := 130.0 ;
+REAL z131 := 131.0 ;
+REAL z132 := 132.0 ;
+REAL z133 := 133.0 ;
+REAL z134 := 134.0 ;
+REAL z135 := 135.0 ;
+REAL z136 := 136.0 ;
+REAL z137 := 137.0 ;
+REAL z138 := 138.0 ;
+REAL z139 := 139.0 ;
+REAL z140 := 140.0 ;
+REAL z141 := 141.0 ;
+REAL z142 := 142.0 ;
+REAL z143 := 143.0 ;
+REAL z144 := 144.0 ;
+REAL z145 := 145.0 ;
+REAL z146 := 146.0 ;
+REAL z147 := 147.0 ;
+REAL z148 := 148.0 ;
+REAL z149 := 149.0 ;
+REAL z150 := 150.0 ;
+REAL z151 := 151.0 ;
+REAL z152 := 152.0 ;
+REAL z153 := 153.0 ;
+REAL z154 := 154.0 ;
+REAL z155 := 155.0 ;
+REAL z156 := 156.0 ;
+REAL z157 := 157.0 ;
+REAL z158 := 158.0 ;
+REAL z159 := 159.0 ;
+REAL z160 := 160.0 ;
+REAL z161 := 161.0 ;
+REAL z162 := 162.0 ;
+REAL z163 := 163.0 ;
+REAL z164 := 164.0 ;
+REAL z165 := 165.0 ;
+REAL z166 := 166.0 ;
+REAL z167 := 167.0 ;
+REAL z168 := 168.0 ;
+REAL z169 := 169.0 ;
+REAL z170 := 170.0 ;
+REAL z171 := 171.0 ;
+REAL z172 := 172.0 ;
+REAL z173 := 173.0 ;
+REAL z174 := 174.0 ;
+REAL z175 := 175.0 ;
+REAL z176 := 176.0 ;
+REAL z177 := 177.0 ;
+REAL z178 := 178.0 ;
+REAL z179 := 179.0 ;
+REAL z180 := 180.0 ;
+REAL z181 := 181.0 ;
+REAL z182 := 182.0 ;
+REAL z183 := 183.0 ;
+REAL z184 := 184.0 ;
+REAL z185 := 185.0 ;
+REAL z186 := 186.0 ;
+REAL z187 := 187.0 ;
+REAL z188 := 188.0 ;
+REAL z189 := 189.0 ;
+REAL z190 := 190.0 ;
+REAL z191 := 191.0 ;
+REAL z192 := 192.0 ;
+REAL z193 := 193.0 ;
+REAL z194 := 194.0 ;
+REAL z195 := 195.0 ;
+REAL z196 := 196.0 ;
+REAL z197 := 197.0 ;
+REAL z198 := 198.0 ;
+REAL z199 := 199.0 ;
+REAL z200 := 200.0 ;
+
+REAL Cote      := 1.404  ;
+Geom := GEO: :: CAR3D 1 1 200
+   X- REFL X+ REFL    Y- REFL Y+ REFL    Z- REFL Z+ REFL
+   MESHX 0.0 <<Cote>>
+   MESHY 0.0 <<Cote>>
+   MESHZ 0.0 <<z1>> <<z2>> <<z3>> <<z4>> <<z5>> <<z6>> <<z7>> <<z8>> 
+            <<z9>> <<z10>> <<z11>> <<z12>> <<z13>> <<z14>> <<z15>> <<z16>> <<z17>> 
+            <<z18>> <<z19>> <<z20>> <<z21>> <<z22>> <<z23>> <<z24>> <<z25>> <<z26>> 
+            <<z27>> <<z28>> <<z29>> <<z30>> <<z31>> <<z32>> <<z33>> <<z34>> <<z35>> 
+            <<z36>> <<z37>> <<z38>> <<z39>> <<z40>> <<z41>> <<z42>> <<z43>> <<z44>> 
+            <<z45>> <<z46>> <<z47>> <<z48>> <<z49>> <<z50>> <<z51>> <<z52>> <<z53>> 
+            <<z54>> <<z55>> <<z56>> <<z57>> <<z58>> <<z59>> <<z60>> <<z61>> <<z62>> 
+            <<z63>> <<z64>> <<z65>> <<z66>> <<z67>> <<z68>> <<z69>> <<z70>> <<z71>> 
+            <<z72>> <<z73>> <<z74>> <<z75>> <<z76>> <<z77>> <<z78>> <<z79>> <<z80>> 
+            <<z81>> <<z82>> <<z83>> <<z84>> <<z85>> <<z86>> <<z87>> <<z88>> <<z89>> 
+            <<z90>> <<z91>> <<z92>> <<z93>> <<z94>> <<z95>> <<z96>> <<z97>> <<z98>> 
+            <<z99>> <<z100>> <<z101>> <<z102>> <<z103>> <<z104>> <<z105>> <<z106>> <<z107>> 
+            <<z108>> <<z109>> <<z110>> <<z111>> <<z112>> <<z113>> <<z114>> <<z115>> <<z116>> 
+            <<z117>> <<z118>> <<z119>> <<z120>> <<z121>> <<z122>> <<z123>> <<z124>> <<z125>> 
+            <<z126>> <<z127>> <<z128>> <<z129>> <<z130>> <<z131>> <<z132>> <<z133>> <<z134>> 
+            <<z135>> <<z136>> <<z137>> <<z138>> <<z139>> <<z140>> <<z141>> <<z142>> <<z143>> 
+            <<z144>> <<z145>> <<z146>> <<z147>> <<z148>> <<z149>> <<z150>> <<z151>> <<z152>> 
+            <<z153>> <<z154>> <<z155>> <<z156>> <<z157>> <<z158>> <<z159>> <<z160>> <<z161>> 
+            <<z162>> <<z163>> <<z164>> <<z165>> <<z166>> <<z167>> <<z168>> <<z169>> <<z170>> 
+            <<z171>> <<z172>> <<z173>> <<z174>> <<z175>> <<z176>> <<z177>> <<z178>> <<z179>> 
+            <<z180>> <<z181>> <<z182>> <<z183>> <<z184>> <<z185>> <<z186>> <<z187>> <<z188>> 
+            <<z189>> <<z190>> <<z191>> <<z192>> <<z193>> <<z194>> <<z195>> <<z196>> <<z197>> 
+            <<z198>> <<z199>> <<z200>>
+   MIX
+   PLANE 1
+      1
+   PLANE 2  SAME 1
+   PLANE 3  SAME 1
+   PLANE 4  SAME 1
+   PLANE 5  SAME 1
+   PLANE 6  SAME 1
+   PLANE 7  SAME 1
+   PLANE 8  SAME 1
+   PLANE 9  SAME 1
+   PLANE 10  SAME 1
+   PLANE 11  SAME 1
+   PLANE 12  SAME 1
+   PLANE 13  SAME 1
+   PLANE 14  SAME 1
+   PLANE 15  SAME 1
+   PLANE 16  SAME 1
+   PLANE 17  SAME 1
+   PLANE 18  SAME 1
+   PLANE 19  SAME 1
+   PLANE 20  SAME 1
+   PLANE 21  SAME 1
+   PLANE 22  SAME 1
+   PLANE 23  SAME 1
+   PLANE 24  SAME 1
+   PLANE 25  SAME 1
+   PLANE 26  SAME 1
+   PLANE 27  SAME 1
+   PLANE 28  SAME 1
+   PLANE 29  SAME 1
+   PLANE 30  SAME 1
+   PLANE 31  SAME 1
+   PLANE 32  SAME 1
+   PLANE 33  SAME 1
+   PLANE 34  SAME 1
+   PLANE 35  SAME 1
+   PLANE 36  SAME 1
+   PLANE 37  SAME 1
+   PLANE 38  SAME 1
+   PLANE 39  SAME 1
+   PLANE 40  SAME 1
+   PLANE 41  SAME 1
+   PLANE 42  SAME 1
+   PLANE 43  SAME 1
+   PLANE 44  SAME 1
+   PLANE 45  SAME 1
+   PLANE 46  SAME 1
+   PLANE 47  SAME 1
+   PLANE 48  SAME 1
+   PLANE 49  SAME 1
+   PLANE 50  SAME 1
+   PLANE 51  SAME 1
+   PLANE 52  SAME 1
+   PLANE 53  SAME 1
+   PLANE 54  SAME 1
+   PLANE 55  SAME 1
+   PLANE 56  SAME 1
+   PLANE 57  SAME 1
+   PLANE 58  SAME 1
+   PLANE 59  SAME 1
+   PLANE 60  SAME 1
+   PLANE 61  SAME 1
+   PLANE 62  SAME 1
+   PLANE 63  SAME 1
+   PLANE 64  SAME 1
+   PLANE 65  SAME 1
+   PLANE 66  SAME 1
+   PLANE 67  SAME 1
+   PLANE 68  SAME 1
+   PLANE 69  SAME 1
+   PLANE 70  SAME 1
+   PLANE 71  SAME 1
+   PLANE 72  SAME 1
+   PLANE 73  SAME 1
+   PLANE 74  SAME 1
+   PLANE 75  SAME 1
+   PLANE 76  SAME 1
+   PLANE 77  SAME 1
+   PLANE 78  SAME 1
+   PLANE 79  SAME 1
+   PLANE 80  SAME 1
+   PLANE 81  SAME 1
+   PLANE 82  SAME 1
+   PLANE 83  SAME 1
+   PLANE 84  SAME 1
+   PLANE 85  SAME 1
+   PLANE 86  SAME 1
+   PLANE 87  SAME 1
+   PLANE 88  SAME 1
+   PLANE 89  SAME 1
+   PLANE 90  SAME 1
+   PLANE 91  SAME 1
+   PLANE 92  SAME 1
+   PLANE 93  SAME 1
+   PLANE 94  SAME 1
+   PLANE 95  SAME 1
+   PLANE 96  SAME 1
+   PLANE 97  SAME 1
+   PLANE 98  SAME 1
+   PLANE 99  SAME 1
+   PLANE 100  SAME 1
+   PLANE 101  SAME 1
+   PLANE 102  SAME 1
+   PLANE 103  SAME 1
+   PLANE 104  SAME 1
+   PLANE 105  SAME 1
+   PLANE 106  SAME 1
+   PLANE 107  SAME 1
+   PLANE 108  SAME 1
+   PLANE 109  SAME 1
+   PLANE 110  SAME 1
+   PLANE 111  SAME 1
+   PLANE 112  SAME 1
+   PLANE 113  SAME 1
+   PLANE 114  SAME 1
+   PLANE 115  SAME 1
+   PLANE 116  SAME 1
+   PLANE 117  SAME 1
+   PLANE 118  SAME 1
+   PLANE 119  SAME 1
+   PLANE 120  SAME 1
+   PLANE 121  SAME 1
+   PLANE 122  SAME 1
+   PLANE 123  SAME 1
+   PLANE 124  SAME 1
+   PLANE 125  SAME 1
+   PLANE 126  SAME 1
+   PLANE 127  SAME 1
+   PLANE 128  SAME 1
+   PLANE 129  SAME 1
+   PLANE 130  SAME 1
+   PLANE 131  SAME 1
+   PLANE 132  SAME 1
+   PLANE 133  SAME 1
+   PLANE 134  SAME 1
+   PLANE 135  SAME 1
+   PLANE 136  SAME 1
+   PLANE 137  SAME 1
+   PLANE 138  SAME 1
+   PLANE 139  SAME 1
+   PLANE 140  SAME 1
+   PLANE 141  SAME 1
+   PLANE 142  SAME 1
+   PLANE 143  SAME 1
+   PLANE 144  SAME 1
+   PLANE 145  SAME 1
+   PLANE 146  SAME 1
+   PLANE 147  SAME 1
+   PLANE 148  SAME 1
+   PLANE 149  SAME 1
+   PLANE 150  SAME 1
+   PLANE 151  SAME 1
+   PLANE 152  SAME 1
+   PLANE 153  SAME 1
+   PLANE 154  SAME 1
+   PLANE 155  SAME 1
+   PLANE 156  SAME 1
+   PLANE 157  SAME 1
+   PLANE 158  SAME 1
+   PLANE 159  SAME 1
+   PLANE 160  SAME 1
+   PLANE 161  SAME 1
+   PLANE 162  SAME 1
+   PLANE 163  SAME 1
+   PLANE 164  SAME 1
+   PLANE 165  SAME 1
+   PLANE 166  SAME 1
+   PLANE 167  SAME 1
+   PLANE 168  SAME 1
+   PLANE 169  SAME 1
+   PLANE 170  SAME 1
+   PLANE 171  SAME 1
+   PLANE 172  SAME 1
+   PLANE 173  SAME 1
+   PLANE 174  SAME 1
+   PLANE 175  SAME 1
+   PLANE 176  SAME 1
+   PLANE 177  SAME 1
+   PLANE 178  SAME 1
+   PLANE 179  SAME 1
+   PLANE 180  SAME 1
+   PLANE 181  SAME 1
+   PLANE 182  SAME 1
+   PLANE 183  SAME 1
+   PLANE 184  SAME 1
+   PLANE 185  SAME 1
+   PLANE 186  SAME 1
+   PLANE 187  SAME 1
+   PLANE 188  SAME 1
+   PLANE 189  SAME 1
+   PLANE 190  SAME 1
+   PLANE 191  SAME 1
+   PLANE 192  SAME 1
+   PLANE 193  SAME 1
+   PLANE 194  SAME 1
+   PLANE 195  SAME 1
+   PLANE 196  SAME 1
+   PLANE 197  SAME 1
+   PLANE 198  SAME 1
+   PLANE 199  SAME 1
+   PLANE 200  SAME 1
+;
+
+Geom Matex := USPLIT: Geom :: NGRP 2 MAXR <<MaxR>>
+               NFUEL 1  FMIX  1
+;
+
+Track := TRIVAT: Geom ::
+   EDIT 1 MAXR <<MaxR>> MCFD 1 ;
+
+*--
+* Fuel map definition
+*--
+Fmap Matex := RESINI: Matex ::
+      ::: GEO: CAR3D 1 1 200
+                EDIT  0
+                X- REFL X+ REFL    Y- REFL Y+ REFL    Z- REFL Z+ REFL
+   MESHX 0.0 <<Cote>>
+   MESHY 0.0 <<Cote>>
+   MESHZ 0.0 <<z1>> <<z2>> <<z3>> <<z4>> <<z5>> <<z6>> <<z7>> <<z8>> 
+            <<z9>> <<z10>> <<z11>> <<z12>> <<z13>> <<z14>> <<z15>> <<z16>> <<z17>> 
+            <<z18>> <<z19>> <<z20>> <<z21>> <<z22>> <<z23>> <<z24>> <<z25>> <<z26>> 
+            <<z27>> <<z28>> <<z29>> <<z30>> <<z31>> <<z32>> <<z33>> <<z34>> <<z35>> 
+            <<z36>> <<z37>> <<z38>> <<z39>> <<z40>> <<z41>> <<z42>> <<z43>> <<z44>> 
+            <<z45>> <<z46>> <<z47>> <<z48>> <<z49>> <<z50>> <<z51>> <<z52>> <<z53>> 
+            <<z54>> <<z55>> <<z56>> <<z57>> <<z58>> <<z59>> <<z60>> <<z61>> <<z62>> 
+            <<z63>> <<z64>> <<z65>> <<z66>> <<z67>> <<z68>> <<z69>> <<z70>> <<z71>> 
+            <<z72>> <<z73>> <<z74>> <<z75>> <<z76>> <<z77>> <<z78>> <<z79>> <<z80>> 
+            <<z81>> <<z82>> <<z83>> <<z84>> <<z85>> <<z86>> <<z87>> <<z88>> <<z89>> 
+            <<z90>> <<z91>> <<z92>> <<z93>> <<z94>> <<z95>> <<z96>> <<z97>> <<z98>> 
+            <<z99>> <<z100>> <<z101>> <<z102>> <<z103>> <<z104>> <<z105>> <<z106>> <<z107>> 
+            <<z108>> <<z109>> <<z110>> <<z111>> <<z112>> <<z113>> <<z114>> <<z115>> <<z116>> 
+            <<z117>> <<z118>> <<z119>> <<z120>> <<z121>> <<z122>> <<z123>> <<z124>> <<z125>> 
+            <<z126>> <<z127>> <<z128>> <<z129>> <<z130>> <<z131>> <<z132>> <<z133>> <<z134>> 
+            <<z135>> <<z136>> <<z137>> <<z138>> <<z139>> <<z140>> <<z141>> <<z142>> <<z143>> 
+            <<z144>> <<z145>> <<z146>> <<z147>> <<z148>> <<z149>> <<z150>> <<z151>> <<z152>> 
+            <<z153>> <<z154>> <<z155>> <<z156>> <<z157>> <<z158>> <<z159>> <<z160>> <<z161>> 
+            <<z162>> <<z163>> <<z164>> <<z165>> <<z166>> <<z167>> <<z168>> <<z169>> <<z170>> 
+            <<z171>> <<z172>> <<z173>> <<z174>> <<z175>> <<z176>> <<z177>> <<z178>> <<z179>> 
+            <<z180>> <<z181>> <<z182>> <<z183>> <<z184>> <<z185>> <<z186>> <<z187>> <<z188>> 
+            <<z189>> <<z190>> <<z191>> <<z192>> <<z193>> <<z194>> <<z195>> <<z196>> <<z197>> 
+            <<z198>> <<z199>> <<z200>>
+   MIX
+   PLANE 1
+      1
+   PLANE 2  SAME 1
+   PLANE 3  SAME 1
+   PLANE 4  SAME 1
+   PLANE 5  SAME 1
+   PLANE 6  SAME 1
+   PLANE 7  SAME 1
+   PLANE 8  SAME 1
+   PLANE 9  SAME 1
+   PLANE 10  SAME 1
+   PLANE 11  SAME 1
+   PLANE 12  SAME 1
+   PLANE 13  SAME 1
+   PLANE 14  SAME 1
+   PLANE 15  SAME 1
+   PLANE 16  SAME 1
+   PLANE 17  SAME 1
+   PLANE 18  SAME 1
+   PLANE 19  SAME 1
+   PLANE 20  SAME 1
+   PLANE 21  SAME 1
+   PLANE 22  SAME 1
+   PLANE 23  SAME 1
+   PLANE 24  SAME 1
+   PLANE 25  SAME 1
+   PLANE 26  SAME 1
+   PLANE 27  SAME 1
+   PLANE 28  SAME 1
+   PLANE 29  SAME 1
+   PLANE 30  SAME 1
+   PLANE 31  SAME 1
+   PLANE 32  SAME 1
+   PLANE 33  SAME 1
+   PLANE 34  SAME 1
+   PLANE 35  SAME 1
+   PLANE 36  SAME 1
+   PLANE 37  SAME 1
+   PLANE 38  SAME 1
+   PLANE 39  SAME 1
+   PLANE 40  SAME 1
+   PLANE 41  SAME 1
+   PLANE 42  SAME 1
+   PLANE 43  SAME 1
+   PLANE 44  SAME 1
+   PLANE 45  SAME 1
+   PLANE 46  SAME 1
+   PLANE 47  SAME 1
+   PLANE 48  SAME 1
+   PLANE 49  SAME 1
+   PLANE 50  SAME 1
+   PLANE 51  SAME 1
+   PLANE 52  SAME 1
+   PLANE 53  SAME 1
+   PLANE 54  SAME 1
+   PLANE 55  SAME 1
+   PLANE 56  SAME 1
+   PLANE 57  SAME 1
+   PLANE 58  SAME 1
+   PLANE 59  SAME 1
+   PLANE 60  SAME 1
+   PLANE 61  SAME 1
+   PLANE 62  SAME 1
+   PLANE 63  SAME 1
+   PLANE 64  SAME 1
+   PLANE 65  SAME 1
+   PLANE 66  SAME 1
+   PLANE 67  SAME 1
+   PLANE 68  SAME 1
+   PLANE 69  SAME 1
+   PLANE 70  SAME 1
+   PLANE 71  SAME 1
+   PLANE 72  SAME 1
+   PLANE 73  SAME 1
+   PLANE 74  SAME 1
+   PLANE 75  SAME 1
+   PLANE 76  SAME 1
+   PLANE 77  SAME 1
+   PLANE 78  SAME 1
+   PLANE 79  SAME 1
+   PLANE 80  SAME 1
+   PLANE 81  SAME 1
+   PLANE 82  SAME 1
+   PLANE 83  SAME 1
+   PLANE 84  SAME 1
+   PLANE 85  SAME 1
+   PLANE 86  SAME 1
+   PLANE 87  SAME 1
+   PLANE 88  SAME 1
+   PLANE 89  SAME 1
+   PLANE 90  SAME 1
+   PLANE 91  SAME 1
+   PLANE 92  SAME 1
+   PLANE 93  SAME 1
+   PLANE 94  SAME 1
+   PLANE 95  SAME 1
+   PLANE 96  SAME 1
+   PLANE 97  SAME 1
+   PLANE 98  SAME 1
+   PLANE 99  SAME 1
+   PLANE 100  SAME 1
+   PLANE 101  SAME 1
+   PLANE 102  SAME 1
+   PLANE 103  SAME 1
+   PLANE 104  SAME 1
+   PLANE 105  SAME 1
+   PLANE 106  SAME 1
+   PLANE 107  SAME 1
+   PLANE 108  SAME 1
+   PLANE 109  SAME 1
+   PLANE 110  SAME 1
+   PLANE 111  SAME 1
+   PLANE 112  SAME 1
+   PLANE 113  SAME 1
+   PLANE 114  SAME 1
+   PLANE 115  SAME 1
+   PLANE 116  SAME 1
+   PLANE 117  SAME 1
+   PLANE 118  SAME 1
+   PLANE 119  SAME 1
+   PLANE 120  SAME 1
+   PLANE 121  SAME 1
+   PLANE 122  SAME 1
+   PLANE 123  SAME 1
+   PLANE 124  SAME 1
+   PLANE 125  SAME 1
+   PLANE 126  SAME 1
+   PLANE 127  SAME 1
+   PLANE 128  SAME 1
+   PLANE 129  SAME 1
+   PLANE 130  SAME 1
+   PLANE 131  SAME 1
+   PLANE 132  SAME 1
+   PLANE 133  SAME 1
+   PLANE 134  SAME 1
+   PLANE 135  SAME 1
+   PLANE 136  SAME 1
+   PLANE 137  SAME 1
+   PLANE 138  SAME 1
+   PLANE 139  SAME 1
+   PLANE 140  SAME 1
+   PLANE 141  SAME 1
+   PLANE 142  SAME 1
+   PLANE 143  SAME 1
+   PLANE 144  SAME 1
+   PLANE 145  SAME 1
+   PLANE 146  SAME 1
+   PLANE 147  SAME 1
+   PLANE 148  SAME 1
+   PLANE 149  SAME 1
+   PLANE 150  SAME 1
+   PLANE 151  SAME 1
+   PLANE 152  SAME 1
+   PLANE 153  SAME 1
+   PLANE 154  SAME 1
+   PLANE 155  SAME 1
+   PLANE 156  SAME 1
+   PLANE 157  SAME 1
+   PLANE 158  SAME 1
+   PLANE 159  SAME 1
+   PLANE 160  SAME 1
+   PLANE 161  SAME 1
+   PLANE 162  SAME 1
+   PLANE 163  SAME 1
+   PLANE 164  SAME 1
+   PLANE 165  SAME 1
+   PLANE 166  SAME 1
+   PLANE 167  SAME 1
+   PLANE 168  SAME 1
+   PLANE 169  SAME 1
+   PLANE 170  SAME 1
+   PLANE 171  SAME 1
+   PLANE 172  SAME 1
+   PLANE 173  SAME 1
+   PLANE 174  SAME 1
+   PLANE 175  SAME 1
+   PLANE 176  SAME 1
+   PLANE 177  SAME 1
+   PLANE 178  SAME 1
+   PLANE 179  SAME 1
+   PLANE 180  SAME 1
+   PLANE 181  SAME 1
+   PLANE 182  SAME 1
+   PLANE 183  SAME 1
+   PLANE 184  SAME 1
+   PLANE 185  SAME 1
+   PLANE 186  SAME 1
+   PLANE 187  SAME 1
+   PLANE 188  SAME 1
+   PLANE 189  SAME 1
+   PLANE 190  SAME 1
+   PLANE 191  SAME 1
+   PLANE 192  SAME 1
+   PLANE 193  SAME 1
+   PLANE 194  SAME 1
+   PLANE 195  SAME 1
+   PLANE 196  SAME 1
+   PLANE 197  SAME 1
+   PLANE 198  SAME 1
+   PLANE 199  SAME 1
+   PLANE 200  SAME 1
+;
+!
+NXNAME '01' NYNAME  'A'
+NCOMB 1
+B-ZONE 1
+
+ADD-PARAM PNAME 'T-FUEL' PARKEY 'TFA' GLOBAL
+ADD-PARAM PNAME 'T-COOL' PARKEY 'TCA' GLOBAL
+ADD-PARAM PNAME 'D-FUEL' PARKEY 'DFA' GLOBAL
+ADD-PARAM PNAME 'D-COOL' PARKEY 'DCA' GLOBAL
+BTYPE INST-BURN
+INST-BVAL CHAN 0.0
+REACTOR-POW <<powi>> AXIAL-PFORM 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+SET-PARAM 'T-FUEL' <<Tfuel>>
+SET-PARAM 'T-COOL' <<Tcool>>
+SET-PARAM 'D-FUEL' <<Dfuel>>
+SET-PARAM 'D-COOL' <<dens_mod_0>>
+FUEL WEIGHT <<Mass>>
+;
+
+UTL: Fmap :: STEP UP PARAM STEP AT 4 DIR IMPR P-NAME * ;
+*--
+* THM single-stage calculation
+*--
+Thm Fmap := THM: Fmap ::
+    EDIT 100
+    FLUID H2O
+    FPUISS 1.0
+    INLET 10.8E6 (*Pa*) 500.0 (*K*)
+    INLET-Q 2.1268E-5 (*m2*) 0.148880 (*inlet mass flow rate kg/s*)
+    ASSMB 1 0
+    RADIUS 5.6E-3 6.14E-3 6.52E-3 7.02E-3 (* m *)
+    RODMESH 8 11
+    HGAP 10000.0
+    CONDC 0 10.0 KELVIN
+    CONDF 0 5.0 KELVIN
+    MONO
+;
+
+*--
+* Dump THM object
+*--
+UTL: Thm :: DIR DUMP ;
+
+*--
+* Cross-section database interpolation
+*--
+MicroF := NCR: Cpo Fmap ::
+       EDIT 2
+       MICRO LINEAR
+       TABLE Cpo <<Dir>> 'burnup'
+         MIX 1 INST-BURN
+               SET LINEAR 'burnup' MAP
+               SET CUBIC 'DCA' <<dens_mod_0>>
+               SET CUBIC 'DCAH' <<dens_mod_0>>
+               ADD 'DCA' <<dens_mod_0>> MAP
+                        REF 'burnup' SAMEASREF
+                        ENDREF
+         ENDMIX
+  ;
+MacroF := MicroF :: STEP UP 'MACROLIB' ;
+  
+Macro2 Matex := MACINI: Matex MacroF :: FUEL ;
+  
+*--
+* Steady-state diffusion calculation
+*--
+System := TRIVAA: Macro2 Track ;
+
+Flux := FLUD: System Track :: EDIT 1 ADI 4 ACCE 5 3 ;
+System MacroF Macro2 := DELETE: System MacroF Macro2 ;
+
+GREP: Flux :: GETVAL 'K-EFFECTIVE' 1 >>keff11<< ;
+ECHO "+++ Burnup= 0.0 Keff=" keff11 ;
+
+*assertS Flux :: 'K-EFFECTIVE' 1 1.354165 ;
+
+ECHO "test pincell_mphy_thm.x2m completed" ;
+END: ;

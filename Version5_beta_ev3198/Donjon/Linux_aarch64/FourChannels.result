@@ -262,7 +262,7 @@ QUIT .                                                                          
  DRVEQU: A LCM OBJECT NAMED 'DBASE       ' WAS IMPORTED FROM FILE 'macfme5     '.
 
  DRVEQU: 1995 SPECIFICATION IMPORT.
--->>module EQU:        : time spent=        0.049 memory usage= 1.118E+04
+-->>module EQU:        : time spent=        0.046 memory usage= 1.130E+04
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : UTL:        
 ->@DESCRIPTION  : No description available for this module                                
@@ -307,7 +307,7 @@ QUIT .                                                                          
  ~~~~~~~~~~~~~~~
 
  @END MODULE -> USPLIT:     
--->>MODULE USPLIT:     : TIME SPENT=        0.001 MEMORY USAGE= 4.200E+02
+-->>MODULE USPLIT:     : TIME SPENT=        0.001 MEMORY USAGE= 4.920E+02
 ->@BEGIN MODULE : EQU:        
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -328,7 +328,7 @@ QUIT .                                                                          
  DRVEQU: A LCM OBJECT NAMED 'NREFL       ' WAS IMPORTED FROM FILE 'rnat        '.
 
  DRVEQU: 1995 SPECIFICATION IMPORT.
--->>module EQU:        : time spent=        0.008 memory usage= 0.000E+00
+-->>module EQU:        : time spent=        0.000 memory usage= 0.000E+00
 ->@END MODULE   : EQU:        
 
  ~~~~~~~~~~~~~~~
@@ -341,7 +341,7 @@ QUIT .                                                                          
  ~~~~~~~~~~~~~~~
 
  @END MODULE -> CRE:        
--->>MODULE CRE:        : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE CRE:        : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> RESINI:     
@@ -380,7 +380,7 @@ QUIT .                                                                          
 
 
  EXEC: TRIVAT:      BY A. HEBERT
--->>MODULE TRIVAT:     : TIME SPENT=        0.001 MEMORY USAGE= 8.720E+02
+-->>MODULE TRIVAT:     : TIME SPENT=        0.001 MEMORY USAGE= 8.000E+02
 ->@END MODULE   : TRIVAT:     
 
  ~~~~~~~~~~~~~~~
@@ -454,7 +454,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.025 MEMORY USAGE= 1.228E+03
+-->>MODULE AFM:        : TIME SPENT=        0.022 MEMORY USAGE= 1.228E+03
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -481,7 +481,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        43
 
  @END MODULE -> MACINI:     
--->>MODULE MACINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE MACINI:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : TRIVAA:     
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -509,7 +509,7 @@ QUIT .                                                                          
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
  FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.002                    TOTAL CPU TIME =     0.004
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.3150960207E-01
@@ -599,7 +599,7 @@ QUIT .                                                                          
  CHANNEL-POWER FORM FACTOR  =>  AVG/MAX =   1.0000   (MAX/AVG =   1.0000)
 
  @END MODULE -> FLPOW:      
--->>MODULE FLPOW:      : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE FLPOW:      : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> TAVG:       
@@ -687,7 +687,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       609
 
  @END MODULE -> TAVG:       
--->>MODULE TAVG:       : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE TAVG:       : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -753,7 +753,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 1.096E+03
+-->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 1.096E+03
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -789,7 +789,7 @@ QUIT .                                                                          
 
 
  EXEC: TRIVAA:      BY A. HEBERT
--->>MODULE TRIVAA:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE TRIVAA:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : TRIVAA:     
 ->@BEGIN MODULE : FLUD:       
 ->@DESCRIPTION  : No description available for this module                                
@@ -807,8 +807,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.003
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2869012356E-01
@@ -839,7 +839,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.003 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 
  ~~~~~~~~~~~~~~~
@@ -1107,7 +1107,7 @@ QUIT .                                                                          
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
  FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.002                    TOTAL CPU TIME =     0.004
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2996405363E-01
@@ -1138,7 +1138,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.003 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 
  ~~~~~~~~~~~~~~~
@@ -1285,7 +1285,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       609
 
  @END MODULE -> TAVG:       
--->>MODULE TAVG:       : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE TAVG:       : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1351,7 +1351,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 2.800E+01
+-->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 2.800E+01
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -1405,8 +1405,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.001
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.002                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2961226702E-01
@@ -1584,7 +1584,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       609
 
  @END MODULE -> TAVG:       
--->>MODULE TAVG:       : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE TAVG:       : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1677,7 +1677,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        43
 
  @END MODULE -> MACINI:     
--->>MODULE MACINI:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE MACINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : TRIVAA:     
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1704,8 +1704,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.004
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.004
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2969624996E-01
@@ -1736,7 +1736,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.003 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 
  ~~~~~~~~~~~~~~~
@@ -2248,7 +2248,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 0.000E+00
+-->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -2275,7 +2275,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        43
 
  @END MODULE -> MACINI:     
--->>MODULE MACINI:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE MACINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : TRIVAA:     
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -2302,8 +2302,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.004
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2964248657E-01
@@ -2334,7 +2334,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.003 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 
  ~~~~~~~~~~~~~~~
@@ -2547,7 +2547,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 0.000E+00
+-->>MODULE AFM:        : TIME SPENT=        0.021 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -2602,7 +2602,7 @@ QUIT .                                                                          
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
  FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.002
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.002                    TOTAL CPU TIME =     0.004
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2963253260E-01
@@ -2633,7 +2633,7 @@ QUIT .                                                                          
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.004 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.003 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 
  ~~~~~~~~~~~~~~~
@@ -2692,7 +2692,7 @@ QUIT .                                                                          
  CHANNEL-POWER FORM FACTOR  =>  AVG/MAX =   1.0000   (MAX/AVG =   1.0000)
 
  @END MODULE -> FLPOW:      
--->>MODULE FLPOW:      : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE FLPOW:      : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> TAVG:       
@@ -2846,7 +2846,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 0.000E+00
+-->>MODULE AFM:        : TIME SPENT=        0.023 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -2873,7 +2873,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        43
 
  @END MODULE -> MACINI:     
--->>MODULE MACINI:     : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE MACINI:     : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@BEGIN MODULE : TRIVAA:     
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -2901,7 +2901,7 @@ QUIT .                                                                          
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
  FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.001
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.002                    TOTAL CPU TIME =     0.003
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.003                    TOTAL CPU TIME =     0.004
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2963008881E-01
@@ -2991,7 +2991,7 @@ QUIT .                                                                          
  CHANNEL-POWER FORM FACTOR  =>  AVG/MAX =   1.0000   (MAX/AVG =   1.0000)
 
  @END MODULE -> FLPOW:      
--->>MODULE FLPOW:      : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
+-->>MODULE FLPOW:      : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> TAVG:       
@@ -3292,14 +3292,15 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  2.9297E-03 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
- Boucle terminée
- PCOOL FINAL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
- VCOOL FINAL:   8.05533409       8.10206699       8.19485188       8.33247757       8.51151848       8.72647095       8.97185993       9.24071121       9.47512436       12.7657948       13.8417435       14.2011356    
- DCOOL FINAL:   869.967529       864.949524       855.156250       841.031799       823.340637       803.059875       781.095459       758.370056       739.608154       548.957520       506.285858       493.473145    
- TCOOL FINAL:   536.221436       538.947754       544.116272       551.221375       559.551086       568.341980       576.979980       584.973206       590.880188       591.523987       591.543945       591.546753    
- EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283436835      0.347484022      0.366731346    
- XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46089804E-02   6.02249689E-02   6.55535236E-02
- TBUL:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ Convergence atteinte à I =        43690
+ PCOOL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
+ VCOOL:   8.05533409       8.10206699       8.19485188       8.33247757       8.51151848       8.72647095       8.97185993       9.24071121       9.47512436       12.7657948       13.8417435       14.2011356    
+ DCOOL:   869.967529       864.949524       855.156250       841.031799       823.340637       803.059875       781.095459       758.370056       739.608154       548.957520       506.285858       493.473145    
+ TCOOL:   536.221436       538.947754       544.116272       551.221375       559.551086       568.341980       576.979980       584.973206       590.880188       591.523987       591.543945       591.546753    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283436835      0.347484022      0.366731346    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46089804E-02   6.02249689E-02   6.55535236E-02
+ TSAT:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ MUT:   0.00000000       0.00000000       0.00000000       0.00000000       816.529907       816.529907       816.529907       816.529907       816.529907       816.529907       816.529907       816.529907    
 
  THMDRV: CHANNEL     2     2
  ---------------------------
@@ -3495,14 +3496,15 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  2.9907E-03 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  6.1035E-05 EPS=  1.0000E+00
- Boucle terminée
- PCOOL FINAL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
- VCOOL FINAL:   8.05533028       8.10206127       8.19483662       8.33244896       8.51147079       8.72642136       8.97179985       9.24064255       9.47509098       12.7656012       13.8416700       14.2010994    
- DCOOL FINAL:   869.967957       864.950134       855.157898       841.034729       823.345215       803.064453       781.100708       758.375732       739.610718       548.965820       506.288544       493.474396    
- TCOOL FINAL:   536.221191       538.947388       544.115479       551.219971       559.549011       568.340027       576.978027       584.971375       590.879456       591.523926       591.543945       591.546692    
- EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283424675      0.347479969      0.366729498    
- XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46062684E-02   6.02238774E-02   6.55529872E-02
- TBUL:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ Convergence atteinte à I =        43690
+ PCOOL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
+ VCOOL:   8.05533028       8.10206127       8.19483662       8.33244896       8.51147079       8.72642136       8.97179985       9.24064255       9.47509098       12.7656012       13.8416700       14.2010994    
+ DCOOL:   869.967957       864.950134       855.157898       841.034729       823.345215       803.064453       781.100708       758.375732       739.610718       548.965820       506.288544       493.474396    
+ TCOOL:   536.221191       538.947388       544.115479       551.219971       559.549011       568.340027       576.978027       584.971375       590.879456       591.523926       591.543945       591.546692    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283424675      0.347479969      0.366729498    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46062684E-02   6.02238774E-02   6.55529872E-02
+ TSAT:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ MUT:  -9.07718459E-07   6.12227299E-41   0.00000000       0.00000000       1578.32312       1661.82812       1675.62695       1618.14404       1458.55505       1200.11743       939.950867       703.306335    
 
  THMDRV: CHANNEL     3     2
  ---------------------------
@@ -3698,14 +3700,15 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  2.9907E-03 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
- Boucle terminée
- PCOOL FINAL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
- VCOOL FINAL:   8.05533028       8.10206127       8.19483566       8.33244896       8.51147079       8.72642517       8.97179985       9.24064064       9.47509384       12.7656212       13.8416862       14.2011147    
- DCOOL FINAL:   869.967896       864.950134       855.157959       841.034729       823.345215       803.064087       781.100708       758.375854       739.610474       548.964966       506.287964       493.473877    
- TCOOL FINAL:   536.221252       538.947388       544.115479       551.219971       559.549011       568.340210       576.978027       584.971313       590.879517       591.523987       591.543945       591.546692    
- EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283425659      0.347480804      0.366730273    
- XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46064956E-02   6.02241047E-02   6.55532107E-02
- TBUL:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ Convergence atteinte à I =        43690
+ PCOOL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
+ VCOOL:   8.05533028       8.10206127       8.19483566       8.33244896       8.51147079       8.72642517       8.97179985       9.24064064       9.47509384       12.7656212       13.8416862       14.2011147    
+ DCOOL:   869.967896       864.950134       855.157959       841.034729       823.345215       803.064087       781.100708       758.375854       739.610474       548.964966       506.287964       493.473877    
+ TCOOL:   536.221252       538.947388       544.115479       551.219971       559.549011       568.340210       576.978027       584.971313       590.879517       591.523987       591.543945       591.546692    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283425659      0.347480804      0.366730273    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46064956E-02   6.02241047E-02   6.55532107E-02
+ TSAT:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ MUT:  -9.11813004E-07   6.12227299E-41   0.00000000       0.00000000       1578.26843       1661.75989       1675.65955       1618.19055       1458.63928       1200.12817       940.011719       703.324585    
 
  THMDRV: CHANNEL     2     3
  ---------------------------
@@ -3901,14 +3904,15 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  2.9297E-03 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
- Boucle terminée
- PCOOL FINAL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
- VCOOL FINAL:   8.05533409       8.10206604       8.19485188       8.33247852       8.51151943       8.72647095       8.97185993       9.24071121       9.47512436       12.7658091       13.8417377       14.2011204    
- DCOOL FINAL:   869.967529       864.949646       855.156250       841.031738       823.340515       803.059875       781.095459       758.370056       739.608154       548.956909       506.286072       493.473663    
- TCOOL FINAL:   536.221436       538.947693       544.116272       551.221436       559.551147       568.341980       576.979980       584.973206       590.880188       591.523987       591.543945       591.546753    
- EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283437878      0.347483605      0.366730601    
- XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46092039E-02   6.02248572E-02   6.55533075E-02
- TBUL:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ Convergence atteinte à I =            0
+ PCOOL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
+ VCOOL:   8.05533409       8.10206604       8.19485188       8.33247852       8.51151943       8.72647095       8.97185993       9.24071121       9.47512436       12.7658091       13.8417377       14.2011204    
+ DCOOL:   869.967529       864.949646       855.156250       841.031738       823.340515       803.059875       781.095459       758.370056       739.608154       548.956909       506.286072       493.473663    
+ TCOOL:   536.221436       538.947693       544.116272       551.221436       559.551147       568.341980       576.979980       584.973206       590.880188       591.523987       591.543945       591.546753    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283437878      0.347483605      0.366730601    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46092039E-02   6.02248572E-02   6.55533075E-02
+ TSAT:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ MUT:  -9.13925760E-07   6.12227299E-41   0.00000000       0.00000000       1578.26160       1661.76489       1675.65320       1618.19446       1458.64612       1200.13330       940.018738       703.320618    
 
  THMDRV: CHANNEL     3     3
  ---------------------------
@@ -4065,7 +4069,7 @@ QUIT .                                                                          
 
  AFMDRV: THE CROSS SECTIONS ARE GENERATED FOR A TIME AVERAGE CALCULATION.
  @END MODULE -> AFM:        
--->>MODULE AFM:        : TIME SPENT=        0.020 MEMORY USAGE= 1.360E+02
+-->>MODULE AFM:        : TIME SPENT=        0.023 MEMORY USAGE= 2.000E+02
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> MACINI:     
@@ -4119,8 +4123,8 @@ QUIT .                                                                          
 
  FLDDIR: CONVERGENCE IN  33 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.001
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.001                    TOTAL CPU TIME =     0.002
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.003
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.003
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 6.2962889671E-01
@@ -4337,14 +4341,15 @@ QUIT .                                                                          
   1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00
 
  THM: RECOVER LOCAL PARAMETER = T-FUEL      .
- Boucle terminée
- PCOOL FINAL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
- VCOOL FINAL:   8.05533028       8.10205936       8.19483185       8.33244324       8.51146889       8.72640419       8.97179127       9.24062347       9.47506428       12.7657166       13.8417339       14.2011375    
- DCOOL FINAL:   869.967957       864.950378       855.158386       841.035339       823.345459       803.066040       781.101440       758.377258       739.612793       548.960876       506.286194       493.473053    
- TCOOL FINAL:   536.221191       538.947266       544.115234       551.219727       559.548889       568.339355       576.977783       584.970886       590.878845       591.523926       591.543945       591.546692    
- EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283432066      0.347483456      0.366731495    
- XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46079038E-02   6.02248050E-02   6.55535683E-02
- TBUL:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ Convergence atteinte à I =        65535
+ PCOOL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
+ VCOOL:   8.05533028       8.10205936       8.19483185       8.33244324       8.51146889       8.72640419       8.97179127       9.24062347       9.47506428       12.7657166       13.8417339       14.2011375    
+ DCOOL:   869.967957       864.950378       855.158386       841.035339       823.345459       803.066040       781.101440       758.377258       739.612793       548.960876       506.286194       493.473053    
+ TCOOL:   536.221191       538.947266       544.115234       551.219727       559.548889       568.339355       576.977783       584.970886       590.878845       591.523926       591.543945       591.546692    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283432066      0.347483456      0.366731495    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46079038E-02   6.02248050E-02   6.55535683E-02
+ TSAT:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ MUT:  -3.36937213E-16   9.18340949E-41  -9.02898137E-07   6.12227299E-41   2238.20020       2273.36426       4.62428493E-44   0.00000000      -8.69714313E-07   6.12227299E-41  -3.36935942E-16   9.18340949E-41
 
  THMDRV: CHANNEL     2     2
  ---------------------------
@@ -4366,14 +4371,15 @@ QUIT .                                                                          
  | BOT |     597.54 |     556.66 |    869.9680 |      536.22 |  112.06E+05 |  1.1125E+06 |  5.1277E+07 |  5.1127E+06 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
  |_____|____________|____________|_____________|_____________|_____________|_____________|_____________|_____________|___________|_____________|_____________|________|
  MFLXT=  7.0079E+03 Kg/m2/s
- Boucle terminée
- PCOOL FINAL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
- VCOOL FINAL:   8.05533028       8.10206223       8.19484615       8.33247662       8.51151943       8.72647285       8.97186279       9.24068356       9.47511959       12.7658997       13.8418150       14.2011814    
- DCOOL FINAL:   869.967957       864.950073       855.156860       841.031921       823.340515       803.059753       781.095215       758.372375       739.608521       548.953003       506.283234       493.471527    
- TCOOL FINAL:   536.221191       538.947449       544.115967       551.221375       559.551147       568.341980       576.980103       584.972473       590.880066       591.523987       591.543884       591.546692    
- EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283443630      0.347487897      0.366733760    
- XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46104817E-02   6.02260008E-02   6.55542165E-02
- TBUL:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ Convergence atteinte à I =        65535
+ PCOOL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
+ VCOOL:   8.05533028       8.10206223       8.19484615       8.33247662       8.51151943       8.72647285       8.97186279       9.24068356       9.47511959       12.7658997       13.8418150       14.2011814    
+ DCOOL:   869.967957       864.950073       855.156860       841.031921       823.340515       803.059753       781.095215       758.372375       739.608521       548.953003       506.283234       493.471527    
+ TCOOL:   536.221191       538.947449       544.115967       551.221375       559.551147       568.341980       576.980103       584.972473       590.880066       591.523987       591.543884       591.546692    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283443630      0.347487897      0.366733760    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46104817E-02   6.02260008E-02   6.55542165E-02
+ TSAT:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ MUT:  -9.10101335E-07   6.12227299E-41   0.00000000       0.00000000       1578.34717       1661.89160       1675.81250       1618.35522       1458.77930       1200.24329       940.030640       703.310181    
 
  THMDRV: CHANNEL     3     2
  ---------------------------
@@ -4395,14 +4401,15 @@ QUIT .                                                                          
  | BOT |     597.55 |     556.66 |    869.9680 |      536.22 |  112.06E+05 |  1.1125E+06 |  5.1282E+07 |  5.1132E+06 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
  |_____|____________|____________|_____________|_____________|_____________|_____________|_____________|_____________|___________|_____________|_____________|________|
  MFLXT=  7.0079E+03 Kg/m2/s
- Boucle terminée
- PCOOL FINAL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
- VCOOL FINAL:   8.05533028       8.10206223       8.19484615       8.33247089       8.51151657       8.72646999       8.97185898       9.24068546       9.47511005       12.7658215       13.8417397       14.2011051    
- DCOOL FINAL:   869.967957       864.950073       855.156860       841.032471       823.340820       803.059998       781.095520       758.372192       739.609253       548.956360       506.285980       493.474182    
- TCOOL FINAL:   536.221191       538.947449       544.115967       551.221069       559.550964       568.341858       576.979980       584.972473       590.879883       591.523987       591.543884       591.546692    
- EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283438623      0.347483724      0.366729885    
- XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46093678E-02   6.02248795E-02   6.55530989E-02
- TBUL:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ Convergence atteinte à I =        65535
+ PCOOL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
+ VCOOL:   8.05533028       8.10206223       8.19484615       8.33247089       8.51151657       8.72646999       8.97185898       9.24068546       9.47511005       12.7658215       13.8417397       14.2011051    
+ DCOOL:   869.967957       864.950073       855.156860       841.032471       823.340820       803.059998       781.095520       758.372192       739.609253       548.956360       506.285980       493.474182    
+ TCOOL:   536.221191       538.947449       544.115967       551.221069       559.550964       568.341858       576.979980       584.972473       590.879883       591.523987       591.543884       591.546692    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283438623      0.347483724      0.366729885    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46093678E-02   6.02248795E-02   6.55530989E-02
+ TSAT:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ MUT:  -9.06967216E-07   6.12227299E-41   0.00000000       0.00000000       1578.46008       1662.00769       1675.75867       1618.23645       1458.66125       1200.18726       939.995483       703.286804    
 
  THMDRV: CHANNEL     2     3
  ---------------------------
@@ -4424,14 +4431,15 @@ QUIT .                                                                          
  | BOT |     597.54 |     556.66 |    869.9680 |      536.22 |  112.06E+05 |  1.1125E+06 |  5.1282E+07 |  5.1131E+06 |    0.0000 |  0.0000E+00 |  0.1000E+01 |    0   |
  |_____|____________|____________|_____________|_____________|_____________|_____________|_____________|_____________|___________|_____________|_____________|________|
  MFLXT=  7.0079E+03 Kg/m2/s
- Boucle terminée
- PCOOL FINAL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
- VCOOL FINAL:   8.05533028       8.10205936       8.19483185       8.33244324       8.51146889       8.72640133       8.97177410       9.24060822       9.47508049       12.7656317       13.8416357       14.2010393    
- DCOOL FINAL:   869.967957       864.950378       855.158386       841.035339       823.345459       803.066284       781.102905       758.378540       739.611572       548.964539       506.289795       493.476471    
- TCOOL FINAL:   536.221191       538.947266       544.115234       551.219727       559.548889       568.339294       576.977234       584.970459       590.879150       591.523926       591.543945       591.546753    
- EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283426523      0.347478032      0.366726428    
- XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46066782E-02   6.02233522E-02   6.55521154E-02
- TBUL:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ Convergence atteinte à I =        65535
+ PCOOL:   11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0       11205836.0    
+ VCOOL:   8.05533028       8.10205936       8.19483185       8.33244324       8.51146889       8.72640133       8.97177410       9.24060822       9.47508049       12.7656317       13.8416357       14.2010393    
+ DCOOL:   869.967957       864.950378       855.158386       841.035339       823.345459       803.066284       781.102905       758.378540       739.611572       548.964539       506.289795       493.476471    
+ TCOOL:   536.221191       538.947266       544.115234       551.219727       559.548889       568.339294       576.977234       584.970459       590.879150       591.523926       591.543945       591.546753    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.283426523      0.347478032      0.366726428    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       4.46066782E-02   6.02233522E-02   6.55521154E-02
+ TSAT:   591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537       591.550537    
+ MUT:  -9.10335075E-07   6.12227299E-41   0.00000000       0.00000000       1578.44409       1661.95288       1675.71997       1618.24292       1458.67273       1200.15027       940.009277       703.305420    
 
  THMDRV: CHANNEL     3     3
  ---------------------------
@@ -4536,7 +4544,7 @@ QUIT .                                                                          
                   GNU LESSER GENERAL PUBLIC LICENSE
 
  DRVEQU: A LCM OBJECT NAMED 'RESEAU      ' WAS EXPORTED TO FILE 'neutrodata  '.
--->>module EQU:        : time spent=        0.001 memory usage= 0.000E+00
+-->>module EQU:        : time spent=        0.000 memory usage= 0.000E+00
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                

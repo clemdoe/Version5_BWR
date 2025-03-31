@@ -114,7 +114,7 @@ RODMESH 8 11                                                                    
 HGAP 10000.0                                                                                                               0113
 CONDC 0 10.0 KELVIN                                                                                                        0114
 CONDF 0 5.0 KELVIN                                                                                                         0115
-MONO                                                                                                                       0116
+BOWR                                                                                                                       0116
 PDROP 1                                                                                                                    0117
 ;                                                                                                                          0118
 *--                                                                                                                        0119
@@ -185,7 +185,7 @@ QUIT .                                                                          
                   GNU LESSER GENERAL PUBLIC LICENSE
 
  DRVEQU: A LCM OBJECT NAMED 'Cpo         ' WAS IMPORTED FROM FILE '_ACompo     '.
--->>module EQU:        : time spent=        0.910 memory usage= 1.154E+05
+-->>module EQU:        : time spent=        0.892 memory usage= 1.154E+05
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : UTL:        
 ->@DESCRIPTION  : No description available for this module                                
@@ -216,7 +216,7 @@ QUIT .                                                                          
 
  CREATION OF A LEVEL  1 GEOMETRY ON THE DIRECTORY NAMED '/           ' OF THE LCM OBJECT 'Geom        ' WITH TYPE CARTESIAN 3-D   .
 ->@END MODULE   : GEO:        
--->>MODULE GEO:        : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
+-->>MODULE GEO:        : TIME SPENT=        0.000 MEMORY USAGE= 0.000E+00
 
  ~~~~~~~~~~~~~~~
  @BEGIN MODULE -> USPLIT:     
@@ -247,7 +247,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =        68
 
  @END MODULE -> USPLIT:     
--->>MODULE USPLIT:     : TIME SPENT=        0.000 MEMORY USAGE= 6.240E+02
+-->>MODULE USPLIT:     : TIME SPENT=        0.001 MEMORY USAGE= 6.240E+02
 ->@BEGIN MODULE : TRIVAT:     
 ->@DESCRIPTION  : 3-D diffusion or SPN finite element tracking                            
 ->@CREDITS      : A. Hebert                                                               
@@ -358,11 +358,18 @@ QUIT .                                                                          
   1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00  1.0000E+00
 
  THM: RECOVER GLOBAL PARAMETER = T-FUEL      .
+ MUT apres MUT 1   1.20036042E-04   1.20036042E-04   1.20036042E-04   1.20036042E-04   1.20036042E-04   1.20036042E-04
+ PCOOL apres MUT:   10800000.0       10800000.0       10800000.0       10800000.0       10800000.0       10800000.0    
  I:           0
  ERRV:   1.00000000    
  ERRP:   1.00000000    
  ITERATION:           0
  HINLET:   977424.312    
+ CONSTANTES :   -9.81000042    
+ PCOOL:   10988641.0       10950912.0       10913184.0       10875456.0       10837728.0       10800000.0    
+ DCOOL:   838.738708       838.738708       838.738708       838.738708       838.738708       838.738708    
+ PCOOL(K):   10988641.0    
+ TSAT:   591.153748    
 
  THMDRV: AXIAL SLICE=    1
 
@@ -373,6 +380,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10988641.0       10950912.0       10913184.0       10875456.0       10837728.0       10800000.0    
+ DCOOL:   835.758850       838.738708       838.738708       838.738708       838.738708       838.738708    
+ PCOOL(K):   10950912.0    
+ TSAT:   590.895630    
 
  THMDRV: AXIAL SLICE=    2
 
@@ -383,6 +394,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10988641.0       10950912.0       10913184.0       10875456.0       10837728.0       10800000.0    
+ DCOOL:   835.758850       829.324219       838.738708       838.738708       838.738708       838.738708    
+ PCOOL(K):   10913184.0    
+ TSAT:   590.636780    
 
  THMDRV: AXIAL SLICE=    3
 
@@ -393,6 +408,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10988641.0       10950912.0       10913184.0       10875456.0       10837728.0       10800000.0    
+ DCOOL:   835.758850       829.324219       822.771729       838.738708       838.738708       838.738708    
+ PCOOL(K):   10875456.0    
+ TSAT:   590.377319    
 
  THMDRV: AXIAL SLICE=    4
 
@@ -403,6 +422,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10988641.0       10950912.0       10913184.0       10875456.0       10837728.0       10800000.0    
+ DCOOL:   835.758850       829.324219       822.771729       816.097778       838.738708       838.738708    
+ PCOOL(K):   10837728.0    
+ TSAT:   590.117065    
 
  THMDRV: AXIAL SLICE=    5
 
@@ -413,6 +436,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10988641.0       10950912.0       10913184.0       10875456.0       10837728.0       10800000.0    
+ DCOOL:   835.758850       829.324219       822.771729       816.097778       809.299255       838.738708    
+ PCOOL(K):   10800000.0    
+ TSAT:   589.856201    
 
  THMDRV: AXIAL SLICE=    6
 
@@ -438,6 +465,11 @@ QUIT .                                                                          
  ERRP:   8.73334985E-03
  ITERATION:           1
  HINLET:   977424.312    
+ CONSTANTES :   -9.81000042    
+ PCOOL:   10989429.0       10951749.0       10913969.0       10876086.0       10838098.0       10800000.0    
+ DCOOL:   835.758850       829.324219       822.771729       816.097778       809.299255       802.371948    
+ PCOOL(K):   10989429.0    
+ TSAT:   591.159119    
 
  THMDRV: AXIAL SLICE=    1
 
@@ -448,6 +480,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10989429.0       10951749.0       10913969.0       10876086.0       10838098.0       10800000.0    
+ DCOOL:   835.759094       829.324219       822.771729       816.097778       809.299255       802.371948    
+ PCOOL(K):   10951749.0    
+ TSAT:   590.901367    
 
  THMDRV: AXIAL SLICE=    2
 
@@ -458,6 +494,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10989429.0       10951749.0       10913969.0       10876086.0       10838098.0       10800000.0    
+ DCOOL:   835.759094       829.324951       822.771729       816.097778       809.299255       802.371948    
+ PCOOL(K):   10913969.0    
+ TSAT:   590.642212    
 
  THMDRV: AXIAL SLICE=    3
 
@@ -468,6 +508,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10989429.0       10951749.0       10913969.0       10876086.0       10838098.0       10800000.0    
+ DCOOL:   835.759094       829.324951       822.772583       816.097778       809.299255       802.371948    
+ PCOOL(K):   10876086.0    
+ TSAT:   590.381653    
 
  THMDRV: AXIAL SLICE=    4
 
@@ -478,6 +522,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10989429.0       10951749.0       10913969.0       10876086.0       10838098.0       10800000.0    
+ DCOOL:   835.759094       829.324951       822.772583       816.098389       809.299255       802.371948    
+ PCOOL(K):   10838098.0    
+ TSAT:   590.119629    
 
  THMDRV: AXIAL SLICE=    5
 
@@ -488,6 +536,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10989429.0       10951749.0       10913969.0       10876086.0       10838098.0       10800000.0    
+ DCOOL:   835.759094       829.324951       822.772583       816.098389       809.299805       802.371948    
+ PCOOL(K):   10800000.0    
+ TSAT:   589.856201    
 
  THMDRV: AXIAL SLICE=    6
 
@@ -513,6 +565,11 @@ QUIT .                                                                          
  ERRP:   5.20237227E-05
  ITERATION:           2
  HINLET:   977424.312    
+ CONSTANTES :   -9.81000042    
+ PCOOL:   10994923.0       10956675.0       10918070.0       10879099.0       10839746.0       10800000.0    
+ DCOOL:   835.759094       829.324951       822.772583       816.098389       809.299805       802.371948    
+ PCOOL(K):   10994923.0    
+ TSAT:   591.196655    
 
  THMDRV: AXIAL SLICE=    1
 
@@ -523,6 +580,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10994923.0       10956675.0       10918070.0       10879099.0       10839746.0       10800000.0    
+ DCOOL:   835.764771       829.324951       822.772583       816.098389       809.299805       802.371948    
+ PCOOL(K):   10956675.0    
+ TSAT:   590.935120    
 
  THMDRV: AXIAL SLICE=    2
 
@@ -533,6 +594,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10994923.0       10956675.0       10918070.0       10879099.0       10839746.0       10800000.0    
+ DCOOL:   835.764771       829.330139       822.772583       816.098389       809.299805       802.371948    
+ PCOOL(K):   10918070.0    
+ TSAT:   590.670349    
 
  THMDRV: AXIAL SLICE=    3
 
@@ -543,6 +608,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10994923.0       10956675.0       10918070.0       10879099.0       10839746.0       10800000.0    
+ DCOOL:   835.764771       829.330139       822.776794       816.098389       809.299805       802.371948    
+ PCOOL(K):   10879099.0    
+ TSAT:   590.402405    
 
  THMDRV: AXIAL SLICE=    4
 
@@ -553,6 +622,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  1.2207E-04 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10994923.0       10956675.0       10918070.0       10879099.0       10839746.0       10800000.0    
+ DCOOL:   835.764771       829.330139       822.776794       816.101624       809.299805       802.371948    
+ PCOOL(K):   10839746.0    
+ TSAT:   590.131042    
 
  THMDRV: AXIAL SLICE=    5
 
@@ -563,6 +636,10 @@ QUIT .                                                                          
  THMROD: ITERC=    1 ERROR=  0.0000E+00 EPS=  1.0000E+00
 
  THMROD: ITERC=    2 ERROR=  0.0000E+00 EPS=  1.0000E+00
+ PCOOL:   10994923.0       10956675.0       10918070.0       10879099.0       10839746.0       10800000.0    
+ DCOOL:   835.764771       829.330139       822.776794       816.101624       809.301270       802.371948    
+ PCOOL(K):   10800000.0    
+ TSAT:   589.856201    
 
  THMDRV: AXIAL SLICE=    6
 
@@ -596,6 +673,7 @@ QUIT .                                                                          
  EPS FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
  XFL FINAL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
  TBUL:   591.196655       590.935120       590.670349       590.402405       590.131042       589.856201    
+ MUT:   1.20036042E-04   1.20036042E-04   1.20036042E-04   1.20036042E-04   1.20036042E-04   1.20036042E-04
 
  THMDRV: CHANNEL     1     1
  ---------------------------
@@ -643,7 +721,7 @@ QUIT .                                                                          
  ICONDF        1   (FUEL CONDUCTIVITY FLAG (0=STORA-CHENEBAULT (UOX), COMETHE (MOX)/1=USER-PROVIDED FUNCTION OF FUEL TEMPERATURE))
  ICONDC        1   (CLAD CONDUCTIVITY FLAG (0=DEFAULT/1=USER-PROVIDED POLYNOMIAL OF CLAD TEMPERATURE))
  IFRCDI        0   (FUEL CONDUCTIVITY APPROXIMATION FLAG (0=DEFAULT/1=AVERAGE APPROXIMATION FORCED))
- ISUBM         0   (BOILING MODEL FLAG (0=ONE-PHASE/1=BOWRING CORRELATION/2=SAHA-ZUBER CORRELATION))
+ ISUBM         1   (BOILING MODEL FLAG (0=ONE-PHASE/1=BOWRING CORRELATION/2=SAHA-ZUBER CORRELATION))
  NPRAD         0   (RADIAL POWER FORM FACTOR (0=FLAT/NUMBER OF POINTS))
  NPOWER        0   (NUMBER OF POINTS IN POWER-TABLE)
  IFLUID        0   (TYPE OF FLUID (0=H2O/1=D2O))
@@ -907,7 +985,7 @@ L_THM
 ->       1      12       1      40                                 <-   
 STATE-VECTOR                                                                    
          1         6        50        50        50         8        11         0
-         0         1         0         1         1         0         0         0
+         0         1         0         1         1         0         1         0
          0         0         0         0         1         0         0         0
          0         0         0         0         0         0         0         0
          0         0         0         0         0         0         0         0
@@ -1035,7 +1113,7 @@ FRACT-PU
  IPRECI     0   (CALENDF ACCURACY FLAG:1/2/3/4)
  IDF        0   (0=NO INFO/1=ALBS INFO/2=FLUX GAP INFO/3=ADF GAP INFO)
  @END MODULE -> NCR:        
--->>MODULE NCR:        : TIME SPENT=        0.007 MEMORY USAGE= 2.028E+03
+-->>MODULE NCR:        : TIME SPENT=        0.007 MEMORY USAGE= 1.924E+03
 ->@BEGIN MODULE : EQU:        
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
@@ -1128,8 +1206,8 @@ FRACT-PU
 
  FLDDIR: CONVERGENCE IN  13 ITERATIONS.
 
- FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.001
-                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.001
+ FLDDIR: CPU TIME USED TO SOLVE THE TRIANGULAR LINEAR SYSTEMS =     0.000
+                       TO COMPUTE THE BILINEAR PRODUCTS =     0.000                    TOTAL CPU TIME =     0.000
 
 
  FLDDIR: EFFECTIVE MULTIPLICATION FACTOR = 1.3271349669E+00
@@ -1160,7 +1238,7 @@ FRACT-PU
  EPSMSR 1.00E-06  (INNER ITERATION GMRES EPSILON)
  RELAX  1.00E+00  (RELAXATION FACTOR)
 
--->>MODULE FLUD:       : TIME SPENT=        0.002 MEMORY USAGE= 0.000E+00
+-->>MODULE FLUD:       : TIME SPENT=        0.001 MEMORY USAGE= 0.000E+00
 ->@END MODULE   : FLUD:       
 ->@BEGIN MODULE : GREP:       
 ->@DESCRIPTION  : No description available for this module                                

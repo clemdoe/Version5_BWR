@@ -17,6 +17,8 @@
 *Author(s): 
 * A. Hebert
 * 08/2023: CGT. Modifications to include Molten Salt heat transfer
+* C. Huet
+* 02/2025: CGT. Modifications to include pressure drop calculation
 *
 *Parameters: input
 * MPTHM   directory of the THM object containing steady-state
@@ -154,7 +156,6 @@
       ELSE IF(IFLUID.EQ.1) THEN
         CALL THMHPT(PINLET,TINLET,RHOIN,HINLET,R3,R4,R5)
       ELSE IF(IFLUID.EQ.2) THEN
-        PRINT *, 'PREMIER THMSPT'
         CALL THMSPT(SNAME,SCOMP,TINLET,RHOIN,HINLET,R3,R4,R5,IMPX)
       ENDIF
       MFLOW=SPEED*RHOIN
@@ -176,8 +177,12 @@
          DLCOOL(K)=RHOIN
          TCOOL(K)=TINLET
 
-        IF (IPRES.EQ.1) THEN
+*----
+*  COMPUTE THE SATURATION TEMPERATURE AND THE THERMODYNAMIC PROPERTIES
+*  IF THE PRESSURE DROP IS COMPUTED
+*---
 
+        IF (IPRES.EQ.1) THEN
          IF(POW(K).EQ.0.0) CYCLE
          IF(IFLUID.EQ.0) THEN
            CALL THMSAT(PCOOL(K),TSAT)
@@ -204,8 +209,6 @@
            ENDIF
          ENDIF
         ENDIF
-
-
       ENDDO
 
 *----
@@ -218,33 +221,26 @@
       I=0
 
    10 CONTINUE
-      PRINT *, 'I:', I
-      PRINT *, 'ERRV:', ERRV
-      PRINT *, 'ERRP:', ERRP
 
 *----
 *  UPDATE HINLET FUNCTION OF INLET PRESSURE AND TEMPERATURE
 *----
        HMSUP=HINLET
+       SPEED=MFLOW/DCOOL(1)
 *----
 *  WHILE LOOP FOR PRESSURE AND VELOCITY CONVERGENCE
+*  CHECK FOR CONVERGENCE
 *----
-
-       PRINT *, 'ITERATION:', I
-       PRINT *, 'HINLET:', HINLET
-
-        IF (I .GT. 100) GOTO 20
+        IF (I .GT. 1000) GOTO 20
         IF ((ERRP < 1E-3) .AND. (ERRV < 1E-3)) GOTO 20
 
           I = I + 1
 
           PTEMP = PCOOL
           VTEMP = VCOOL
-          CALL THMPV(MFLXT, SPEED, PINLET, VCOOL, DCOOL, 
-     >              DCOOL0, PCOOL, ACOOL, MUT, XFL, HD, DV, NZ,
-     >              TCOOL, HZ)
-
-    
+          CALL THMPV(SPEED, PINLET, VCOOL, DCOOL, 
+     >              PCOOL, MUT, XFL, HD, NZ,
+     >              HZ)
    30 CONTINUE
 
 *----
@@ -252,7 +248,6 @@
 *----
       K0=0 ! onset of nuclear boiling point
       DO K=1,NZ
-
         IF(POW(K).EQ.0.0) CYCLE
         IF(IFLUID.EQ.0) THEN
           CALL THMSAT(PCOOL(K),TSAT)
@@ -303,8 +298,7 @@
         ENDDO
         HMSUP=HMSUP+DELTH1
 *----
-*  COMPUTE THE VALUE OF THE DENSITY, THE VISCOSITY,
-*  THE TEMPERATURE IN THE COOLANT
+*  COMPUTE THE VALUE OF THE DENSITY
 *  AND THE CLAD-COOLANT HEAT TRANSFER COEFFICIENT
 *----
         IF(K.GT.1) THEN
@@ -360,51 +354,82 @@
           TEMPT(K2,K)=TRE11(K2)
         ENDDO
         IF (IPRES .EQ. 0) THEN
-          PCOOL(K) = PINLET
+          PCOOL(K)=PINLET
           VCOOL(K)=MFLOW/DCOOL(K)
         ENDIF
+*----
+*  COMPUTE THE SATURATION TEMPERATURE AND THE THERMODYNAMIC PROPERTIES
+*  IF THE PRESSURE DROP IS COMPUTED
+*---
+        IF (IPRES.EQ.1) THEN
+          IF(POW(K).EQ.0.0) CYCLE
+          IF(IFLUID.EQ.0) THEN
+            CALL THMSAT(PCOOL(K),TSAT)
+          ELSE IF(IFLUID.EQ.1) THEN
+            CALL THMHST(PCOOL(K),TSAT)
+          ENDIF
+ 
+          TB=TSAT-0.1
+          IF(TCOOL(K).LT.TB) THEN
+            IF(IFLUID.EQ.0) THEN
+             CALL THMPT(PCOOL(K),TCOOL(K),RHOIN,H11,K11,MUT(K),C11)
+            ELSE IF(IFLUID.EQ.1) THEN
+             CALL THMHPT(PCOOL(K),TCOOL(K),RHOIN,H11,K11,MUT(K),C11)
+            ELSE IF(IFLUID.EQ.2) THEN
+             CALL THMSPT(STP,TCOOL(K),R11,H11,K11,MUT(K),C11,IMPX)
+            ENDIF
+          ELSE
+            IF(IFLUID.EQ.0) THEN
+             CALL THMPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
+            ELSE IF(IFLUID.EQ.1) THEN
+             CALL THMHPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
+            ELSE IF(IFLUID.EQ.2) THEN
+             CALL THMSPT(STP,TB,R11,H11,K11,MUT(K),C11,IMPX)
+            ENDIF
+          ENDIF
+         ENDIF
+
       ENDDO
 
+*----
+* IF THE PRESSURE DROP IS COMPUTED, COMPUTE THE 
+* THE PRESSURE AND VELOCITY RESIDUALS
+*----
       IF (IPRES .EQ. 0) GOTO 20
-
       ERRV = 0
       ERRP = 0
       DO K=1,NZ
         ERRV = ERRV + ABS(VCOOL(K) - VTEMP(K))/VTEMP(K)
         ERRP = ERRP + ABS(PCOOL(K) - PTEMP(K))/PTEMP(K)
       ENDDO
-
       ERRV = ERRV/NZ
       ERRP = ERRP/NZ
 
-      PRINT *, 'FIN ITERATION', I
+      PRINT *, 'I:', I
       PRINT *, 'ERRV:', ERRV
       PRINT *, 'ERRP:', ERRP
+
+      GO TO 10
+
+   20 CONTINUE
+
+      IF (I == 1000) THEN
+        PRINT *, 'Nombre maximum d''itérations max atteint'
+      ELSE
+        PRINT *, 'Convergence atteinte à I = ', I
+      ENDIF
+
+*----
+* PRINT THE THERMOHYDRAULICAL PARAMETERS
+*----
       PRINT *, 'PCOOL:', PCOOL
       PRINT *, 'VCOOL:', VCOOL
       PRINT *, 'DCOOL:', DCOOL
       PRINT *, 'TCOOL:', TCOOL
       PRINT *, 'EPS:', EPS
       PRINT *, 'XFL:', XFL
-      PRINT *, 'DCOOLG:', DLCOOL
-
-      GO TO 10
-
-   20 CONTINUE
-
-      IF (I == 100) THEN
-        PRINT *, 'Nombre maximum d''itérations atteint'
-      ENDIF
-      PRINT *, 'Boucle terminée'
-
-      PRINT *, 'PCOOL FINAL:', PCOOL
-      PRINT *, 'VCOOL FINAL:', VCOOL
-      PRINT *, 'DCOOL FINAL:', DCOOL
-      PRINT *, 'TCOOL FINAL:', TCOOL
-      PRINT *, 'EPS FINAL:', EPS
-      PRINT *, 'XFL FINAL:', XFL
-      PRINT *, 'TBUL:', TBUL
-      
+      PRINT *, 'TSAT:', TBUL
+      PRINT *, 'MUT:', MUT
 *----
 *  PRINT THE OUTLET THERMOHYDRAULICAL PARAMETERS
 *----

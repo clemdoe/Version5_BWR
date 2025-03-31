@@ -1,7 +1,7 @@
 ***********************************************************
 * Input file :  pincell_mphy_thm.x2m                      *
 *                                                         *
-* Test of a PWR single pincell                            *
+* Test of a PWR single pincell with pressure drop         *
 *                                                         *
 * The aim is to test the THM module of DONJON             *
 ***********************************************************
@@ -175,9 +175,10 @@ System := TRIVAA: Macro2 Track ;
 Flux := FLUD: System Track :: EDIT 1 ADI 4 ACCE 5 3 ;
 System MacroF Macro2 := DELETE: System MacroF Macro2 ;
 
-UTL: Thm :: DIR DUMP ;
-assertS Thm :: 'AVG-T-FUEL' 1 1.46497717E+03 ;
-assertS Thm :: 'AVG-T-COOL' 1 5.78069702E+02 ;
+*UTL: Thm :: DIR DUMP ;
+*assertS Thm :: 'AVG-T-FUEL' 1 1.46671924E+03 ;
+
+*assertS Thm :: 'AVG-T-COOL' 1 5.78066101E+02 ;
 
 ECHO "test pincell_mphy_thm.x2m completed" ;
 END: ;

@@ -11,6 +11,7 @@
 *
 *Author(s): 
 * A. Hebert, P. Gallet and V. Salino
+* 02/2025: CGT. Modifications to include pressure drop calculation
 *
 *Parameters: input
 * NENTRY  number of data structures transfered to this module.
@@ -1174,7 +1175,6 @@
           DEALLOCATE(PW)
         ENDIF
         TMOY0=DD1/DD2
-        PRINT *, 'VOICI PNAME', PNAME
         TEXT12='AVG-'//PNAME(:8)
         CALL LCMLEN(IPTHM,TEXT12,KLONG,ITYLCM)
         IF(((PNAME.EQ.'T-FUEL').OR.(PNAME.EQ.'T-COOL').OR.

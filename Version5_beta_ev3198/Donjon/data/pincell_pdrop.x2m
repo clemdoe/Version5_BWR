@@ -1,7 +1,7 @@
 ***********************************************************
 * Input file :  pincell_mphy_thm.x2m                      *
 *                                                         *
-* Test of a PWR single pincell                            *
+* Test of a PWR single pincell with pressure drop         *
 *                                                         *
 * The aim is to test the THM module of DONJON             *
 ***********************************************************
