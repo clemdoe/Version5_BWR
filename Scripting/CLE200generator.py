@@ -1,4 +1,4 @@
-def generate_cle2000_script(num_volumes, total_height=200.0):
+def generate_cle2000_script(num_volumes, total_height):
     # Calcul de la hauteur de chaque volume
     segment_height = total_height / num_volumes
     
@@ -228,7 +228,7 @@ echo "pincell_mphy_thm access script terminated"
     return script
 # Exemple d'utilisation
 num_volumes = int(input("Combien de volume de contrôle il faut ?"))  # Nombre de volumes de contrôle
-total_height = 200.0  # Hauteur totale en cm
+total_height = 155.5  # Hauteur totale en cm
 
 # Générer le script CLE-2000
 cle2000_script = generate_cle2000_script(num_volumes, total_height)
@@ -236,7 +236,6 @@ access_script = access(f"THM_{num_volumes}_{int(total_height)}")
 
 # Nom du fichier de sortie
 output_filename = f"THM_{num_volumes}_{int(total_height)}"
-
 
 
 # Écrire le script dans un fichier

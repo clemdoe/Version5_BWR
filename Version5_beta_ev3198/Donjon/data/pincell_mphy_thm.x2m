@@ -168,7 +168,7 @@ Thm Fmap := THM: Fmap ::
     ASSMB 1 0
     RADIUS 4.55063E-3 4.60169E-3 5.00184E-3 5.00184E-3 (* m *)
     RODMESH 15 20
-    MONO
+    BOWR
 ;
 
 *--

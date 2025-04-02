@@ -158,7 +158,7 @@ CRITFL 8.5E6 (* W/m^2 *)                                                        
 ASSMB 1 0                                                                                                                  0157
 RADIUS 4.55063E-3 4.60169E-3 5.00184E-3 5.00184E-3 (* m *)                                                                 0158
 RODMESH 15 20                                                                                                              0159
-MONO                                                                                                                       0160
+BOWR                                                                                                                       0160
 ;                                                                                                                          0161
 *--                                                                                                                        0162
 * Dump THM object                                                                                                          0163
@@ -228,7 +228,7 @@ QUIT .                                                                          
                   GNU LESSER GENERAL PUBLIC LICENSE
 
  DRVEQU: A LCM OBJECT NAMED 'Cpo         ' WAS IMPORTED FROM FILE '_ACompo     '.
--->>module EQU:        : time spent=        0.889 memory usage= 1.153E+05
+-->>module EQU:        : time spent=        0.872 memory usage= 1.156E+05
 ->@END MODULE   : EQU:        
 ->@BEGIN MODULE : UTL:        
 ->@DESCRIPTION  : No description available for this module                                
@@ -290,7 +290,7 @@ QUIT .                                                                          
  TOTAL NUMBER OF WORDS ON DIRECTORY '/           ' =       110
 
  @END MODULE -> USPLIT:     
--->>MODULE USPLIT:     : TIME SPENT=        0.001 MEMORY USAGE= 6.240E+02
+-->>MODULE USPLIT:     : TIME SPENT=        0.000 MEMORY USAGE= 4.320E+02
 ->@BEGIN MODULE : TRIVAT:     
 ->@DESCRIPTION  : 3-D diffusion or SPN finite element tracking                            
 ->@CREDITS      : A. Hebert                                                               
@@ -610,7 +610,7 @@ QUIT .                                                                          
  EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
  XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
  TSAT:   409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536       409.955536    
- MUT:  -7.55832876E-33   9.18340949E-41  -7.55832876E-33   9.18340949E-41   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
+ MUT:  -8.66192303E-17   9.18340949E-41  -8.66192303E-17   9.18340949E-41   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
 
  THMDRV: CHANNEL     1     1
  ---------------------------
@@ -672,7 +672,7 @@ QUIT .                                                                          
  ICONDF        0   (FUEL CONDUCTIVITY FLAG (0=STORA-CHENEBAULT (UOX), COMETHE (MOX)/1=USER-PROVIDED FUNCTION OF FUEL TEMPERATURE))
  ICONDC        0   (CLAD CONDUCTIVITY FLAG (0=DEFAULT/1=USER-PROVIDED POLYNOMIAL OF CLAD TEMPERATURE))
  IFRCDI        0   (FUEL CONDUCTIVITY APPROXIMATION FLAG (0=DEFAULT/1=AVERAGE APPROXIMATION FORCED))
- ISUBM         0   (BOILING MODEL FLAG (0=ONE-PHASE/1=BOWRING CORRELATION/2=SAHA-ZUBER CORRELATION))
+ ISUBM         1   (BOILING MODEL FLAG (0=ONE-PHASE/1=BOWRING CORRELATION/2=SAHA-ZUBER CORRELATION))
  NPRAD         0   (RADIAL POWER FORM FACTOR (0=FLAT/NUMBER OF POINTS))
  NPOWER        0   (NUMBER OF POINTS IN POWER-TABLE)
  IFLUID        0   (TYPE OF FLUID (0=H2O/1=D2O))
@@ -1125,7 +1125,7 @@ L_THM
 ->       1      12       1      40                                 <-   
 STATE-VECTOR                                                                    
          1        20        50        50        50        15        20         0
-         0         0         0         0         0         0         0         0
+         0         0         0         0         0         0         1         0
          0         0         0         0         0         0         0         0
          0         0         0         0         0         0         0         0
          0         0         0         0         0         0         0         0
@@ -1323,7 +1323,7 @@ FRACT-PU
  IPRECI     0   (CALENDF ACCURACY FLAG:1/2/3/4)
  IDF        0   (0=NO INFO/1=ALBS INFO/2=FLUX GAP INFO/3=ADF GAP INFO)
  @END MODULE -> NCR:        
--->>MODULE NCR:        : TIME SPENT=        0.019 MEMORY USAGE= 3.040E+03
+-->>MODULE NCR:        : TIME SPENT=        0.019 MEMORY USAGE= 2.904E+03
 ->@BEGIN MODULE : EQU:        
 ->@DESCRIPTION  : No description available for this module                                
 ->@CREDITS      : No author provided for this module                                      
