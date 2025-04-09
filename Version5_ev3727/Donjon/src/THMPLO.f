@@ -50,7 +50,8 @@
 * LOCKHART-MARTINELLI CORRELATION
       XLM = ((1-X)/X)**0.9*(RHOG/RHOL)**0.5*(MUG/MUL)**0.1
       PHIL0 = (1.0 + 20/XLM + 1.0/XLM**2)**0.5
-*     PHIL0 = 1
+      PRINT * , PHIL0
+*      PHIL0 = 1
 
       RETURN
       END
