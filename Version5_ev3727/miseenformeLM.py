@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import numpy as np 
+
 # Données brutes sous forme de chaîne de caractères
 raw_data = """
 PCOOL:   11137852.0       11112698.0       11087173.0       11061236.0       11034838.0       11007925.0       10980831.0       10945200.0       10881401.0       10800000.0
@@ -26,13 +29,18 @@ def extraire(var_name, line_nb):
 # Affichage du tableau des valeurs triées
 PCOOL=[]
 extraire(PCOOL, 0)
-extraire(VCOOL, 1)
+"""extraire(VCOOL, 1)
 extraire(DCOOL, 2)
 extraire(TCOOL, 3)
 extraire(EPS, 4)
 extraire(XFL, 5)
 extraire(TSAT, 6)
-extraire(MUT, 7)
+extraire(MUT, 7)"""
+
+zaxis= np.linspace(0,2,len(PCOOL))
+plt.plot(zaxis, PCOOL)
+plt.show()
+
 
 
 
