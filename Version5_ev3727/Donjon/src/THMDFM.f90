@@ -1,18 +1,18 @@
-*DECK THMH2O
-      SUBROUTINE THMH2O(ITIME,I,J,K,K0,PINLET,MFLOW,HMAVG,ENT,HD,IFLUID,
+*DECK THMDFM
+      SUBROUTINE THMDFM(ITIME,I,J,K,K0,PINLET,MFLOW,HMAVG,ENT,HD,IFLUID,
      > IHCONV,KHCONV,ISUBM,RADCL,ZF,PHI,XFL,EPS,SLIP,ACOOL,PCH,DZ,TCALO,
      > RHO,RHOLAV,TSCLAD,KWA)
 *
 *-----------------------------------------------------------------------
 *
 *Purpose:
-* Nucleate boiling correlations along a single coolant channel.
+* Drift-flux Model for the computation of thermohydraulics parameters in two-phase flow
 *
 *Copyright:
-* Copyright (C) 2012 Ecole Polytechnique de Montreal.
+* Copyright (C) 2025 Ecole Polytechnique de Montreal.
 *
 *Author(s): 
-* A. Hebert, P. Gallet
+* M.Bellier
 *
 *Parameters: input
 * ITIME   type of calculation  (0=steady-state; 1=transient).
@@ -70,57 +70,80 @@
       REAL W(4),HL(4),JL,JG
       CHARACTER HSMG*131
       LOGICAL LFIRST
+      REAL EPSold
 *----
 *  SAVE VARIABLES
 *----
       SAVE DHSUB,DSAT,W
       DATA W /0.347855,0.652145,0.652145,0.347855/
+
 *----
-*  COMPUTE THE PROPERTIES OF THE SATURATED STEAM
+*  MAIN LOOP
 *----
-      IF(HMAVG.LT.0.0) CALL XABORT('THMH2O: NEGATIVE INPUT ENTHALPY.')
-      IF(IFLUID.EQ.0) THEN
-         CALL THMSAT(PINLET,TSAT)
-         CALL THMTX(TSAT,0.0,RHOL,HLSAT,ZKL,ZMUL,CPL)
-         CALL THMTX(TSAT,1.0,RHOG,HGSAT,ZKG,ZMUG,CPG)
-      ELSE IF(IFLUID.EQ.1) THEN
-         CALL THMHST(PINLET,TSAT)
-         CALL THMHTX(TSAT,0.0,RHOL,HLSAT,ZKL,ZMUL,CPL)
-         CALL THMHTX(TSAT,1.0,RHOG,HGSAT,ZKG,ZMUG,CPG)
+     I=0
+     ERREPS=1
+
+    10 CONTINUE
+
+*----
+*  SAVE THE OLD EPSILON VALUE
+*----
+     EPSold=EPS 
+
+*----
+* TEST ON ERR EPS
+*----
+    IF (I .GT. 1000) GOTO 20
+    IF (ERREPS < 1E-3) GOTO 20
+
+
+*----
+*  COMPUTE PHASES VELOCITIES AND REYNOLDS
+*----
+
+
+*----
+*  COMPUTE FLOW QUALITY
+*----
+
+*----
+*  COMPUTE DENSITIES
+*----
+
+*----
+*  COMPUTE VGJ, VGJprime and C0 AFTER CHOSEN CORRELATION
+*----
+
+
+
+*----
+*  COMPUTE HD (hydraulic diameter)
+*----
+
+*----
+*  COMPUTE NEW EPS VALUE
+*----
+
+*----
+*  COMPUTE DELTA BETWEEN EPSold AND EPS
+*----
+    ERREPS = ABS(ERRold - EPS)
+    GOTO 10
+
+
+*----
+* EXIT LOOP
+*----
+    20 CONTINUE
+
+      IF (I == 1000) THEN
+        PRINT *, 'Nombre maximum d''itérations max atteint'
+      ELSE
+        PRINT *, 'Convergence atteinte à I = ', I
       ENDIF
-*----
-*  COMPUTE THE DENSITY AND TEMPERATURE OF THE LIQUID
-*----
-      HL(1)=MIN1(ENT(1),HLSAT)
-      HL(2)=MIN1(ENT(2),HLSAT)
-      HL(3)=MIN1(ENT(3),HLSAT)
-      HL(4)=MIN1(ENT(4),HLSAT)
-      CALL THMPH(IFLUID,PINLET,HL(1),R11,TL1)
-      CALL THMPH(IFLUID,PINLET,HL(2),R11,TL2)
-      CALL THMPH(IFLUID,PINLET,HL(3),R11,TL3)
-      CALL THMPH(IFLUID,PINLET,HL(4),R11,TL4)
-      IF(IFLUID.EQ.0) THEN
-        CALL THMPT(PINLET,TL1,RHO1,R2,R3,R4,CP1)
-        CALL THMPT(PINLET,TL2,RHO2,R2,R3,R4,CP2)
-        CALL THMPT(PINLET,TL3,RHO3,R2,R3,R4,CP3)
-        CALL THMPT(PINLET,TL4,RHO4,R2,R3,R4,CP4)
-        IF(ABS(TSAT-TL1).LT.0.1) CALL THMTX(TSAT,0.0,RHO1,R2,R3,R4,CP1)
-        IF(ABS(TSAT-TL2).LT.0.1) CALL THMTX(TSAT,0.0,RHO2,R2,R3,R4,CP2)
-        IF(ABS(TSAT-TL3).LT.0.1) CALL THMTX(TSAT,0.0,RHO3,R2,R3,R4,CP3)
-        IF(ABS(TSAT-TL4).LT.0.1) CALL THMTX(TSAT,0.0,RHO4,R2,R3,R4,CP4)
-      ELSE IF(IFLUID.EQ.1) THEN
-        CALL THMHPT(PINLET,TL1,RHO1,R2,R3,R4,CP1)
-        CALL THMHPT(PINLET,TL2,RHO2,R2,R3,R4,CP2)
-        CALL THMHPT(PINLET,TL3,RHO3,R2,R3,R4,CP3)
-        CALL THMHPT(PINLET,TL4,RHO4,R2,R3,R4,CP4)
-        IF(ABS(TSAT-TL1).LT.0.1) CALL THMHTX(TSAT,0.0,RHO1,R2,R3,R4,CP1)
-        IF(ABS(TSAT-TL2).LT.0.1) CALL THMHTX(TSAT,0.0,RHO2,R2,R3,R4,CP2)
-        IF(ABS(TSAT-TL3).LT.0.1) CALL THMHTX(TSAT,0.0,RHO3,R2,R3,R4,CP3)
-        IF(ABS(TSAT-TL4).LT.0.1) CALL THMHTX(TSAT,0.0,RHO4,R2,R3,R4,CP4)
-      ENDIF
-      TL=0.5*(W(1)*TL1+W(2)*TL2+W(3)*TL3+W(4)*TL4)
-      RHOLAV=0.5*(W(1)*RHO1+W(2)*RHO2+W(3)*RHO3+W(4)*RHO4)
-      CPLAV=0.5*(W(1)*CP1+W(2)*CP2+W(3)*CP3+W(4)*CP4)
+
+
+
 *----
 *  COMPUTE THE STEAM FLOW QUALITY AND LIQUID ENTHALPY
 *  Reference: R. T. Lahey Jr. and F. J. Moody, "The thermal hydraulics
