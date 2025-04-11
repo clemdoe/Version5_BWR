@@ -99,7 +99,12 @@ ELSE IF (CORREL.EQ.'EPRI') THEN
 
 ELSE IF (CORREL.EQ.'MODBESTION') THEN
     VGJ =  0.188 * (((RHOL - RHOG) * g * HD ) / RHOG )*0.5
-    C0 = 1.2 - 0.2*(RHOG/RHOL)**0.5
+    C0 = 1.2 - 0.2*(RHOG/RHOL)**0.5*
+
+ELSE 
+    PRINT *, 'Unknow correlation model, HEM1 used by default'
+    VGJ = 0
+    C0 = 1
 ENDIF
 RETURN
 END
