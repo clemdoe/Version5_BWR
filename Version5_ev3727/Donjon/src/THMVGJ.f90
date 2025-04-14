@@ -1,4 +1,4 @@
-SUBROUTINE MARIE(VCOOL, DCOOL, PCOOL, MUT, XFL, HD, RHOG, RHOL, EPS, CORREL, VGJ, C0)
+SUBROUTINE THMVGJ(VCOOL, DCOOL, PCOOL, MUT, XFL, HD, RHOG, RHOL, EPS, CORREL, VGJ, C0)
 !
 !-----------------------------------------------------------------------
 !
@@ -99,7 +99,7 @@ ELSE IF (CORREL.EQ.'EPRI') THEN
 
 ELSE IF (CORREL.EQ.'MODBESTION') THEN
     VGJ =  0.188 * (((RHOL - RHOG) * g * HD ) / RHOG )*0.5
-    C0 = 1.2 - 0.2*(RHOG/RHOL)**0.5*
+    C0 = 1.2 - 0.2*(RHOG/RHOL)**0.5
 
 ELSE 
     PRINT *, 'Unknow correlation model, HEM1 used by default'
