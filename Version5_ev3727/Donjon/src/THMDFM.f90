@@ -77,6 +77,14 @@
       SAVE DHSUB,DSAT,W
       DATA W /0.347855,0.652145,0.652145,0.347855/
 
+*réécrit à partir d'ici
+*----
+* INITIALIZE VARIABLES
+*----
+      VGJ = 0
+      C0 = 1
+      VGJprime = 0
+
 *----
 *  MAIN LOOP
 *----
@@ -89,6 +97,7 @@
 *  SAVE THE OLD EPSILON VALUE
 *----
      EPSold=EPS 
+     I = I+1
 
 *----
 * TEST ON ERR EPS
@@ -100,30 +109,161 @@
 *----
 *  COMPUTE PHASES VELOCITIES AND REYNOLDS
 *----
+    VLIQ = VCOOL - (1/(1- EPS) - RHOLAV/RHO) *VGJprime
+    VVAP = VCOOL + RHOLAV/RHO * VGJprime
 
-
+    REY = RHO * ABS(VCOOL) * HD / (ZMUL*ZMUG/ (ZMUL*(1-EPS) + ZMUG*EPS))
+  
 *----
 *  COMPUTE FLOW QUALITY
 *----
+#Get the enthalpy values for the liquid and vapor phases at a given pressure
+    def getPhasesEnthalpy(self, i):
+        P = self.P[i]
+        vapor = IAPWS97(P = P*(10**(-6)), x = 1)
+        liquid = IAPWS97(P = P*(10**(-6)), x = 0)
+        return liquid.h, vapor.h
 
+
+    IF CORREL.EQ.'EPRI' THEN
+      Xs = 0.05
+      Xh = 0.025
+      Xeq = (HLAVG - HMAVG*0.001) / (HLAVG - hg) !hg à récupérer 
+            
+      IF (Xeq.GE.0.05) THEN
+        XFL = Xeq
+      ELSE 
+      
+        else:
+          rhol = self.rholTEMP[i]
+          rhog = self.rhogTEMP[i]
+          u = self.U[i]
+          muf = IAPWS97(P = p*(10**(-6)), x = 1).mu
+          Re = rhol * abs(u) * self.D_h[i] / muf
+
+          Cpf = IAPWS97(P = p*(10**(-6)), x = 1).cp
+          k_f = IAPWS97(P = p*(10**(-6)), x = 1).k
+          Pr = Cpf * muf / k_f
+
+          qdp = self.q__[i] * self.DV / (2 * np.pi * self.rw * self.height)
+
+          ! Calculate heat transfer coefficients
+          hb = np.exp(p / 4.35e6) / (22.7)**2 * 1000.0  # W/(m^2·K)
+          Chn = 0.2 / 4.0 * self.D_h[i] / self.rf
+          hhn = Chn * Re**0.662 * Pr * k_f / (self.D_h[i])
+          Cdb = (0.033 *self.areaMatrix[i] / (self.areaMatrix[i] +  np.pi * self.rf**2 + np.pi *self.rw**2) + 0.013)
+          hdb = Cdb * Re**0.8 * Pr**0.4 * k_f / (self.D_h[i])
+
+          !Intermediate calculations
+          tmp1 = 4.0 * hb * (hdb + hhn)**2
+          tmp2 = 2.0 * hdb**2 * (hhn + hdb / 2.0) + 8.0 * qdp * hb * (hdb + hhn)
+          tmp3 = qdp * (4.0 * hb * qdp + hdb**2)
+
+          !Calculate characteristic quality xd  ///////////////PROBLEM HERE 
+          !Toujours problème ? 
+          delta_h = hg - hl
+          xd = -Cpf / (delta_h) * ((-tmp2 + np.sqrt(tmp2**2 - 4.0 * tmp1 * tmp3)) / (2.0 * tmp1))
+
+          !Determine quality based on xeq and xd
+                    if xeq <= 0.0:
+                        if xeq <= -xd:
+                            QUALITY = 0.0       
+                            print(f'IF 2')
+                        else:
+                            tmp1 = 1 + xeq / xd
+                            tmp2 = tmp1**2
+                            QUALITY = xd * tmp2 * (0.1 + 0.087 * tmp1 + 0.05 * tmp2)
+                            print(f'IF 3')
+                    elif Xh > xd:
+                        if xeq >= 2 * xd:
+                            QUALITY = xeq
+                            print(f'IF 4')
+                        else:
+                            tmp1 = xeq / xd
+                            QUALITY = xd * (0.237 + tmp1 * (0.661 + tmp1 * (0.153 + tmp1 * (-0.01725 - tmp1 * 0.0020625))))
+                            print(f'IF 5')
+                    else:
+                        tmp1 = xeq / Xh
+                        tmp2 = xd / Xh
+                        tmp3 = 0.237 * tmp2
+                        QUALITY = Xh * (tmp3 + tmp1 * (0.661 + tmp1 * (0.5085 - 0.3555 * tmp2 + tmp1 * (tmp3 - 0.25425 + tmp1 * (0.042375 - 0.0444375 * tmp2)))))
+                        print(f'IF 6')
+
+                print(f'Quality: {QUALITY}')
+                if QUALITY >= 1.0:
+                    return 0.99
+                else:
+                    return QUALITY
+
+    ELSE 
+    !hl, hg = self.getPhasesEnthalpy(i) trouver un moyen de les récupérer, solution provisoire = utiliser HGSAT et HLSAT
+      H = self.H[i]
+      hfg = IAPWS97(P = self.P[i]*(10**(-6)), x = 0).h
+      if H*0.001 < hl: !demander à clément: HMAVG plutôt que H, qu'est ce que HFG ? 
+        x = (H*0.001 - hl)/(hg - hl)
+        return 0
+      elif H*0.001 > hg:
+        return 1
+            
+      elif H*0.001 <= hg and H*0.001 >= hl:
+        return (H*0.001 - hl)/(hg - hl)
 *----
 *  COMPUTE DENSITIES
 *----
+def getDensity(self, i):
+        vapor = IAPWS97(P = self.P[i]*(10**(-6)), x = 1)
+        liquid = IAPWS97(P = self.P[i]*(10**(-6)), x = 0)
+        rho_g = vapor.rho
+        rho_l = liquid.rho
+        rho = rho_l * (1 - self.voidFractionTEMP[i]) + rho_g * self.voidFractionTEMP[i]
+        return rho_l, rho_g, rho
 
 *----
 *  COMPUTE VGJ, VGJprime and C0 AFTER CHOSEN CORRELATION
 *----
-
-
+CALL MARIE(VCOOL, DCOOL, PCOOL, MUT, XFL, HD, RHOG, RHOL, EPS, CORREL, VGJ, C0)
+#Get the drift velocity for a given cell based on the selected void fraction correlation
+    def getVgj_prime(self, i):
+        U = self.U[i]
+        C0 = self.C0TEMP[i]
+        Vgj = self.VgjTEMP[i]
+        Vgj_prime = Vgj + (C0-1) * U
+        return Vgj_prime
 
 *----
 *  COMPUTE HD (hydraulic diameter)
 *----
-
+!pourquoi cecalculer le Dh ? Qui est fixe ? Est-ce que c'était un autre paramètre à recalculer ? En fait DHGL ? 
 *----
 *  COMPUTE NEW EPS VALUE
 *----
-
+#Get the void fraction for a given cell using different correlations for drift flux model
+    def getVoidFraction(self, i):
+        correl = 'paths'
+        if correl == 'simple':
+            x_th = self.xThTEMP[i]
+            rho_l = self.rholTEMP[i]
+            rho_g = self.rhogTEMP[i]
+            if x_th == 0:
+                return 0
+            elif x_th == 1:
+                return 0.99
+            else:
+                return (x_th * rho_l)/(x_th * rho_l + (1 - x_th) * rho_g)
+        elif correl == 'paths':
+            x_th = self.xThTEMP[i]
+            rho_l = self.rholTEMP[i]
+            rho_g = self.rhogTEMP[i]
+            u = self.U[i]
+            V_gj = self.VgjTEMP[i]
+            C0 = self.C0TEMP[i]
+            if x_th == 0:
+                return 0
+            elif x_th == 1:
+                return 0.99
+            else:
+                return x_th / (C0 * (x_th + (rho_g / rho_l) * (1 - x_th)) + (rho_g * V_gj) / (rho_l * u))
+    
 *----
 *  COMPUTE DELTA BETWEEN EPSold AND EPS
 *----
