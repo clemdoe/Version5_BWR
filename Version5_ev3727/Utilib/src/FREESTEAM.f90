@@ -89,24 +89,4 @@ subroutine THMTX(t, x, rho, h, zk, zmu, cp)
    cp=real(cpd)
 end subroutine THMTX
 
-subroutine THMPX(p, x, rho, h, zk, zmu, cp)
-   ! return the remaining thermohydraulics parameters as a function of the pressure (Pa)
-   ! and quality
-   use, intrinsic :: iso_c_binding
-   real :: p, x, rho, h, zk, zmu, cp
-   real(c_double) :: pd, xd, rhod, hd, zkd, zmud, cpd
-   interface 
-      subroutine free_Px (pd, xd, rhod, hd, zkd, zmud, cpd) bind(c, name='free_Px')
-      use, intrinsic :: iso_c_binding
-      real(c_double) :: pd, xd, rhod, hd, zkd, zmud, cpd
-      end subroutine free_Px
-   end interface
-   td=t
-   xd=x
-   call free_Px(pd, xd, rhod, hd, zkd, zmud, cpd)
-   rho=real(rhod)
-   h=real(hd)
-   zk=real(zkd)
-   zmu=real(zmud)
-   cp=real(cpd)
-end subroutine THMPX
+

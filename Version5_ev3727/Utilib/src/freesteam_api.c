@@ -35,12 +35,3 @@ void free_Tx(double *T, double *X, double *RHO, double *H, double *ZK, double *Z
   *ZMU = freesteam_mu(State);   /*dynamic viscosity*/
   *CP = freesteam_cp(State);    /*isobaric heat capacity*/
 }
-
-void free_Px(double *P, double *X, double *RHO, double *H, double *ZK, double *ZMU, double *CP){
-  SteamState State = freesteam_set_Px((double)*P, (double)*X);
-  *RHO = freesteam_rho(State);  /*density*/
-  *H = freesteam_h(State);      /*enthalpy*/
-  *ZK = freesteam_k(State);     /*thermal conductivity*/
-  *ZMU = freesteam_mu(State);   /*dynamic viscosity*/
-  *CP = freesteam_cp(State);    /*isobaric heat capacity*/
-}
