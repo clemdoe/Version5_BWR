@@ -1,5 +1,5 @@
 !DECK THMDFM
-      SUBROUTINE THMDFM(PCOOL,VCOOL,DCOOL,HMAVG,HD,TL,TSAT,CORREL,EPS,XFL,RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
+      SUBROUTINE THMDFM(PCOOL,VCOOL,HMAVG,HD,TL,TSAT,CORREL,EPS,XFL,RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
 !
 !-----------------------------------------------------------------------
 !
@@ -15,7 +15,6 @@
 !Parameters: input
 ! PCOOL   pressure in Pascal
 ! VCOOL   coolant velocity in m/s
-! DCOOL   density of the fluid in the channel in kg/m-3
 ! HMAVG   averaged enthalpy
 ! HD      hydraulic diameter in m
 ! TL      liquid temperature in K
@@ -40,7 +39,7 @@
 !  SUBROUTINE ARGUMENTS
 !----
       CHARACTER CORREL
-      REAL PCOOL,VCOOL,DCOOL,HMAVG,HD,TL,TSAT,EPS,XFL,RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV
+      REAL PCOOL,VCOOL,HMAVG,HD,TL,TSAT,EPS,XFL,RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV
 !----
 !  LOCAL VARIABLES
 !----
@@ -106,7 +105,7 @@
 !  COMPUTE VGJ, VGJprime and C0 AFTER CHOSEN CORRELATION
 !----
       CORREL = 'EPRI'
-      CALL THMVGJ(VCOOL, DCOOL, PCOOL, ZMU, XFL, HD, RHOG, RHOL, EPS, CORREL, VGJ, C0)
+      CALL THMVGJ(VCOOL, RHO, PCOOL, ZMU, XFL, HD, RHOG, RHOL, EPS, CORREL, VGJ, C0)
 
       VGJprime = VGJ + (C0-1)*VCOOL
 

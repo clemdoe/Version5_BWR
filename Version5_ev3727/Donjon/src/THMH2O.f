@@ -1,7 +1,7 @@
 *DECK THMH2O
       SUBROUTINE THMH2O(ITIME,I,J,K,K0,PINLET,MFLOW,HMAVG,ENT,HD,IFLUID,
-     > IHCONV,KHCONV,ISUBM,RADCL,ZF,PHI,XFL,EPS,SLIP,ACOOL,PCH,DZ,TCALO,
-     > RHO,RHOLAV,TSCLAD,KWA)
+     > IHCONV,KHCONV,ISUBM,RADCL,ZF,VCOOL,PHI,XFL,EPS,SLIP,ACOOL,PCH,DZ,
+     > TCALO,RHO,RHOLAV,TSCLAD,KWA)
 *
 *-----------------------------------------------------------------------
 *
@@ -42,6 +42,7 @@
 * ACOOL   coolant cross section area in m^2.
 * PCH     heating perimeter in m.
 * DZ      axial mesh width in m.
+* VCOOL   local coolant velocity
 *
 *Parameters: output
 * PHI     heat flow exchanged between clad and fluid in W/m^2.
@@ -63,7 +64,7 @@
 *----
       INTEGER I,J,K,K0,IFLUID,IHCONV,ISUBM,KWA
       REAL PINLET,MFLOW,HMAVG,ENT(4),HD,KHCONV,RADCL,ZF(2),PHI,TCALO,
-     > RHO,RHOLAV,TSCLAD,XFL,EPS,SLIP,ACOOL,PCH,DZ
+     > RHO,RHOLAV,TSCLAD,XFL,EPS,SLIP,ACOOL,PCH,DZ,VCOOL
 *----
 *  LOCAL VARIABLES
 *----
@@ -175,11 +176,6 @@
 *  parameter CO and the drift velocity VGJ (their correspondent 
 *  correlations are supposed to work fine under different flow regimes).
 *----
-! Condenser cette étape à la suivante en distinguant trois cas 
-! One pahse liquid (garder l'existant)
-! Two-phase flow
-! Superheated steam 
-! OUUUUUU
 ! Garder cette cellule pour obtenir une première valeur de epsilon 
 ! et ensuite dans le two-phase flow, itérer sur ce epsilon dans le recalcul de tous les paramètres hydrauliques
           IF(HGSAT.GT.HLSAT) THEN
@@ -189,10 +185,6 @@
             VGJ=1.18*((SIGM*9.81*(RHOL-RHOG))/RHOL**2)**0.25
             F4=CO*((XFL*RHOL)+((1.0-XFL)*RHOG))+(RHOL*RHOG*VGJ/MFLOW)
             EPS=(XFL*RHOL)/F4
-            JL=(1.0-XFL)*MFLOW/RHOL
-            JG=XFL*MFLOW/RHOG
-            IF(EPS.NE.0) SLIP=JG*(1.0-EPS)/(JL*EPS)
-          ENDIF
         ELSE
 *         superheated steam
           CALL THMPH(IFLUID,PINLET,HMAVG,RHOG,TCALO)
@@ -222,18 +214,27 @@
         ELSE IF(IFLUID.EQ.1) THEN
           CALL THMHPT(PINLET,TCALO,R1,R2,ZKONE,ZMUONE,CPONE)
         ENDIF
+        JL = MFLOW/RHOL
+        JG = 0
         RHO=RHOLAV
         REL=MFLOW*HD/ZMUONE
         PRL=ZMUONE*CPONE/ZKONE
       ELSE IF(HMAVG.LT.HGSAT) THEN
 *       Two-phase flow
-! remplacer ça par une référence à mon tout joli algo DFM ? 
+        IF(IFLUID.EQ.0) THEN
+        CALL THMDFM(PINLET,VCOOL,DCOOL,HMAVG,HD,TL,TSAT,'EPRI',EPS,XFL,
+     >  RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
+        ENDIF
         TCALO=EPS*TSAT+(1.0-EPS)*TL
         ZKONE=ZKL
         CPONE=CPL
         RHO=EPS*RHOG+(1.0-EPS)*RHOL
         REL=MFLOW*(1.0-XFL)*HD/ZMUL
         PRL=ZMUL*CPL/ZKL
+        JL=(1.0-XFL)*MFLOW/RHOL
+        JG=XFL*MFLOW/RHOG
+        IF(EPS.NE.0) SLIP=JG*(1.0-EPS)/(JL*EPS) 
+        ENDIF
       ELSE
 *       superheated steam
         RHO=RHOG
