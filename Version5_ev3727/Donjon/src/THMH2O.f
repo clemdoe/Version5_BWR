@@ -1,7 +1,7 @@
 *DECK THMH2O
       SUBROUTINE THMH2O(ITIME,I,J,K,K0,PINLET,MFLOW,HMAVG,ENT,HD,IFLUID,
      > IHCONV,KHCONV,ISUBM,RADCL,ZF,VCOOL,PHI,XFL,EPS,SLIP,ACOOL,PCH,DZ,
-     > TCALO,RHO,RHOLAV,TSCLAD,KWA)
+     > TCALO,RHO,RHOLAV,RHOG,TSCLAD,KWA,VGJ)
 *
 *-----------------------------------------------------------------------
 *
@@ -53,9 +53,11 @@
 * TCALO   coolant temperature in K
 * RHO     coolant density in Kg/m^3
 * RHOLAV  liquid density in kg/m^3
+* RHOG    vapour density in kg/m^3
 * TSCLAD  clad temperature in K
 * KWA     flow regime (=0: single-phase; =1: subcooled; =2: nucleate
 *         boiling; =3 superheated steam)
+* VGJ     drift velocity in m/s
 *
 *-----------------------------------------------------------------------
 *

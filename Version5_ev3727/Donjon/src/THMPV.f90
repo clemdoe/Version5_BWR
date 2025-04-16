@@ -1,4 +1,4 @@
-SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ)
+SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ, EPS, RHOL, RHOG, VGJ)
 !
 !-----------------------------------------------------------------------
 !
@@ -21,6 +21,10 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ)
 ! PCOOL   pressure of the fluid in the channel
 ! MUT     dynamic viscosity of the fluid in the channel
 ! HD      hydraulic diameter of the channel
+! VGJ     drift velocity in the channel
+! EPS     coolant void fraction in the channel
+! RHOL    density of the liquid fraction
+! RHOG    density of the vapour fraction
 !
 !Parameters: output
 ! VCOOL   velocity of the fluid in the channel
@@ -34,12 +38,12 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ)
 !   SUBROUTINE ARGUMENTS
 !----
     INTEGER NZ
-    REAL SPEED, POULET, VCOOL(NZ), DCOOL(NZ), PCOOL(NZ), MUT(NZ), XFL(NZ), HD
-    REAL HZ(NZ)
+    REAL SPEED, POULET, VCOOL(NZ), DCOOL(NZ), PCOOL(NZ), MUT(NZ), XFL(NZ), HD 
+    REAL HZ(NZ),VGJ(NZ),RHOL(NZ), RHOG(NZ), EPS(NZ)
 !----
 !   LOCAL VARIABLES
 !----
-    REAL g
+    REAL g, DELTA
     REAL(kind=8), ALLOCATABLE, DIMENSION(:,:) :: A
 
     INTEGER K, I, J, IER
@@ -71,23 +75,27 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ)
                 TPMULT0 = 1.0
             ENDIF
             A(1,1) = 1.0
-!   MASS CONCERVATION EQUATION
+
+!   MOMENTUM CONSERVATION EQUATION
+            DELTA = ((EPS(K)/1-EPS(K))*RHOL(K)*RHOG(K)/DCOOL(K)*VGJ(K)**2) - &
+            ((EPS(K+1)/1-EPS(K+1))*RHOL(K+1)*RHOG(K+1)/DCOOL(K+1)*VGJ(K+1)**2)
             A(K+NZ,K) = - (VCOOL(K)*DCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
             A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
-            A(1, 2*NZ+1) = SPEED
-!   MOMENTUM CONCERVATION EQUATION
-            A(K+NZ, 2*NZ+1) =  - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2
+            A(K+NZ, 2*NZ+1) =  - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2 - DELTA
+
+!    MASS CONSERVATION EQUATION
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0
             A(K+NZ,K+1+NZ) = 1.0
+            A(1, 2*NZ+1) = SPEED
 !----
 !   TOP OF THE CHANNEL
 !----
         ELSE IF (K .EQ. NZ) THEN
-!   MASS CONCERVATION EQUATION
+!   MASS CONSERVATION EQUATION
             A(K,K-1) = - DCOOL(K-1)
             A(K,K) = DCOOL(K)
-!   MOMENTUM CONCERVATION EQUATION
+!   MOMENTUM CONSERVATION EQUATION
             A(K, 2*NZ+1) = 0.0
             A(2*NZ, 2*NZ+1) = POULET
             A(2*NZ, 2*NZ) = 1.0
@@ -110,17 +118,19 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ)
                 TPMULT = 1.0
                 TPMULT0 = 1.0
             ENDIF
-!   MASS CONCERVATION EQUATION
+!   MASS CONSERVATION EQUATION
             A(K,K-1) = - DCOOL(K-1)
             A(K,K) = DCOOL(K)
             A(K,K+1) = 0.0
-            A(K, 2*NZ+1) = 0.0
+            A(K, 2*NZ+1) = 0.0 
 !----
-!   MOMENTUM CONCERVATION EQUATION
+!   MOMENTUM CONSERVATION EQUATION
 !----
+            DELTA = ((EPS(K)/1-EPS(K))*RHOL(K)*RHOG(K)/DCOOL(K)*VGJ(K)**2) - &
+            ((EPS(K+1)/1-EPS(K+1))*RHOL(K+1)*RHOG(K+1)/DCOOL(K+1)*VGJ(K+1)**2)
             A(K+NZ,K) = - (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
             A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
-            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2
+            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2 - DELTA
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0
             A(K+NZ,K+1+NZ) = 1.0
