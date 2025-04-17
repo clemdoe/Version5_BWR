@@ -81,12 +81,12 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ, EPS, 
             ((EPS(K+1)/1-EPS(K+1))*RHOL(K+1)*RHOG(K+1)/DCOOL(K+1)*VGJ(K+1)**2)
             A(K+NZ,K) = - (VCOOL(K)*DCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
             A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
-            A(K+NZ, 2*NZ+1) =  - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2 - DELTA
-
-!    MASS CONSERVATION EQUATION
+            A(K+NZ, 2*NZ+1) =  - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2 + DELTA
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0
             A(K+NZ,K+1+NZ) = 1.0
+
+!    MASS CONSERVATION EQUATION
             A(1, 2*NZ+1) = SPEED
 !----
 !   TOP OF THE CHANNEL
@@ -130,7 +130,7 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ, EPS, 
             ((EPS(K+1)/1-EPS(K+1))*RHOL(K+1)*RHOG(K+1)/DCOOL(K+1)*VGJ(K+1)**2)
             A(K+NZ,K) = - (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
             A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
-            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2 - DELTA
+            A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2 + DELTA
             A(K+NZ,K-1+NZ) = 0.0
             A(K+NZ,K+NZ) = -1.0
             A(K+NZ,K+1+NZ) = 1.0

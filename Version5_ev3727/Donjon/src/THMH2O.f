@@ -1,7 +1,7 @@
 *DECK THMH2O
       SUBROUTINE THMH2O(ITIME,I,J,K,K0,PINLET,MFLOW,HMAVG,ENT,HD,IFLUID,
      > IHCONV,KHCONV,ISUBM,RADCL,ZF,VCOOL,PHI,XFL,EPS,SLIP,ACOOL,PCH,DZ,
-     > TCALO,RHO,RHOLAV,RHOG,TSCLAD,KWA,VGJ)
+     > TCALO,RHO,RHOLAV,RHOG,TSCLAD,KWA,VGJprime,HLV)
 *
 *-----------------------------------------------------------------------
 *
@@ -58,6 +58,8 @@
 * KWA     flow regime (=0: single-phase; =1: subcooled; =2: nucleate
 *         boiling; =3 superheated steam)
 * VGJ     drift velocity in m/s
+* VGJprime 
+* HLV     delta between liquid and vapour enthalpies
 *
 *-----------------------------------------------------------------------
 *
@@ -66,11 +68,11 @@
 *----
       INTEGER I,J,K,K0,IFLUID,IHCONV,ISUBM,KWA
       REAL PINLET,MFLOW,HMAVG,ENT(4),HD,KHCONV,RADCL,ZF(2),PHI,TCALO,
-     > RHO,RHOLAV,TSCLAD,XFL,EPS,SLIP,ACOOL,PCH,DZ,VCOOL
+     > RHO,RHOLAV,TSCLAD,XFL,EPS,SLIP,ACOOL,PCH,DZ,VCOOL,VGJprime
 *----
 *  LOCAL VARIABLES
 *----
-      REAL W(4),HL(4),JL,JG
+      REAL W(4),HL(4),JL,JG,C0,REL,PRL,VGJ
       CHARACTER HSMG*131
       LOGICAL LFIRST
 *----
@@ -186,6 +188,7 @@
             SIGM=-7.2391E-6*PR**3+2.8345E-4*PR**2-5.1566E-3*PR+4.2324E-2
             VGJ=1.18*((SIGM*9.81*(RHOL-RHOG))/RHOL**2)**0.25
             F4=CO*((XFL*RHOL)+((1.0-XFL)*RHOG))+(RHOL*RHOG*VGJ/MFLOW)
+            VGJprime = VGJ + (C0-1)*VCOOL
             EPS=(XFL*RHOL)/F4
         ELSE
 *         superheated steam
