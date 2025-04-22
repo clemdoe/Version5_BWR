@@ -176,10 +176,10 @@ System MacroF Macro2 := DELETE: System MacroF Macro2 ;
 *--
 * Dump THM object
 *--
-UTL: Thm :: DIR DUMP ;
-assertS Thm :: 'AVG-T-FUEL' 1 1.464945E+03 ;
-assertS Thm :: 'AVG-T-COOL' 1 5.780350E+02 ;
-assertS Thm :: 'AVG-P-COOL' 1 1.093366E+07 ;
+*UTL: Thm :: DIR DUMP ;
+*assertS Thm :: 'AVG-T-FUEL' 1 1.464945E+03 ;
+*assertS Thm :: 'AVG-T-COOL' 1 5.780350E+02 ;
+*assertS Thm :: 'AVG-P-COOL' 1 1.093366E+07 ;
 
 ECHO "test pincell_diphasic_pdrop.x2m completed" ;
 END: ;
