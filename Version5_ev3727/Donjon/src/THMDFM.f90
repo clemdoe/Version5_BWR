@@ -44,7 +44,7 @@
 !  LOCAL VARIABLES
 !----
       REAL EPSold, ERREPS, VLIQ, VVAP, TCALO, HLSAT, HGSAT, ZMUL, ZMUG, CPL, CPG, ZKL, ZKG, ZMU, REY
-      INTEGER I
+      INTEGER NITER
 !----
 ! INITIALIZE VARIABLES
 !----
@@ -55,7 +55,7 @@
 !----
 !  MAIN LOOP
 !----
-     I=0
+     NITER=0
      ERREPS=1
 
     10 CONTINUE
@@ -64,13 +64,13 @@
 !  SAVE THE OLD EPSILON VALUE
 !----
       EPSold=EPS 
-      I = I+1
+      NITER = NITER+1
 
 !----
 ! TEST ON ERR EPS
 !----
-      IF (I .GT. 1000) GOTO 20
-      IF (ERREPS < 1E-3) GOTO 20
+      IF (NITER .GT. 10) GOTO 20
+      IF (ERREPS < 1E3) GOTO 20 
 
 !----
 !  COMPUTE DENSITIES
@@ -104,9 +104,10 @@
 !----
 !  COMPUTE VGJ, VGJprime and C0 AFTER CHOSEN CORRELATION
 !----
-      CORREL = 'EPRI'
-      CALL THMVGJ(VCOOL, RHO, PCOOL, ZMU, XFL, HD, RHOG, RHOL, EPS,'EPRI', VGJ, C0)
-
+!      CORREL = 'EPRI'
+!      CALL THMVGJ(VCOOL, RHO, PCOOL, ZMU, XFL, HD, RHOG, RHOL, EPS,'EPRI', VGJ, C0)
+      VGJ =0
+      C0=1
       VGJprime = VGJ + (C0-1)*VCOOL
 
 !----
@@ -136,9 +137,9 @@
 !----
     20 CONTINUE
 
-      IF (I == 1000) THEN
+      IF (NITER == 10) THEN
         PRINT *, 'Nombre maximum d''itérations max atteint'
       ELSE
-        PRINT *, 'Convergence atteinte à I = ', I
+        PRINT *, 'Convergence atteinte à I = ', NITER
       ENDIF
 END

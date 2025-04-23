@@ -225,12 +225,22 @@
         PRL=ZMUONE*CPONE/ZKONE
       ELSE IF(HMAVG.LT.HGSAT) THEN
 *       Two-phase flow
+        IF(IFLUID.EQ.0) THEN
+*        CALL THMDFM(PINLET,VCOOL,DCOOL,HMAVG,HD,TL,TSAT,'EPRI',EPS,XFL,
+*     >  RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
+        VGJprime = VGJ !+ (C0-1)*VCOOL
+        ENDIF
         TCALO=EPS*TSAT+(1.0-EPS)*TL
         ZKONE=ZKL
         CPONE=CPL
         RHO=EPS*RHOG+(1.0-EPS)*RHOL
         REL=MFLOW*(1.0-XFL)*HD/ZMUL
         PRL=ZMUL*CPL/ZKL
+        JL=(1.0-XFL)*MFLOW/RHOL
+        JG=XFL*MFLOW/RHOG
+        IF(EPS.NE.0) THEN
+        SLIP=JG*(1.0-EPS)/(JL*EPS) 
+        ENDIF
       ELSE
 *       superheated steam
         RHO=RHOG
