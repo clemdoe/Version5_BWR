@@ -28,7 +28,7 @@
 *----
 *  SUBROUTINE ARGUMENTS
 *----
-      REAL P,EPS,X,PHIL0
+      REAL P,X,PHIL0
 *----
 *  LOCAL VARIABLES
 *----
@@ -48,9 +48,10 @@
 *     PHIL0=(1+X*(RHOL/RHOG-1))/((1+X*(MUL/MUG-1))**0.25)
 *- 
 * LOCKHART-MARTINELLI CORRELATION
+      PHIL0=1
       XLM = ((1-X)/X)**0.9*(RHOG/RHOL)**0.5*(MUG/MUL)**0.1
       PHIL0 = (1.0 + 20/XLM + 1.0/XLM**2)**0.5
-*     PHIL0 = 1
+      PHIL0 = 1
 
       RETURN
       END

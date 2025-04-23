@@ -6,7 +6,7 @@
      > KCONDF,UCONDF,ICONDC,NCONDC,KCONDC,UCONDC,IHGAP,KHGAP,IHCONV,
      > KHCONV,WTEFF,IFRCDI,ISUBM,FRO,POW,IPRES,TCOMB,DCOOL,TCOOL,TSURF,
      > HCOOL,PCOOL)
-*
+
 *-----------------------------------------------------------------------
 *
 *Purpose:
@@ -91,7 +91,7 @@
 * IPRES   flag indicating if pressure is to be computed (0=nonstant/
 *         1=variable).
 *
-*Parameters: output
+* Parameters: output
 * TCOMB   averaged fuel temperature distribution in K.
 * DCOOL   coolant density distribution in g/cc.
 * TCOOL   coolant temperature distribution in K.
@@ -113,7 +113,7 @@
      > HD,PCH,RAD(NDTOT-1,NZ),ERMAXT,SPEED,TINLET,PINLET,FRACPU,
      > KCONDF(NCONDF+3),KCONDC(NCONDC+1),KHGAP,KHCONV,WTEFF,FRO(NFD-1),
      > POW(NZ),TCOMB(NZ),DCOOL(NZ),TCOOL(NZ),TSURF(NZ),HCOOL(NZ),
-     > PCOOL(NZ),MUT(NZ)
+     > PCOOL(NZ),MUT(NZ),PFINAL(NZ)
       CHARACTER UCONDF*12,UCONDC*12
 *----
 *  LOCAL VARIABLES
@@ -135,15 +135,18 @@
 *----
 *  ALLOCATABLE ARRAYS
 *----
-      REAL, ALLOCATABLE, DIMENSION(:) :: VCOOL,TCENT,DLCOOL
-      REAL, ALLOCATABLE, DIMENSION(:,:) :: TEMPT
-
-      REAL, ALLOCATABLE, DIMENSION(:) :: PTEMP, VTEMP
+      REAL, ALLOCATABLE, DIMENSION(:) :: VCOOL,TCENT,DLCOOL,DGCOOL
+      REAL, ALLOCATABLE, DIMENSION(:) :: VGJprime
+      REAL, ALLOCATABLE, DIMENSION(:,:) :: TEMPT, A
+      REAL, ALLOCATABLE, DIMENSION(:) :: PTEMP, VTEMP, HLV
 *----
 *  SCRATCH STORAGE ALLOCATION
 *----
-      ALLOCATE(VCOOL(NZ),TEMPT(NDTOT,NZ),TCENT(NZ),DLCOOL(NZ))
+      ALLOCATE(VCOOL(NZ),TEMPT(NDTOT,NZ),TCENT(NZ))
+      ALLOCATE(DLCOOL(NZ),DGCOOL(NZ),VGJprime(NZ),HLV(NZ))
       ALLOCATE(PTEMP(NZ), VTEMP(NZ))
+      ALLOCATE(A(NZ,NZ+1))
+      FORALL (I=1:NZ, J=1:NZ+1) A(I, J) = 0.0
 *----
 *  COMPUTE THE INLET FLOW ENTHALPY AND VELOCITY
 *----
@@ -252,7 +255,7 @@
           VTEMP = VCOOL
           CALL THMPV(SPEED, PINLET, VCOOL, DCOOL, 
      >              PCOOL, MUT, XFL, HD, NZ,
-     >              HZ)
+     >              HZ, EPS, DLCOOL,DGCOOL, VGJprime)
    30 CONTINUE
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
@@ -319,9 +322,10 @@
         ENDIF
 *CGT
         IF ((IFLUID.EQ.0).OR.(IFLUID.EQ.1)) THEN
-          CALL THMH2O(0,IX,IY,K,K0,PCOOL(K),MFLOW,HMSUP,ENT,HD,IFLUID,
-     >    IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),EPS(K),
-     >    SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,RHOL,TRE11(NDTOT),KWA(K))
+          CALL THMH2O(0,IX,IY,K,K0,PCOOL(K),MFLOW,HMSUP,ENT,HD,
+     >    IFLUID,IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,VCOOL(K),
+     >    PHI2,XFL(K),EPS(K),SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,RHOL,
+     >    RHOG,TRE11(NDTOT),KWA(K),VGJprime(K), HLV(K))
         ELSEIF (IFLUID.EQ.2) THEN
           CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,STP,
      >    IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),

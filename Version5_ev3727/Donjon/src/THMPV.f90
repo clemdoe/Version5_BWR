@@ -1,4 +1,4 @@
-SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ)
+SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ,EPS, RHOL, RHOG, VGJ)
 !
 !-----------------------------------------------------------------------
 !
@@ -21,6 +21,10 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ)
 ! PCOOL   pressure of the fluid in the channel
 ! MUT     dynamic viscosity of the fluid in the channel
 ! HD      hydraulic diameter of the channel
+! VGJ     drift velocity in the channel
+! EPS     coolant void fraction in the channel
+! RHOL    density of the liquid fraction
+! RHOG    density of the vapour fraction
 !
 !Parameters: output
 ! VCOOL   velocity of the fluid in the channel
@@ -34,8 +38,8 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ)
 !   SUBROUTINE ARGUMENTS
 !----
     INTEGER NZ
-    REAL SPEED, POULET, VCOOL(NZ), DCOOL(NZ), PCOOL(NZ), MUT(NZ), XFL(NZ), HD
-    REAL HZ(NZ)
+    REAL SPEED, POULET, VCOOL(NZ), DCOOL(NZ), PCOOL(NZ), MUT(NZ), XFL(NZ), HD 
+    REAL HZ(NZ),VGJ(NZ),RHOL(NZ), RHOG(NZ), EPS(NZ)
 !----
 !   LOCAL VARIABLES
 !----

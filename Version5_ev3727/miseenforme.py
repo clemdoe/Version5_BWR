@@ -1,5 +1,31 @@
+import numpy as np 
+import matplotlib.pyplot as plt 
+
+
 # Données brutes sous forme de chaîne de caractères
-raw_data = """
+#Sans pressure drop
+raw_data_0 = """PCOOL:   10800000.0       10800000.0       10800000.0       10800000.0       10800000.0       10800000.0       10800000.0       10800000.0       10800000.0       10800000.0    
+ VCOOL:   9.25140858       9.41284752       9.58627510       9.77334118       9.97613430       10.1970577       11.5061941       12.6151037       13.6931667       14.7416553    
+ DCOOL:   756.661804       743.684326       730.230225       716.253235       701.693420       686.490906       608.384277       554.905273       511.217590       474.857635    
+ TCOOL:   553.484619       560.338135       567.007568       573.473022       579.713318       585.699646       589.856201       589.856201       589.856201       589.856201    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.108675249      0.195768550      0.266916275      0.326130331    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       1.26429414E-02   2.53272764E-02   3.80116105E-02   5.06959483E-02
+ TSAT:   589.856201       589.856201       589.856201       589.856201       589.856201       589.856201       589.856201       589.856201       589.856201       589.856201    
+ MUT:  -7.35066711E-15   9.18340949E-41  -7.35066711E-15   9.18340949E-41   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
+"""
+#sans correction sur PHIL0
+raw_data_1 = """
+PCOOL:   11137852.0       11112698.0       11087173.0       11061236.0       11034838.0       11007925.0       10980831.0       10945200.0       10881401.0       10800000.0    
+ VCOOL:   9.24568653       9.40701008       9.58030033       9.76725292       9.96992397       10.1908073       10.3912401       11.5481129       12.6550112       13.7449045    
+ DCOOL:   757.130737       744.146790       730.685547       716.700134       702.128662       686.912476       673.661499       606.174988       553.154846       509.292847    
+ TCOOL:   553.513855       560.375366       567.052185       573.524292       579.770935       585.761963       590.559814       590.856445       590.418213       589.856201    
+ EPS:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000      0.108962595      0.197041392      0.270050794    
+ XFL:   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       1.29405092E-02   2.58223973E-02   3.86294909E-02
+ TSAT:   592.167847       591.997681       591.824646       591.648499       591.468872       591.285400       591.100342       590.856506       590.418213       589.856201    
+ MUT:   9.49746754E-05   9.21317187E-05   8.93800243E-05   8.67009949E-05   8.40756766E-05   8.14880623E-05   7.93356085E-05   7.92272695E-05   7.93935469E-05   7.96065724E-05
+"""
+#avec correction sur la paramètre PHIL0
+raw_data_m = """
 PCOOL:   11137852.0       11112698.0       11087173.0       11061236.0       11034838.0       11007925.0       10980831.0       10945200.0       10881401.0       10800000.0
 VCOOL:   9.24568653       9.40701008       9.58030033       9.76725292       9.96992397       10.1908073       10.3912401       11.5481129       12.6550112       13.7449045
 DCOOL:   757.130737       744.146790       730.685547       716.700134       702.128662       686.912476       673.661499       606.174988       553.154846       509.292847
@@ -10,30 +36,43 @@ TSAT:   592.167847       591.997681       591.824646       591.648499       591.
 MUT:   9.49746754E-05   9.21317187E-05   8.93800243E-05   8.67009949E-05   8.40756766E-05   8.14880623E-05   7.93356085E-05   7.92272695E-05   7.93935469E-05   7.96065724E-05
 """
 
-# Séparation des données en lignes et traitement de chaque ligne
-data_lines = raw_data.strip().split("\n")
 
 
 # Traitement de chaque ligne pour extraire les valeurs numériques
-def extraire(var_name, line_nb):
+def extraire(var_name, line_nb, data_name):
+    data_lines = data_name.strip().split("\n")
     values = data_lines[line_nb].split(":")[1]
     # Séparation des valeurs en une liste de flottants
     for value in values.split():
         var_name.append(float(value))
     return
 
-
 # Affichage du tableau des valeurs triées
-PCOOL=[]
-extraire(PCOOL, 0)
-extraire(VCOOL, 1)
+PCOOLm=[]
+PCOOL1=[]
+PCOOL0=[]
+extraire(PCOOLm, 0, raw_data_m)
+extraire(PCOOL1, 0, raw_data_1)
+extraire(PCOOL0, 0, raw_data_0)
+"""extraire(VCOOL, 1)
 extraire(DCOOL, 2)
 extraire(TCOOL, 3)
 extraire(EPS, 4)
 extraire(XFL, 5)
 extraire(TSAT, 6)
-extraire(MUT, 7)
+extraire(MUT, 7)"""
+Zaxis=np.linspace(0,2,len(PCOOLm))
 
-
+fig, ax = plt.subplots()
+ax.plot(Zaxis,PCOOLm, label='PhiM')
+ax.plot(Zaxis,PCOOL1, label='PhiM=1')
+ax.plot(Zaxis,PCOOL0, label='Sans chute de pression')
+ax.set_xlabel("Axial position in m")
+ax.set_ylabel("Pressure in Pa")
+ax.set_title("Effect of Pressure Drop and Martinellis Coefficient")
+ax.grid()
+ax.legend(loc="best")
+plt.show()
+fig.savefig(rf'/home/p122173/Version5_BWR/Version5_ev3727/Donjon/data/results_marie/Ppdrop.png', bbox_inches='tight')
 
 

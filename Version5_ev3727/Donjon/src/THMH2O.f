@@ -1,7 +1,7 @@
 *DECK THMH2O
       SUBROUTINE THMH2O(ITIME,I,J,K,K0,PINLET,MFLOW,HMAVG,ENT,HD,IFLUID,
-     > IHCONV,KHCONV,ISUBM,RADCL,ZF,PHI,XFL,EPS,SLIP,ACOOL,PCH,DZ,TCALO,
-     > RHO,RHOLAV,TSCLAD,KWA)
+     > IHCONV,KHCONV,ISUBM,RADCL,ZF,VCOOL,PHI,XFL,EPS,SLIP,ACOOL,PCH,DZ,
+     > TCALO,RHO,RHOLAV,RHOG,TSCLAD,KWA,VGJprime,HLV)
 *
 *-----------------------------------------------------------------------
 *
@@ -42,6 +42,7 @@
 * ACOOL   coolant cross section area in m^2.
 * PCH     heating perimeter in m.
 * DZ      axial mesh width in m.
+* VCOOL   local coolant velocity
 *
 *Parameters: output
 * PHI     heat flow exchanged between clad and fluid in W/m^2.
@@ -52,9 +53,13 @@
 * TCALO   coolant temperature in K
 * RHO     coolant density in Kg/m^3
 * RHOLAV  liquid density in kg/m^3
+* RHOG    vapour density in kg/m^3
 * TSCLAD  clad temperature in K
 * KWA     flow regime (=0: single-phase; =1: subcooled; =2: nucleate
 *         boiling; =3 superheated steam)
+* VGJ     drift velocity in m/s
+* VGJprime 
+* HLV     delta between liquid and vapour enthalpies
 *
 *-----------------------------------------------------------------------
 *
@@ -63,11 +68,11 @@
 *----
       INTEGER I,J,K,K0,IFLUID,IHCONV,ISUBM,KWA
       REAL PINLET,MFLOW,HMAVG,ENT(4),HD,KHCONV,RADCL,ZF(2),PHI,TCALO,
-     > RHO,RHOLAV,TSCLAD,XFL,EPS,SLIP,ACOOL,PCH,DZ
+     > RHO,RHOLAV,TSCLAD,XFL,EPS,SLIP,ACOOL,PCH,DZ,VCOOL,VGJprime
 *----
 *  LOCAL VARIABLES
 *----
-      REAL W(4),HL(4),JL,JG
+      REAL W(4),HL(4),JL,JG, REL, PRL, VGJ
       CHARACTER HSMG*131
       LOGICAL LFIRST
 *----
