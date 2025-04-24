@@ -180,6 +180,7 @@
 *  parameter CO and the drift velocity VGJ (their correspondent 
 *  correlations are supposed to work fine under different flow regimes.
 *----
+          VGJ=0
           IF(HGSAT.GT.HLSAT) THEN
             CO=1.13
             PR=PINLET/10**6
@@ -226,7 +227,7 @@
       ELSE IF(HMAVG.LT.HGSAT) THEN
 *       Two-phase flow
         IF(IFLUID.EQ.0) THEN
-*        CALL THMDFM(PINLET,VCOOL,DCOOL,HMAVG,HD,TL,TSAT,'EPRI',EPS,XFL,
+*        CALL THMDFM(PINLET,VCOOL,HMAVG,HD,TL,TSAT,'EPRI',EPS,XFL,
 *     >  RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
         VGJprime = VGJ !+ (C0-1)*VCOOL
         ENDIF

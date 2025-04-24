@@ -163,16 +163,6 @@
         MAXIT3=ISTATE(5)
         NFD=ISTATE(6)
         NDTOT=ISTATE(7)
-        !debug Marie
-        !WRITE(6,*) 'DEBUG ISTATE =', ISTATE
-        !NDTOT = ISTATE(7)
-        !(6,*) 'DEBUG NDTOT =', NDTOT
-
-        !IF (NDTOT <= 0) THEN
-        !WRITE(6,*) 'ERREUR: NDTOT invalide après lecture STATE-VECTOR!'
-        !STOP
-        !ENDIF
-        !fin débug
         ITIME=ISTATE(8)
         TIMEIT=ISTATE(9)
         IHGAP=ISTATE(10)
