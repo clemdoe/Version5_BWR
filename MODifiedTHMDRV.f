@@ -113,7 +113,7 @@
      > HD,PCH,RAD(NDTOT-1,NZ),ERMAXT,SPEED,TINLET,PINLET,FRACPU,
      > KCONDF(NCONDF+3),KCONDC(NCONDC+1),KHGAP,KHCONV,WTEFF,FRO(NFD-1),
      > POW(NZ),TCOMB(NZ),DCOOL(NZ),TCOOL(NZ),TSURF(NZ),HCOOL(NZ),
-     > PCOOL(NZ),MUT(NZ), PFINAL(NZ)
+     > PCOOL(NZ),MUT(NZ),PFINAL(NZ)
       CHARACTER UCONDF*12,UCONDC*12
 *----
 *  LOCAL VARIABLES
@@ -265,13 +265,9 @@
 
           PTEMP = PCOOL
           VTEMP = VCOOL
-          PRINT *, 'VGJprime', VGJprime
-          PRINT *, 'epsilon', EPS
-
           CALL THMPV(SPEED, PINLET, VCOOL, DCOOL, 
      >              PCOOL, MUT, XFL, HD, NZ,
      >              HZ, EPS, DLCOOL,DGCOOL, VGJprime)
-          PRINT *,'V', VCOOL, 'P', PCOOL 
    30 CONTINUE
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
@@ -329,53 +325,53 @@
         HMSUP=HMSUP+DELTH1
 
 *---- 
-c *  COMPUTE THE ENTHALPY VALUE WITH ENERGY CONSERVATION EQUATION
-c *----
-c *  MATRIX FILLING 
-c *----
-c *   BOTTOM OF THE CHANNEL
-c *----
-c       DO J = 1, NZ 
-c         IF (J .EQ. 1) THEN
-c             A(1,NZ+1)=HINLET
-c *----
-c *   TOP OF THE CHANNEL
-c *----
-c         ELSE IF (J .EQ. NZ) THEN
-c             A(J,J-1) = - (VCOOL(J-1)*DCOOL(J-1))
-c             A(J,J) = (VCOOL(J)*DCOOL(J))
-c             A(J,NZ+1) = ((VCOOL(J-1) + EPS(J-1)*(DLCOOL(J-1)-
-c      >      DGCOOl(J-1))/DCOOL(J-1)*VGJprime(J-1))
-c      >      + (VCOOL(J) + EPS(J)*(DLCOOL(J)-DGCOOl(J))/
-c      >      DCOOL(J)*VGJprime(J)))/2*(PCOOL(J-1)-PCOOL(J)) 
-c      >      + QCOOL(J-1)*HZ(K) +(EPS(J-1)*DGCOOL(J-1)*DLCOOL(J-1)/
-c      >      DCOOL(J-1)*HLV(J-1)*VGJprime(J-1))-(EPS(J)*DGCOOL(J)*
-c      >      DLCOOL(J)/DCOOL(J)*HLV(J)*VGJprime(J))
-c *----
-c *   MIDDLE OF THE CHANNEL
-c *----
-c         ELSE
-c             A(J,J-1) = - (VCOOL(J-1)*DCOOL(J-1))
-c             A(J,J) = (VCOOL(J)*DCOOL(J))
-c             A(J,NZ+1) =  -((VCOOL(J-1) + EPS(J-1)*(DLCOOL(J-1)-
-c      >      DGCOOl(J-1))/DCOOL(J-1)*VGJprime(J-1))
-c      >      + (VCOOL(J) + EPS(J)*(DLCOOL(J)-DGCOOl(J))/
-c      >      DCOOL(J)*VGJprime(J))) /2*(PCOOL(J-1)-PCOOL(J)) 
-c      >      + QCOOL(J-1)*HZ(K) -(EPS(J-1)*DGCOOL(J-1)*DLCOOL(J-1)/
-c      >      DCOOL(J-1)*HLV(J-1)*VGJprime(J-1))+(EPS(J)*DGCOOL(J)*
-c      >      DLCOOL(J)/DCOOL(J)*HLV(J)*VGJprime(J))
-c         ENDIF
-c       END DO
+*  COMPUTE THE ENTHALPY VALUE WITH ENERGY CONSERVATION EQUATION
+*----
+*  MATRIX FILLING 
+*----
+*   BOTTOM OF THE CHANNEL
+*----
+      DO J = 1, NZ 
+        IF (J .EQ. 1) THEN
+            A(1,NZ+1)=HINLET
+*----
+*   TOP OF THE CHANNEL
+*----
+        ELSE IF (J .EQ. NZ) THEN
+            A(J,J-1) = - (VCOOL(J-1)*DCOOL(J-1))
+            A(J,J) = (VCOOL(J)*DCOOL(J))
+            A(J,NZ+1) = ((VCOOL(J-1) + EPS(J-1)*(DLCOOL(J-1)-
+     >      DGCOOl(J-1))/DCOOL(J-1)*VGJprime(J-1))
+     >      + (VCOOL(J) + EPS(J)*(DLCOOL(J)-DGCOOl(J))/
+     >      DCOOL(J)*VGJprime(J)))/2*(PCOOL(J-1)-PCOOL(J)) 
+     >      + QCOOL(J-1)*HZ(K) +(EPS(J-1)*DGCOOL(J-1)*DLCOOL(J-1)/
+     >      DCOOL(J-1)*HLV(J-1)*VGJprime(J-1))-(EPS(J)*DGCOOL(J)*
+     >      DLCOOL(J)/DCOOL(J)*HLV(J)*VGJprime(J))
+*----
+*   MIDDLE OF THE CHANNEL
+*----
+        ELSE
+            A(J,J-1) = - (VCOOL(J-1)*DCOOL(J-1))
+            A(J,J) = (VCOOL(J)*DCOOL(J))
+            A(J,NZ+1) =  -((VCOOL(J-1) + EPS(J-1)*(DLCOOL(J-1)-
+     >      DGCOOl(J-1))/DCOOL(J-1)*VGJprime(J-1))
+     >      + (VCOOL(J) + EPS(J)*(DLCOOL(J)-DGCOOl(J))/
+     >      DCOOL(J)*VGJprime(J))) /2*(PCOOL(J-1)-PCOOL(J)) 
+     >      + QCOOL(J-1)*HZ(K) -(EPS(J-1)*DGCOOL(J-1)*DLCOOL(J-1)/
+     >      DCOOL(J-1)*HLV(J-1)*VGJprime(J-1))+(EPS(J)*DGCOOL(J)*
+     >      DLCOOL(J)/DCOOL(J)*HLV(J)*VGJprime(J))
+        ENDIF
+      END DO
 
-c *----
-c *   SOLVING THE LINEAR SYSTEM
-c *----
-c         CALL ALSBD(NZ, 1, A, IER, NZ)
+*----
+*   SOLVING THE LINEAR SYSTEM
+*----
+        CALL ALSBD(NZ, 1, A, IER, NZ)
 
-c         IF (IER /= 0) CALL XABORT('THMP DRV: SINGULAR MATRIX.')
-c         DO  J= 1, NZ
-c           HCOOL(J) = REAL(A(J, NZ+1))
-c         ENDDO
+        IF (IER /= 0) CALL XABORT('THMP DRV: SINGULAR MATRIX.')
+        DO  J= 1, NZ
+          HCOOL(J) = REAL(A(J, NZ+1))
+        ENDDO
 
 *----
 *  COMPUTE THE VALUE OF THE DENSITY AND THE CLAD-COOLANT HEAT TRANSFER
@@ -393,7 +389,6 @@ c         ENDDO
      >    IFLUID,IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,VCOOL(K),
      >    PHI2,XFL(K),EPS(K),SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,RHOL,
      >    RHOG,TRE11(NDTOT),KWA(K),VGJprime(K), HLV(K))
-          PRINT *, 'P2', PCOOL
         ELSEIF (IFLUID.EQ.2) THEN
           !CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HCOOL(K),ENT,HD,STP,
           CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,STP,
@@ -411,14 +406,12 @@ c         ENDDO
      >    TRE11,TRE11,QFUEL(K),FRO,TRE11(NDTOT),POWLIN,XBURN(K),
      >    POROS,FRACPU,ICONDF,NCONDF,KCONDF,UCONDF,ICONDC,NCONDC,
      >    KCONDC,UCONDC,IHGAP,KHGAP,IFRCDI,TC1,XX2,XX3,ZF)
-          PRINT *, 'P3', PCOOL
         ELSE
           CALL THMRNG(IMPX,NFD,NDTOT-1,MAXIT1,MAXITL,ERMAXT,DTINV,RADD,
      >    TRE11,TRE11,QFUEL(K),FRO,TRE11(NDTOT),XBURN(K),
      >    POROS,FRACPU,ICONDF,NCONDF,KCONDF,UCONDF,ICONDC,NCONDC,
      >    KCONDC,UCONDC,IFRCDI,IFUEL,FTP,TC1,XX2,XX3,ZF)
         ENDIF
-*
         DO K1=1,NDTOT-1
           TRE11(K1)=XX2(K1)+TRE11(NDTOT)*XX3(K1)
         ENDDO
