@@ -38,7 +38,7 @@ SUBROUTINE THMVGJ(VCOOL, DCOOL, PCOOL, MUT, XFL, HD, RHOG, RHOL, EPS, CORREL, VG
 !----
     REAL VCOOL, DCOOL, PCOOL, MUT, XFL, HD 
     REAL EPS, RHOG, RHOL
-    CHARACTER CORREL*4 !devra être modifié, ici quatre pour que cela convienne à EPRI
+    CHARACTER CORREL*10
 !----
 !   LOCAL VARIABLES
 !----
@@ -49,7 +49,10 @@ SUBROUTINE THMVGJ(VCOOL, DCOOL, PCOOL, MUT, XFL, HD, RHOG, RHOL, EPS, CORREL, VG
     INTEGER PC
 
     REY = ABS(VCOOL*DCOOL) * (1.0 - XFL) * HD / MUT !Reynolds
-    g =  - 9.81 !gravity
+    g =  9.81 !gravity
+    PR=PCOOL/10**6 ! PCOOL ou autre valeur de P ? initialement Pinlet
+    SIGM=-7.2391E-6*PR**3+2.8345E-4*PR**2-5.1566E-3*PR+4.2324E-2
+    !sigma = IAPWS97(P = self.P[i]*(10**(-6)), x = 0).sigma
 !----
 !   VGJ AND C0 CALCULATION
 !----
@@ -66,17 +69,15 @@ ELSE IF (CORREL.EQ.'HEM1') THEN
 ELSE IF (CORREL.EQ.'CHEXAL') THEN
 ! Correlation used in previous codes, after the work of Sarra Zoghlami for CANDU reactors
     C0=1.13
-    PR=PCOOL/10**6 ! PCOOL ou autre valeur de P ? initialement Pinlet
-    SIGM=-7.2391E-6*PR**3+2.8345E-4*PR**2-5.1566E-3*PR+4.2324E-2
-    VGJ=1.18*((SIGM*9.81*(RHOL-RHOG))/RHOL**2)**0.25
+    VGJ=1.18*((SIGM*9.81*(RHOL-RHOG))/(RHOL**2))**0.25
+    
 
 ELSE IF (CORREL.EQ.'GERAMP') THEN
-    SIGM=-7.2391E-6*PR**3+2.8345E-4*PR**2-5.1566E-3*PR+4.2324E-2
-    !sigma = IAPWS97(P = self.P[i]*(10**(-6)), x = 0).sigma
+    PRINT *, 'THMVGJ : GERAMP CORREL USED'
     IF (SIGM.EQ.0) THEN
         VGJ = 0
     ELSE 
-        VGJ = (g*SIGM*(RHOL-RHOG)/RHOG**2)**0.25  
+        VGJ = (g*SIGM*(RHOL-RHOG)/(RHOG**2))**0.25  
         IF (EPS.GT.0.65) THEN
             VGJ= VGJ*(2.9/0.35)*(1-EPS) 
             C0= 1 + (0.1/0.35)*(1-EPS)
@@ -87,17 +88,19 @@ ELSE IF (CORREL.EQ.'GERAMP') THEN
     ENDIF
 
 ELSE IF (CORREL.EQ.'EPRI') THEN
-    SIGM= -7.2391E-6*PR**3+2.8345E-4*PR**2-5.1566E-3*PR+4.2324E-2
-    !sigma = IAPWS97(P = self.P[i]*(10**(-6)), x = 0).sigma
-    VGJ= (2**0.5*g*SIGM*(RHOL-RHOG)/RHOL**2)**0.25 * (1+EPS)**1.5
+    PRINT *, 'THMVGJ : EPRI CORREL USED'
+    VGJ= ((2**0.5)*g*SIGM*(RHOL-RHOG)/(RHOL**2))**0.25 * ((1+EPS)**1.5)
     PC = 22060000
-    C1 = (4 * PC**2)/(PCOOL*(PC - PCOOL))
+    C1 = (4 * (PC**2))/(PCOOL*(PC - PCOOL))
     k1 = MIN(0.8, 1/(1 + exp(-REY /60000)))
     k0 = k1 + (1-k1) * (RHOG / RHOL)**2
     r = (1+1.57*(RHOG/RHOL))/(1-k1)
-    C0 = (((k0 + (1 - k0) * (EPS**r))**(-1)) * ((1 - exp(-C1 * EPS))/(1 - exp(-C1))))
+    IF (EPS.GT.0) THEN
+        C0 = (k0 + (1 - k0)*(EPS**r)*(1 - exp((-1)*C1))/(1 - exp((-1)*C1 * EPS)))**(-1)
+    ENDIF
 
 ELSE IF (CORREL.EQ.'MODBESTION') THEN
+    PRINT *, 'THMVGJ : MODBESTION CORREL USED'
     VGJ =  0.188 * (((RHOL - RHOG) * g * HD ) / RHOG )*0.5
     C0 = 1.2 - 0.2*(RHOG/RHOL)**0.5
 

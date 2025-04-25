@@ -38,7 +38,7 @@
 !----
 !  SUBROUTINE ARGUMENTS
 !----
-      CHARACTER CORREL
+      CHARACTER CORREL*10
       REAL PCOOL,VCOOL,HMAVG,HD,TL,TSAT,EPS,XFL,RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV
 !----
 !  LOCAL VARIABLES
@@ -58,19 +58,20 @@
      NITER=0
      ERREPS=1
 
-    10 CONTINUE
-
+   10 CONTINUE
 !----
 !  SAVE THE OLD EPSILON VALUE
 !----
-      EPSold=EPS 
+      EPSold = EPS 
       NITER = NITER+1
 
 !----
 ! TEST ON ERR EPS
 !----
+      PRINT *, 'THMDFM: NITER = ', NITER
+      PRINT *, 'THMDFM: ERREPS = ', ERREPS
       IF (NITER .GT. 10) GOTO 20
-      IF (ERREPS < 1E3) GOTO 20 
+      IF (ERREPS .LT. 1E-3) GOTO 20 
 
 !----
 !  COMPUTE DENSITIES
@@ -104,10 +105,10 @@
 !----
 !  COMPUTE VGJ, VGJprime and C0 AFTER CHOSEN CORRELATION
 !----
-!      CORREL = 'EPRI'
-!      CALL THMVGJ(VCOOL, RHO, PCOOL, ZMU, XFL, HD, RHOG, RHOL, EPS,'EPRI', VGJ, C0)
-      VGJ =0
-      C0=1
+      CALL THMVGJ(VCOOL, RHO, PCOOL, ZMU, XFL, HD, RHOG, RHOL, EPS, CORREL, VGJ, C0)
+      PRINT *, 'THMVGJ: VGJ = ', VGJ
+      PRINT *, 'THMVGJ: C0 = ', C0
+      PRINT *, 'THMVGJ CALLED'
       VGJprime = VGJ + (C0-1)*VCOOL
 
 !----
@@ -124,18 +125,17 @@
       ELSE 
         EPS = XFL / (C0 * (XFL + (RHOG/RHOL) * (1 - XFL)) + (RHOG * VGJ) / (RHOL * VCOOL))
       ENDIF
-    
 !----
 !  COMPUTE DELTA BETWEEN EPSold AND EPS
 !----
-    ERREPS = ABS(ERRold - EPS)
-    GOTO 10
+    ERREPS = ABS(EPSold - EPS)
+   GOTO 10
 
 
 !----
 ! EXIT LOOP
 !----
-    20 CONTINUE
+   20 CONTINUE
 
       IF (NITER == 10) THEN
         PRINT *, 'Nombre maximum d''itérations max atteint'
