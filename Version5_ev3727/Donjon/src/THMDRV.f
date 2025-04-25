@@ -113,7 +113,7 @@
      > HD,PCH,RAD(NDTOT-1,NZ),ERMAXT,SPEED,TINLET,PINLET,FRACPU,
      > KCONDF(NCONDF+3),KCONDC(NCONDC+1),KHGAP,KHCONV,WTEFF,FRO(NFD-1),
      > POW(NZ),TCOMB(NZ),TCOOL(NZ),TSURF(NZ),HCOOL(NZ),
-     > PCOOL(NZ),MUT(NZ),PFINAL(NZ),VCOOL(NZ),DCOOL(NZ), DGCOOL(NZ), 
+     > PCOOL(NZ),MUT(NZ),VCOOL(NZ),DCOOL(NZ), DGCOOL(NZ), 
      > DLCOOL(NZ),TCENT(NZ),VGJprime(NZ),HLV(NZ),PTEMP(NZ),VTEMP(NZ)
       CHARACTER UCONDF*12,UCONDC*12
 *----
@@ -131,7 +131,7 @@
 
       REAL TBUL(NZ)
 
-      INTEGER I, IER
+      INTEGER I
       REAL ERRV, ERRP
 *----
 *  ALLOCATABLE ARRAYS
@@ -317,45 +317,25 @@
           POINT=(1.0+XS(I1))/2.0
           ENT(I1)=HMSUP+POINT*DELTH1
         ENDDO
-*        HMSUP=HMSUP+DELTH1
-
+        PRINT *, 'DELTH1', DELTH1
+        !HMSUP=HMSUP+DELTH1
+!MARIE: regrouper les deux cellules en une seule ? 
 *---- 
 *  COMPUTE THE ENTHALPY VALUE WITH ENERGY CONSERVATION EQUATION
 *----
-       IF (K.GT.1) THEN
-       DELTA = QCOOL(K-1)*HZ(K)
-       WRITE(6,*) 'DELTA SANS VGJ', DELTA
-       DELTA = ((VCOOL(K-1) + EPS(K-1)*(DLCOOL(K-1)-
+      IF (K.GT.1) THEN
+      DELTA = (PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)
+      DELTA = DELTA + ((VCOOL(K-1) + EPS(K-1)*(DLCOOL(K-1)-
      >      DGCOOl(K-1))/DCOOL(K-1)*VGJprime(K-1))
      >      + (VCOOL(K) + EPS(K)*(DLCOOL(K)-DGCOOl(K))/
-     >      DCOOL(K)*VGJprime(K)))/2*(PCOOL(K-1)-PCOOL(K)) 
-      PRINT *, 'DELTA', DELTA
-      DELTA = DELTA + QCOOL(K-1)*HZ(K)
-      PRINT *, 'DELTA', DELTA
+     >      DCOOL(K)*VGJprime(K)))/2*(PCOOL(K-1)-PCOOL(K))
       DELTA = DELTA +(EPS(K-1)*DGCOOL(K-1)*(DLCOOL(K-1)/
      >      DCOOL(K-1))*HLV(K-1)*VGJprime(K-1))-(EPS(K)*DGCOOL(K)*
      >      (DLCOOL(K)/DCOOL(K))*HLV(K)*VGJprime(K))
-      PRINT *, 'DL/D(K)', DLCOOL(K)/DCOOL(K)
-       PRINT *, "Ratio VCOOL = ", VCOOL(K)/VCOOL(K-1)
-       PRINT *, "Ratio DCOOL = ", DCOOL(K)/DCOOL(K-1)
-       HMSUP = HMSUP*(DCOOL(K)/DCOOL(K-1))*(VCOOL(K)/VCOOL(K-1))
-       PRINT *, 'K', (DCOOL(K)/DCOOL(K-1))*(VCOOL(K)/VCOOL(K-1))
-       PRINT *, 'HMSUP', HMSUP
-       HMSUP = HMSUP +DELTA
-       PRINT*, 'DeltaP', (PCOOL(K-1)-PCOOL(K))
-       ENDIF
-       PRINT *, 'HMSUP:', HMSUP
-       PRINT *, 'HZ:', HZ(K)
-       PRINT *, 'DCOOL:', DCOOL(K)
-       PRINT *, 'VCOOL:', VCOOL(K)
-       PRINT *, 'QCOOL:', QCOOL(K)
-       PRINT *, 'EPS:', EPS(K)
-       PRINT *, 'DLCOOL:', DLCOOL(K)
-       PRINT *, 'HLV', HLV(K)
-       PRINT *, 'DLCOOL', DLCOOL(K)
-       PRINT *, 'DGCOOL', DGCOOL(K)
-       PRINT *, 'VGJprime', VGJprime(K)
-       PRINT *, 'DELTA', DELTA
+      HMSUP = (HMSUP*(DCOOL(K-1)*VCOOL(K-1))+DELTA )/(VCOOL(K)*DCOOL(K))                                                      
+      ENDIF
+       
+       
 
 *----
 *  COMPUTE THE VALUE OF THE DENSITY AND THE CLAD-COOLANT HEAT TRANSFER
@@ -374,7 +354,6 @@
      >    RHOG,TRE11(NDTOT),KWA(K),VGJprime(K), HLV(K))
 
 
-          PRINT *, 'HMSUP après H2O:', HMSUP
         ELSEIF (IFLUID.EQ.2) THEN
           CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,STP,
      >    IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),
@@ -387,7 +366,7 @@
 *----
         DTINV=0.0
         IF(IGAP.EQ.0) THEN
-          CALL THMROD(IMPX,NFD,10,MAXIT1,MAXITL,ERMAXT,DTINV,RADD,  !NDTOT-1 MARIE
+          CALL THMROD(IMPX,NFD,NDTOT-1,MAXIT1,MAXITL,ERMAXT,DTINV,RADD,  
      >    TRE11,TRE11,QFUEL(K),FRO,TRE11(NDTOT),POWLIN,XBURN(K),
      >    POROS,FRACPU,ICONDF,NCONDF,KCONDF,UCONDF,ICONDC,NCONDC,
      >    KCONDC,UCONDC,IHGAP,KHGAP,IFRCDI,TC1,XX2,XX3,ZF)
@@ -414,7 +393,6 @@
         DLCOOL(K)=RHOL
         DGCOOL(K)=RHOG
         HCOOL(K)=HMSUP
-        !PFINAL(K)=PCOOL(K)
         !PCOOL(K)=PINLET
         PC(K)=PINLET
         TP(K)=TCLAD(K)
@@ -487,7 +465,6 @@
 * PRINT THE THERMOHYDRAULICAL PARAMETERS
 *----
       PRINT *, 'PCOOL:', PCOOL
-      !PRINT *, 'PFINAL:', PFINAL
       PRINT *, 'VCOOL:', VCOOL
       PRINT *, 'DCOOL:', DCOOL
       PRINT *, 'TCOOL:', TCOOL
