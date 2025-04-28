@@ -13,6 +13,7 @@ raw_data_0 = """PCOOL:   10800000.0       10800000.0       10800000.0       1080
  TSAT:   589.856201       589.856201       589.856201       589.856201       589.856201       589.856201       589.856201       589.856201       589.856201       589.856201    
  MUT:  -7.35066711E-15   9.18340949E-41  -7.35066711E-15   9.18340949E-41   0.00000000       0.00000000       0.00000000       0.00000000       0.00000000       0.00000000    
 """
+
 #sans correction sur PHIL0
 raw_data_1 = """
 PCOOL:   11072582.0       11047426.0       11021899.0       10995958.0       10969557.0       10942641.0       10915615.0       10880015.0       10841477.0       10800000.0    
@@ -51,9 +52,17 @@ def extraire(var_name, line_nb, data_name):
 PCOOLm=[]
 PCOOL1=[]
 PCOOL0=[]
+DCOOL0=[]
 extraire(PCOOLm, 0, raw_data_m)
 extraire(PCOOL1, 0, raw_data_1)
 extraire(PCOOL0, 0, raw_data_0)
+extraire(DCOOL0, 2, raw_data_0)
+Prho0=[0 for i in range(len(PCOOL0))]
+Prho0[-1]=PCOOL0[-1]
+Grad=0
+for i in range(2,1+len(PCOOL0)):
+    Grad +=0.22*DCOOL0[-i]*9.81
+    Prho0[-i]=(PCOOL0[i-1]+Grad)
 """extraire(VCOOL, 1)
 extraire(DCOOL, 2)
 extraire(TCOOL, 3)
@@ -66,7 +75,7 @@ Zaxis=np.linspace(0,2,len(PCOOLm))
 fig, ax = plt.subplots()
 ax.plot(Zaxis,PCOOLm, label='PhiM')
 ax.plot(Zaxis,PCOOL1, label='PhiM=1')
-ax.plot(Zaxis,PCOOL0, label='Sans chute de pression')
+ax.plot(Zaxis,Prho0, label='Sans chute de pression')
 ax.set_xlabel("Axial position in m")
 ax.set_ylabel("Pressure in Pa")
 ax.set_title("Effect of Pressure Drop and Martinellis Coefficient")

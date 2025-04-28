@@ -311,7 +311,6 @@
           POINT=(1.0+XS(I1))/2.0
           ENT(I1)=HMSUP+POINT*DELTH1
         ENDDO
-        PRINT *, 'DELTH1', DELTH1
         !HMSUP=HMSUP+DELTH1
 !MARIE: regrouper les deux cellules en une seule ? 
 *---- 

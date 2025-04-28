@@ -231,9 +231,6 @@
         IF(IFLUID.EQ.0) THEN
         CALL THMDFM(PINLET,VCOOL,HMAVG,HD,TL,TSAT,CORREL,EPS,XFL,
      >  RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
-        PRINT *, 'THMH2O: C0=', C0
-        PRINT *, 'THMH2O: VGJ=', VGJ
-        PRINT *, 'THMDFM CALLED'
         ENDIF
         TCALO=EPS*TSAT+(1.0-EPS)*TL
         ZKONE=ZKL

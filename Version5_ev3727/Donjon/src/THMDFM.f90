@@ -68,8 +68,6 @@
 !----
 ! TEST ON ERR EPS
 !----
-      PRINT *, 'THMDFM: NITER = ', NITER
-      PRINT *, 'THMDFM: ERREPS = ', ERREPS
       IF (NITER .GT. 10) GOTO 20
       IF (ERREPS .LT. 1E-3) GOTO 20 
 
@@ -106,9 +104,6 @@
 !  COMPUTE VGJ, VGJprime and C0 AFTER CHOSEN CORRELATION
 !----
       CALL THMVGJ(VCOOL, RHO, PCOOL, ZMU, XFL, HD, RHOG, RHOL, EPS, CORREL, VGJ, C0)
-      PRINT *, 'THMVGJ: VGJ = ', VGJ
-      PRINT *, 'THMVGJ: C0 = ', C0
-      PRINT *, 'THMVGJ CALLED'
       VGJprime = VGJ + (C0-1)*VCOOL
 
 !----

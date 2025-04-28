@@ -81,7 +81,7 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ,EPS, R
 !   MOMENTUM CONSERVATION EQUATION
             DELTA = ((EPS(K)/1-EPS(K))*RHOL(K)*RHOG(K)/DCOOL(K)*VGJ(K)**2) - &
             ((EPS(K+1)/1-EPS(K+1))*RHOL(K+1)*RHOG(K+1)/DCOOL(K+1)*VGJ(K+1)**2)
-            ! DELTA =0
+            !DELTA=0
             A(K+NZ,K) = - (VCOOL(K)*DCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
             A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
             A(K+NZ, 2*NZ+1) =  - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2 + DELTA
