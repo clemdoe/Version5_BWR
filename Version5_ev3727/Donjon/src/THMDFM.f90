@@ -133,8 +133,8 @@
    20 CONTINUE
 
       IF (NITER == 10) THEN
-        PRINT *, 'Nombre maximum d''itérations max atteint'
+        PRINT *, 'Nombre maximum d''itérations THMDFM max atteint'
       ELSE
-        PRINT *, 'Convergence atteinte à I = ', NITER
+        PRINT *, 'Convergence THMDFM atteinte à I = ', NITER
       ENDIF
 END

@@ -25,7 +25,7 @@ REAL   Tcool := 500.0 ; (*coolant temperature (K)*)
 REAL   Dfuel := 9.7413951 ; (*fuel density (g/cc)*)
 REAL   dens_mod_0 := 0.65 ;
 REAL   pres_mod_0 := 10.8E6 ; (*coolant pressure Pa*)
-REAL   powi := 0.12 ; 
+REAL   powi := 0.16 ; 
 ECHO "total reactor power=" powi "MW" ;
 
 *----
@@ -41,24 +41,46 @@ REAL Y1 Y2 ROOT YNEW ;
 LOGICAL CONV ;
 
 REAL maxh := 200.0 ;
-REAL z1 := maxh 10.0 / ;
-REAL z2 := maxh 10.0 / z1 + ;
-REAL z3 := maxh 10.0 / z2 + ;
-REAL z4 := maxh 10.0 / z3 + ;
-REAL z5 := maxh 10.0 / z4 + ;
-REAL z6 := maxh 10.0 / z5 + ;
-REAL z7 := maxh 10.0 / z6 + ;
-REAL z8 := maxh 10.0 / z7 + ;
-REAL z9 := maxh 10.0 / z8 + ;
-REAL z10 := maxh 10.0 / z9 + ;
+REAL z1 := maxh 30.0 / ;
+REAL z2 := maxh 30.0 / z1 + ;
+REAL z3 := maxh 30.0 / z2 + ;
+REAL z4 := maxh 30.0 / z3 + ;
+REAL z5 := maxh 30.0 / z4 + ;
+REAL z6 := maxh 30.0 / z5 + ;
+REAL z7 := maxh 30.0 / z6 + ;
+REAL z8 := maxh 30.0 / z7 + ;
+REAL z9 := maxh 30.0 / z8 + ;
+REAL z10 := maxh 30.0 / z9 + ;
+REAL z11 := maxh 30.0 / z10 + ;
+REAL z12 := maxh 30.0 / z11 + ;
+REAL z13 := maxh 30.0 / z12 + ;
+REAL z14 := maxh 30.0 / z13 + ;
+REAL z15 := maxh 30.0 / z14 + ;
+REAL z16 := maxh 30.0 / z15 + ;
+REAL z17 := maxh 30.0 / z16 + ;
+REAL z18 := maxh 30.0 / z17 + ;
+REAL z19 := maxh 30.0 / z18 + ;
+REAL z20 := maxh 30.0 / z19 + ;
+REAL z21 := maxh 30.0 / z20 + ;
+REAL z22 := maxh 30.0 / z21 + ;
+REAL z23 := maxh 30.0 / z22 + ;
+REAL z24 := maxh 30.0 / z23 + ;
+REAL z25 := maxh 30.0 / z24 + ;
+REAL z26 := maxh 30.0 / z25 + ;
+REAL z27 := maxh 30.0 / z26 + ;
+REAL z28 := maxh 30.0 / z27 + ;
+REAL z29 := maxh 30.0 / z28 + ;
+REAL z30 := maxh 30.0 / z29 + ;
 
 REAL Cote      := 1.404  ;
-Geom := GEO: :: CAR3D 1 1 10
+Geom := GEO: :: CAR3D 1 1 30
    X- REFL X+ REFL    Y- REFL Y+ REFL    Z- REFL Z+ REFL
    MESHX 0.0 <<Cote>>
    MESHY 0.0 <<Cote>>
    MESHZ 0.0 <<z1>> <<z2>> <<z3>> <<z4>> <<z5>> <<z6>> <<z7>> <<z8>>
-         <<z9>> <<z10>>
+         <<z9>> <<z10>> <<z11>> <<z12>> <<z13>> <<z14>> <<z15>> <<z16>> <<z17>> 
+         <<z18>> <<z19>> <<z20>> <<z21>> <<z22>> <<z23>> <<z24>> <<z25>> <<z26>> 
+         <<z27>> <<z28>> <<z29>> <<z30>>
    MIX
    PLANE 1
       1
@@ -71,6 +93,26 @@ Geom := GEO: :: CAR3D 1 1 10
    PLANE 8  SAME 1
    PLANE 9  SAME 1
    PLANE 10 SAME 1
+   PLANE 11  SAME 1
+   PLANE 12  SAME 1
+   PLANE 13  SAME 1
+   PLANE 14  SAME 1
+   PLANE 15  SAME 1
+   PLANE 16  SAME 1
+   PLANE 17  SAME 1
+   PLANE 18  SAME 1
+   PLANE 19  SAME 1
+   PLANE 20  SAME 1
+   PLANE 21  SAME 1
+   PLANE 22  SAME 1
+   PLANE 23  SAME 1
+   PLANE 24  SAME 1
+   PLANE 25  SAME 1
+   PLANE 26  SAME 1
+   PLANE 27  SAME 1
+   PLANE 28  SAME 1
+   PLANE 29  SAME 1
+   PLANE 30  SAME 1
 ;
 
 Geom Matex := USPLIT: Geom :: NGRP 2 MAXR <<MaxR>>
@@ -84,13 +126,15 @@ Track := TRIVAT: Geom ::
 * Fuel map definition
 *--
 Fmap Matex := RESINI: Matex ::
-      ::: GEO: CAR3D 1 1 10
+      ::: GEO: CAR3D 1 1 30
                 EDIT  0
                 X- REFL X+ REFL    Y- REFL Y+ REFL    Z- REFL Z+ REFL
    MESHX 0.0 <<Cote>>
    MESHY 0.0 <<Cote>>
    MESHZ 0.0 <<z1>> <<z2>> <<z3>> <<z4>> <<z5>> <<z6>> <<z7>> <<z8>>
-         <<z9>> <<z10>>
+         <<z9>> <<z10>><<z11>> <<z12>> <<z13>> <<z14>> <<z15>> <<z16>> <<z17>> 
+         <<z18>> <<z19>> <<z20>> <<z21>> <<z22>> <<z23>> <<z24>> <<z25>> <<z26>> 
+         <<z27>> <<z28>> <<z29>> <<z30>>
    MIX
    PLANE 1
       1
@@ -103,6 +147,26 @@ Fmap Matex := RESINI: Matex ::
    PLANE 8  SAME 1
    PLANE 9  SAME 1
    PLANE 10 SAME 1
+   PLANE 11  SAME 1
+   PLANE 12  SAME 1
+   PLANE 13  SAME 1
+   PLANE 14  SAME 1
+   PLANE 15  SAME 1
+   PLANE 16  SAME 1
+   PLANE 17  SAME 1
+   PLANE 18  SAME 1
+   PLANE 19  SAME 1
+   PLANE 20  SAME 1
+   PLANE 21  SAME 1
+   PLANE 22  SAME 1
+   PLANE 23  SAME 1
+   PLANE 24  SAME 1
+   PLANE 25  SAME 1
+   PLANE 26  SAME 1
+   PLANE 27  SAME 1
+   PLANE 28  SAME 1
+   PLANE 29  SAME 1
+   PLANE 30  SAME 1
 ;
 !
 NXNAME '01' NYNAME  'A'
@@ -117,6 +181,8 @@ ADD-PARAM PNAME 'P-COOL' PARKEY 'PCA' GLOBAL
 BTYPE INST-BURN
 INST-BVAL CHAN 0.0
 REACTOR-POW <<powi>> AXIAL-PFORM 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
 SET-PARAM 'T-FUEL' <<Tfuel>>
 SET-PARAM 'T-COOL' <<Tcool>>
 SET-PARAM 'D-FUEL' <<Dfuel>>

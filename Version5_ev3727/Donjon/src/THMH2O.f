@@ -81,7 +81,7 @@
 *----
       SAVE DHSUB,DSAT,W
       DATA W /0.347855,0.652145,0.652145,0.347855/
-      CORREL = 'MODBESTION'
+      CORREL = 'HEM1'
 *----
 *  COMPUTE THE PROPERTIES OF THE SATURATED STEAM
 *----
@@ -232,6 +232,16 @@
         CALL THMDFM(PINLET,VCOOL,HMAVG,HD,TL,TSAT,CORREL,EPS,XFL,
      >  RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
         ENDIF
+        PRINT *, 'THMH2O: THMDFM called'
+        PRINT *, 'C0=', C0
+        PRINT *, 'HLV=', HLV
+        PRINT *, 'EPS=', EPS
+        PRINT *, 'XFL=', XFL
+        PRINT *, 'RHOL=', RHOL
+        PRINT *, 'RHOG=', RHOG
+        PRINT *, 'RHO=', RHO
+        PRINT *, 'VGJ=', VGJ
+        PRINT *, 'VGJprime=', VGJprime
         TCALO=EPS*TSAT+(1.0-EPS)*TL
         ZKONE=ZKL
         CPONE=CPL
