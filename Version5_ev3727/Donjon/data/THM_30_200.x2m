@@ -25,7 +25,7 @@ REAL   Tfuel := 900.0 ; (*fuel temperature (K)*)
 REAL   Tcool := 550.0 ; (*coolant temperature (K)*)
 REAL   Dfuel := 9.7413951 ; (*fuel density (g/cc)*)
 REAL   dens_mod_0 := 0.65 ;
-REAL   powi := 0.16 ;
+REAL   powi := 0.12 ;
 ECHO "total reactor power=" powi "MW" ;
 *----
 *  Recover the Multicompo

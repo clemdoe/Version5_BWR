@@ -311,29 +311,40 @@
           POINT=(1.0+XS(I1))/2.0
           ENT(I1)=HMSUP+POINT*DELTH1
         ENDDO
-        HMSUP=HMSUP+DELTH1
+        !HMSUP=HMSUP+DELTH1
 !MARIE: regrouper les deux cellules en une seule ? 
 *---- 
 *  COMPUTE THE ENTHALPY VALUE WITH ENERGY CONSERVATION EQUATION
 *----
       IF (K.GT.1) THEN
       DELTA = (PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)
+      PRINT *, 'DELTA = ', DELTA
       DELTA = DELTA + ((VCOOL(K-1) + EPS(K-1)*(DLCOOL(K-1)-
      >      DGCOOl(K-1))/DCOOL(K-1)*VGJprime(K-1))
      >      + (VCOOL(K) + EPS(K)*(DLCOOL(K)-DGCOOl(K))/
      >      DCOOL(K)*VGJprime(K)))/2*(PCOOL(K-1)-PCOOL(K))
+      PRINT *, 'DELTA = ', DELTA
       DELTA = DELTA +(EPS(K-1)*DGCOOL(K-1)*(DLCOOL(K-1)/
      >      DCOOL(K-1))*HLV(K-1)*VGJprime(K-1))-(EPS(K)*DGCOOL(K)*
      >      (DLCOOL(K)/DCOOL(K))*HLV(K)*VGJprime(K))
-      !HMSUP = (HMSUP*(DCOOL(K-1)*VCOOL(K-1))+DELTA )/(VCOOL(K)*DCOOL(K))                                                      
+      PRINT *, 'DELTA = ', DELTA
+      PRINT *, 'DELTH1 = ', DELTH1
+      HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K)) 
+     > + DELTA /MFLOW
+      PRINT *, 'MFLOW= ', MFLOW
+      PRINT *, 'RHO V=', VCOOL(K)*DCOOL(K)   
+      PRINT *, 'VGJprime = ', VGJprime(K)                                                 
       ENDIF
-       
+      HCOOL(K)=HMSUP
+      ENDDO 
        
 
 *----
 *  COMPUTE THE VALUE OF THE DENSITY AND THE CLAD-COOLANT HEAT TRANSFER
 *  COEFFICIENT
 *----
+      DO K=1,NZ
+        HMSUP=HCOOL(K)
         IF (K.GT.1) THEN
           XFL(K)=XFL(K-1)
           EPS(K)=EPS(K-1)
@@ -385,7 +396,7 @@
         DCOOL(K)=RHO
         DLCOOL(K)=RHOL
         DGCOOL(K)=RHOG
-        HCOOL(K)=HMSUP
+        !HCOOL(K)=HMSUP
         !PCOOL(K)=PINLET
         PC(K)=PINLET
         TP(K)=TCLAD(K)
@@ -465,6 +476,7 @@
       PRINT *, 'XFL:', XFL
       PRINT *, 'TSAT:', TBUL
       PRINT *, 'MUT:', MUT
+      PRINT *, 'HCOOL:', HCOOL
 *----
 *  PRINT THE OUTLET THERMOHYDRAULICAL PARAMETERS
 *----
