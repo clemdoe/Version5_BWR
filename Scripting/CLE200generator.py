@@ -35,7 +35,7 @@ REAL        Mass := 6.464E-3 ; ! kg
 *----
 STRING Dir := "EDI2B" ;
 REAL   Tfuel := 900.0 ; (*fuel temperature (K)*)
-REAL   Tcool := 500.0 ; (*coolant temperature (K)*)
+REAL   Tcool := 550.0 ; (*coolant temperature (K)*)
 REAL   Dfuel := 9.7413951 ; (*fuel density (g/cc)*)
 REAL   dens_mod_0 := 0.65 ;
 REAL   powi := 0.0591122 ;
@@ -156,7 +156,7 @@ Thm Fmap := THM: Fmap ::
     EDIT 100
     FLUID H2O
     FPUISS 1.0
-    INLET 10.8E6 (*Pa*) 500.0 (*K*)
+    INLET 10.8E6 (*Pa*) 550.0 (*K*)
     INLET-Q 2.1268E-5 (*m2*) 0.148880 (*inlet mass flow rate kg/s*)
     ASSMB 1 0
     RADIUS 5.6E-3 6.14E-3 6.52E-3 7.02E-3 (* m *)
@@ -164,7 +164,8 @@ Thm Fmap := THM: Fmap ::
     HGAP 10000.0
     CONDC 0 10.0 KELVIN
     CONDF 0 5.0 KELVIN
-    MONO
+    BOWR
+    PDROP 1
 ;
 
 *--
@@ -228,7 +229,7 @@ echo "pincell_mphy_thm access script terminated"
     return script
 # Exemple d'utilisation
 num_volumes = int(input("Combien de volume de contrôle il faut ?"))  # Nombre de volumes de contrôle
-total_height = 155.5  # Hauteur totale en cm
+total_height = 200   # Hauteur totale en cm
 
 # Générer le script CLE-2000
 cle2000_script = generate_cle2000_script(num_volumes, total_height)
