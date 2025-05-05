@@ -113,7 +113,7 @@
      > HD,PCH,RAD(NDTOT-1,NZ),ERMAXT,SPEED,TINLET,PINLET,FRACPU,
      > KCONDF(NCONDF+3),KCONDC(NCONDC+1),KHGAP,KHCONV,WTEFF,FRO(NFD-1),
      > POW(NZ),TCOMB(NZ),TCOOL(NZ),TSURF(NZ),HCOOL(NZ),
-     > PCOOL(NZ),MUT(NZ),VCOOL(NZ),DCOOL(NZ), DGCOOL(NZ), 
+     > PCOOL(NZ),MUT(NZ),VCOOL(NZ),DCOOL(NZ), DGCOOL(NZ), XTEMP(NZ),
      > DLCOOL(NZ),TCENT(NZ),VGJprime(NZ),HLV(NZ),PTEMP(NZ),VTEMP(NZ)
       CHARACTER UCONDF*12,UCONDC*12
 *----
@@ -121,7 +121,7 @@
 *----
       TYPE(tpdata) STP,FTP
       PARAMETER (KMAXO=100,MAXNPO=40)
-      REAL TRE11(MAXNPO),RADD(MAXNPO),ENT(4),MFLOW,TLC(NZ)
+      REAL TRE11(MAXNPO),RADD(MAXNPO),ENT(4),MFLOW,TLC(NZ),DELTA
       CHARACTER HSMG*131,SNAME*32,SCOMP*32,FNAME*32,FCOMP*32
       REAL XS(4),TC1,PC(NZ),TP(NZ),RHOL,XFL(NZ),EPS(NZ),HINLET,
      > TCLAD(NZ),ENTH(NZ),SLIP(NZ),AGM(NZ),QFUEL(NZ),QCOOL(NZ),K11
@@ -133,6 +133,8 @@
 
       INTEGER I
       REAL ERRV, ERRP
+      REAL, DIMENSION(4, NZ) :: ENTLIST
+
 *----
 *  ALLOCATABLE ARRAYS
 *----
@@ -229,7 +231,7 @@
         ENDIF
       ENDDO
 *----
-*  MAIN LOOP ALONG THE 1D CHANNEL.
+*  MAIN LOOP ALONG THE 1D CHANNEL
 *----
       IF (IPRES .EQ. 0) GOTO 30
 
@@ -254,9 +256,11 @@
 
           PTEMP = PCOOL
           VTEMP = VCOOL
+          XTEMP = XFL
           CALL THMPV(SPEED, PINLET, VCOOL, DCOOL, 
      >              PCOOL, MUT, XFL, HD, NZ,
      >              HZ, EPS, DLCOOL,DGCOOL, VGJprime)
+          PRINT*, 'THMPV DCOOL = ', DCOOL
    30 CONTINUE
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
@@ -280,9 +284,11 @@
 *       volumic power in W/m^3
         QFUEL(K)=POW(K)*FFUEL/DV
         QCOOL(K)=POW(K)*FCOOL/DV
+      ENDDO
 *----
 *  INITIALIZATION OF PINCELL TEMPERATURES
 *----
+      DO K=1,NZ
         IF(POW(K).EQ.0.0) CYCLE
         IF(IMPX.GT.4) WRITE(6,190) K
         DO L=1,NDTOT
@@ -302,54 +308,54 @@
      >    PHI2,CFLUX 
           CALL XABORT(HSMG)
         ENDIF
+      ENDDO
 *----
 *  COMPUTE FOUR VALUES OF ENTHALPY IN J/KG TO BE USED IN GAUSSIAN
 *  INTEGRATION. DELTH1 IS THE ENTHALPY INCREASE IN EACH AXIAL MESH.
 *----
+      DO K=1,NZ
+        HMSUPold=HMSUP
         DELTH1=(PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)/MFLOW
-        DO I1=1,4
-          POINT=(1.0+XS(I1))/2.0
-          ENT(I1)=HMSUP+POINT*DELTH1
-        ENDDO
-        !HMSUP=HMSUP+DELTH1
-!MARIE: regrouper les deux cellules en une seule ? 
-*---- 
-*  COMPUTE THE ENTHALPY VALUE WITH ENERGY CONSERVATION EQUATION
-*----
-      IF (K.GT.1) THEN
-      DELTA = (PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)
-      PRINT *, 'DELTA = ', DELTA
-      DELTA = DELTA + ((VCOOL(K-1) + EPS(K-1)*(DLCOOL(K-1)-
+        DELTA = (PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)
+
+        IF (K.GT.1) THEN
+          DELTA = DELTA + ((VCOOL(K-1) + EPS(K-1)*(DLCOOL(K-1)-
      >      DGCOOl(K-1))/DCOOL(K-1)*VGJprime(K-1))
      >      + (VCOOL(K) + EPS(K)*(DLCOOL(K)-DGCOOl(K))/
      >      DCOOL(K)*VGJprime(K)))/2*(PCOOL(K-1)-PCOOL(K))
-      PRINT *, 'DELTA = ', DELTA
-      DELTA = DELTA +(EPS(K-1)*DGCOOL(K-1)*(DLCOOL(K-1)/
+          DELTA = DELTA +(EPS(K-1)*DGCOOL(K-1)*(DLCOOL(K-1)/
      >      DCOOL(K-1))*HLV(K-1)*VGJprime(K-1))-(EPS(K)*DGCOOL(K)*
      >      (DLCOOL(K)/DCOOL(K))*HLV(K)*VGJprime(K))
-      PRINT *, 'DELTA = ', DELTA
-      PRINT *, 'DELTH1 = ', DELTH1
-      HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K)) 
-     > + DELTA /MFLOW
-      PRINT *, 'MFLOW= ', MFLOW
-      PRINT *, 'RHO V=', VCOOL(K)*DCOOL(K)   
-      PRINT *, 'VGJprime = ', VGJprime(K)                                                 
-      ENDIF
-      HCOOL(K)=HMSUP
-      ENDDO 
-       
-
+        ENDIF
+        DELTA = DELTA/MFLOW
+        IF (K.GT.1) THEN
+          HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K))
+        ENDIF
+        HMSUP = HMSUP + DELTA
+        DO I1=1,4
+          POINT=(1.0+XS(I1))/2.0
+          ENT(I1)=HMSUPold+POINT*(HMSUP - HMSUPold)
+          PRINT *, 'ENT(I1)', ENT(I1)
+        ENDDO
+        ENTLIST(1:4, K) = ENT(1:4)
+        PRINT *, 'ENTLIST(1:4, K)', ENTLIST(1:4, K)
+        !HMSUP=HMSUP+DELTH1
+        HCOOL(K)=HMSUP
+      ENDDO
 *----
-*  COMPUTE THE VALUE OF THE DENSITY AND THE CLAD-COOLANT HEAT TRANSFER
-*  COEFFICIENT
+*  COMPUTE THE VALUE OF THE DENSITY
+*  AND THE CLAD-COOLANT HEAT TRANSFER COEFFICIENT
 *----
       DO K=1,NZ
         HMSUP=HCOOL(K)
+        ENT(:) =ENTLIST(1:4, K)
+        PRINT *, 'XFL AVANT = ', XFL(K)
         IF (K.GT.1) THEN
           XFL(K)=XFL(K-1)
           EPS(K)=EPS(K-1)
           SLIP(K)=SLIP(K-1)
         ENDIF
+        PRINT *, 'XFL APRES = ', XFL(K)   
 *CGT
         IF ((IFLUID.EQ.0).OR.(IFLUID.EQ.1)) THEN
           CALL THMH2O(0,IX,IY,K,K0,PCOOL(K),MFLOW,HMSUP,ENT,HD,
@@ -357,13 +363,14 @@
      >    PHI2,XFL(K),EPS(K),SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,RHOL,
      >    RHOG,TRE11(NDTOT),KWA(K),VGJprime(K), HLV(K))
 
-
         ELSEIF (IFLUID.EQ.2) THEN
           CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,STP,
      >    IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),
      >    EPS(K),SLIP(K),HZ(K),TCALO,RHO,RHOL,TRE11(NDTOT),
      >    KWA(K))
         ENDIF
+        
+
 *CGT
 *----
 *  STEADY-STATE SOLUTION OF THE CONDUCTION EQUATIONS IN A FUEL PIN.
@@ -390,12 +397,12 @@
 *----  
         TCOMB(K)=(1.0-WTEFF)*TC1+WTEFF*TRE11(NFD)
         TCENT(K)=TC1
-        TSURF(K)=TRE11(NFD)
-        TCLAD(K)=TRE11(NDTOT)
         TCOOL(K)=TCALO
         DCOOL(K)=RHO
         DLCOOL(K)=RHOL
         DGCOOL(K)=RHOG
+        TSURF(K)=TRE11(NFD)
+        TCLAD(K)=TRE11(NDTOT) 
         !HCOOL(K)=HMSUP
         !PCOOL(K)=PINLET
         PC(K)=PINLET
@@ -407,6 +414,7 @@
           TEMPT(K2,K)=TRE11(K2)
         ENDDO
         IF (IPRES .EQ. 0) THEN
+          PRINT *, 'IPRES.EQ.0'
           PCOOL(K)=PINLET
           VCOOL(K)=MFLOW/DCOOL(K)
         ENDIF
@@ -455,7 +463,7 @@
       ENDDO
       ERRV = ERRV/NZ
       ERRP = ERRP/NZ
-      GO TO 10
+      GOTO 10
 
    20 CONTINUE
 

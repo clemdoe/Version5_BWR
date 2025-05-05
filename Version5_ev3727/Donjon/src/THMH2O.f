@@ -81,7 +81,7 @@
 *----
       SAVE DHSUB,DSAT,W
       DATA W /0.347855,0.652145,0.652145,0.347855/
-      CORREL = 'HEM1'
+      CORREL = 'CHEXAL'
 *----
 *  COMPUTE THE PROPERTIES OF THE SATURATED STEAM
 *----
@@ -182,7 +182,6 @@
 *  parameter CO and the drift velocity VGJ (their correspondent 
 *  correlations are supposed to work fine under different flow regimes.
 *----
-          VGJ=0
           IF(HGSAT.GT.HLSAT) THEN
             CO=1.13
             PR=PINLET/10**6
@@ -211,6 +210,7 @@
 *  PRL: Prandtl number of liquid phase
 *----
       IF(XFL.EQ.0.0) THEN
+        PRINT *, 'THMH2O: XFL=0.0'
 *       One phase liquid
         TB=TSAT-0.1
         IF(TL.LT.TB) THEN
@@ -239,13 +239,13 @@
         PRINT *, 'XFL=', XFL
         PRINT *, 'RHOL=', RHOL
         PRINT *, 'RHOG=', RHOG
-        PRINT *, 'RHO=', RHO
         PRINT *, 'VGJ=', VGJ
         PRINT *, 'VGJprime=', VGJprime
         TCALO=EPS*TSAT+(1.0-EPS)*TL
         ZKONE=ZKL
         CPONE=CPL
-        RHO=EPS*RHOG+(1.0-EPS)*RHOL
+        RHO=EPS*RHOG+(1.0-EPS)*RHOL 
+        PRINT *, 'RHO=', RHO
         REL=MFLOW*(1.0-XFL)*HD/ZMUL
         PRL=ZMUL*CPL/ZKL
         JL=(1.0-XFL)*MFLOW/RHOL
@@ -254,6 +254,7 @@
         SLIP=JG*(1.0-EPS)/(JL*EPS) 
         ENDIF
       ELSE
+      PRINT *, 'THMH2O: SUPERHEATED STEAM'
 *       superheated steam
         RHO=RHOG
         REL=MFLOW*HD/ZMUG
