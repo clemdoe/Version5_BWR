@@ -260,7 +260,8 @@
           CALL THMPV(SPEED, PINLET, VCOOL, DCOOL, 
      >              PCOOL, MUT, XFL, HD, NZ,
      >              HZ, EPS, DLCOOL,DGCOOL, VGJprime)
-          PRINT*, 'THMPV DCOOL = ', DCOOL
+          PRINT *, 'THMPV DCOOL = ', DCOOL
+          PRINT *, 'THMPV PCOOL = ', PCOOL
    30 CONTINUE
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
