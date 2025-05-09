@@ -229,7 +229,7 @@ echo "pincell_mphy_thm access script terminated"
     return script
 # Exemple d'utilisation
 num_volumes = int(input("Combien de volume de contrôle il faut ?"))  # Nombre de volumes de contrôle
-total_height = 200   # Hauteur totale en cm
+total_height = 155  # Hauteur totale en cm
 
 # Générer le script CLE-2000
 cle2000_script = generate_cle2000_script(num_volumes, total_height)

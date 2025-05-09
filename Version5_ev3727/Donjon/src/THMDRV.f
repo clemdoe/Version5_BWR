@@ -254,7 +254,7 @@
         PRINT *, 'I = ', I
         PRINT *, 'ERRV = ', ERRV
         PRINT *, 'ERRP = ', ERRP
-        IF ((ERRP < 1E-3) .AND.(ERRV < 1E-3) .AND. (I .GT. 10)) GOTO 20
+        IF ((ERRP < 1E-3) .AND.(ERRV < 1E-3) .AND. (I .GT. 3)) GOTO 20
 
           I = I + 1
 
