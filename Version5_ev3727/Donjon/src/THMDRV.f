@@ -233,6 +233,7 @@
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL
 *----
+      PRINT *, 'IPRES', IPRES
       IF (IPRES .EQ. 0) GOTO 30
 
       ERRV = 1.0
@@ -250,7 +251,10 @@
 *  CHECK FOR CONVERGENCE
 *----
         IF (I .GT. 1000) GOTO 20
-        IF ((ERRP < 1E-3) .AND. (ERRV < 1E-3)) GOTO 20
+        PRINT *, 'I = ', I
+        PRINT *, 'ERRV = ', ERRV
+        PRINT *, 'ERRP = ', ERRP
+        IF ((ERRP < 1E-3) .AND.(ERRV < 1E-3) .AND. (I .GT. 10)) GOTO 20
 
           I = I + 1
 
@@ -455,6 +459,7 @@
 * IF THE PRESSURE DROP IS COMPUTED, COMPUTE THE 
 * THE PRESSURE AND VELOCITY RESIDUALS
 *----
+      PRINT *, 'IPRES', IPRES
       IF (IPRES .EQ. 0) GOTO 20
       ERRV = 0
       ERRP = 0
@@ -465,7 +470,7 @@
       ERRV = ERRV/NZ
       ERRP = ERRP/NZ
       GOTO 10
-
+* Ne rien écrire ici
    20 CONTINUE
 
       IF (I == 1000) THEN

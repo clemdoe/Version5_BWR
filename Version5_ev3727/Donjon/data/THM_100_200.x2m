@@ -429,7 +429,7 @@ Thm Fmap := THM: Fmap ::
     FLUID H2O
     FPUISS 1.0
     INLET 7.2E6 (*Pa*) 543.15 (*K*)
-    INLET-Q 2.1268E-5 (*m2*) 0.08407 (*inlet mass flow rate kg/s*)
+    INLET-Q 6.3571E-5 (*m2*) 0.08407 (*inlet mass flow rate kg/s*)
     ASSMB 1 0
     RADIUS 4.435E-3 4.516E-3 6.52E-3 6.52E-3 (* m *)
     RODMESH 8 11
