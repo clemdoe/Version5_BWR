@@ -94,7 +94,7 @@ ELSE IF (CORREL.EQ.'EPRI') THEN
     k0 = k1 + (1-k1) * (RHOG / RHOL)**2
     r = (1+1.57*(RHOG/RHOL))/(1-k1)
     IF (EPS.GT.0) THEN
-        C0 = (k0 + (1 - k0)*(EPS**r)*(1 - exp((-1)*C1))/(1 - exp((-1)*C1 * EPS)))**(-1)
+        C0 = (k0 + (1 - k0)*(EPS**r)*exp((-1)*C1*(1-EPS))*(sinh(C1/2)/sinh(C1/2*EPS)))**(-1)
     ENDIF
 
 ELSE IF (CORREL.EQ.'MODBESTION') THEN
