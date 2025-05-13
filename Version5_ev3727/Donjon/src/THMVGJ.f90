@@ -1,4 +1,4 @@
-SUBROUTINE THMVGJ(VCOOL, DCOOL, PCOOL, MUT, XFL, HD, RHOG, RHOL, EPS, CORREL, VGJ, C0)
+SUBROUTINE THMVGJ(VCOOL, DCOOL, PCOOL, MUT, XFL, HD, RHOG, RHOL, EPS, IDFM, VGJ, C0)
 !
 !-----------------------------------------------------------------------
 !
@@ -23,7 +23,8 @@ SUBROUTINE THMVGJ(VCOOL, DCOOL, PCOOL, MUT, XFL, HD, RHOG, RHOL, EPS, CORREL, VG
 ! RHOG    density of the vapour in given thermohydraulic conditions
 ! RHOL    density of the liquid in given thermohydraulic conditions
 ! ESP     void fraction of the fluid
-! CORREL  correlation used to compute VGJ and C0
+! IDFM    flag indicating if the drift flux model is to be used 
+!         (0=HEM1(no drift velocity)/1=EPRI/2=MODEBSTION/3=GERAMP/4=CHEXAL) 
 !
 !Parameters: output
 ! VGJ     drift velocity
@@ -38,7 +39,7 @@ SUBROUTINE THMVGJ(VCOOL, DCOOL, PCOOL, MUT, XFL, HD, RHOG, RHOL, EPS, CORREL, VG
 !----
     REAL VCOOL, DCOOL, PCOOL, MUT, XFL, HD 
     REAL EPS, RHOG, RHOL
-    CHARACTER CORREL*10
+    INTEGER IDFM
 !----
 !   LOCAL VARIABLES
 !----
@@ -62,17 +63,21 @@ IF (RHOG.EQ.0) THEN
 ELSE IF (RHOL.EQ.0) THEN
     C0=0
     VGJ=0
-ELSE IF (CORREL.EQ.'HEM1') THEN
+
+ELSE IF (IDFM.EQ.0) THEN
+!HEM1 correlation (no drift velocity)
     VGJ = 0
     C0 = 1
     
-ELSE IF (CORREL.EQ.'CHEXAL') THEN
+ELSE IF (IDFM.EQ.4) THEN
+! Chexal correlation
 ! Correlation used in previous codes, after the work of Sarra Zoghlami for CANDU reactors
     C0=1.13
     VGJ=1.18*((SIGM*9.81*(RHOL-RHOG))/(RHOL**2))**0.25
     
 
-ELSE IF (CORREL.EQ.'GERAMP') THEN
+ELSE IF (IDFM.EQ.3) THEN
+! GEramp correlation 
     IF (SIGM.EQ.0) THEN
         VGJ = 0
     ELSE 
@@ -86,7 +91,8 @@ ELSE IF (CORREL.EQ.'GERAMP') THEN
         ENDIF
     ENDIF
 
-ELSE IF (CORREL.EQ.'EPRI') THEN
+ELSE IF (IDFM.EQ.1) THEN
+! EPRI correlation
     VGJ= ((2**0.5)*g*SIGM*(RHOL-RHOG)/(RHOL**2))**0.25 * ((1+EPS)**1.5)
     PC = 22060000
     C1 = (4 * (PC**2))/(PCOOL*(PC - PCOOL))
@@ -97,14 +103,11 @@ ELSE IF (CORREL.EQ.'EPRI') THEN
         C0 = (k0 + (1 - k0)*(EPS**r)*exp((-1)*C1*(1-EPS))*(sinh(C1/2)/sinh(C1/2*EPS)))**(-1)
     ENDIF
 
-ELSE IF (CORREL.EQ.'MODBESTION') THEN
+ELSE IF (IDFM.EQ.2) THEN
+! Modfified Bestion Correlation
     VGJ =  0.188 * (((RHOL - RHOG) * g * HD ) / RHOG )*0.5
     C0 = 1.2 - 0.2*(RHOG/RHOL)**0.5
 
-ELSE 
-    PRINT *, 'Unknown correlation model, HEM1 used by default'
-    VGJ = 0
-    C0 = 1
 ENDIF
 RETURN
 END

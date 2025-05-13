@@ -1,7 +1,7 @@
 *DECK THMH2O
       SUBROUTINE THMH2O(ITIME,I,J,K,K0,PINLET,MFLOW,HMAVG,ENT,HD,IFLUID,
-     > IHCONV,KHCONV,ISUBM,RADCL,ZF,VCOOL,PHI,XFL,EPS,SLIP,ACOOL,PCH,DZ,
-     > TCALO,RHO,RHOLAV,RHOG,TSCLAD,KWA,VGJprime,HLV)
+     > IHCONV,KHCONV,ISUBM,RADCL,ZF,VCOOL,IDFM,PHI,XFL,EPS,SLIP,ACOOL,
+     > PCH,DZ,TCALO,RHO,RHOLAV,RHOG,TSCLAD,KWA,VGJprime,HLV)
 *
 *-----------------------------------------------------------------------
 *
@@ -43,6 +43,8 @@
 * PCH     heating perimeter in m.
 * DZ      axial mesh width in m.
 * VCOOL   local coolant velocity
+* IDFM    flag indicating if the drift flux model is to be used 
+*         (0=HEM1(no drift velocity)/1=EPRI/2=MODEBSTION/3=GERAMP/4=CHEXAL) 
 *
 *Parameters: output
 * PHI     heat flow exchanged between clad and fluid in W/m^2.
@@ -66,10 +68,9 @@
 *----
 *  SUBROUTINE ARGUMENTS
 *----
-      INTEGER I,J,K,K0,IFLUID,IHCONV,ISUBM,KWA
+      INTEGER I,J,K,K0,IFLUID,IHCONV,ISUBM,KWA,IDFM
       REAL PINLET,MFLOW,HMAVG,ENT(4),HD,KHCONV,RADCL,ZF(2),PHI,TCALO,
      > RHO,RHOLAV,TSCLAD,XFL,EPS,SLIP,ACOOL,PCH,DZ,VCOOL,VGJprime
-      CHARACTER CORREL*10
 *----
 *  LOCAL VARIABLES
 *----
@@ -81,7 +82,6 @@
 *----
       SAVE DHSUB,DSAT,W
       DATA W /0.347855,0.652145,0.652145,0.347855/
-      CORREL = 'HEM1'
 *----
 *  COMPUTE THE PROPERTIES OF THE SATURATED STEAM
 *----
@@ -210,7 +210,6 @@
 *  PRL: Prandtl number of liquid phase
 *----
       IF(XFL.EQ.0.0) THEN
-        PRINT *, 'THMH2O: XFL=0.0'
 *       One phase liquid
         TB=TSAT-0.1
         IF(TL.LT.TB) THEN
@@ -229,23 +228,13 @@
       ELSE IF(HMAVG.LT.HGSAT) THEN
 *       Two-phase flow
         IF(IFLUID.EQ.0) THEN
-        CALL THMDFM(PINLET,VCOOL,HMAVG,HD,TL,TSAT,CORREL,EPS,XFL,
+        CALL THMDFM(PINLET,VCOOL,HMAVG,HD,TL,TSAT,IDFM,EPS,XFL,
      >  RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
         ENDIF
-        PRINT *, 'THMH2O: THMDFM called'
-        PRINT *, 'C0=', C0
-        PRINT *, 'HLV=', HLV
-        PRINT *, 'EPS=', EPS
-        PRINT *, 'XFL=', XFL
-        PRINT *, 'RHOL=', RHOL
-        PRINT *, 'RHOG=', RHOG
-        PRINT *, 'VGJ=', VGJ
-        PRINT *, 'VGJprime=', VGJprime
         TCALO=EPS*TSAT+(1.0-EPS)*TL
         ZKONE=ZKL
         CPONE=CPL
         RHO=EPS*RHOG+(1.0-EPS)*RHOL 
-        PRINT *, 'RHO=', RHO
         REL=MFLOW*(1.0-XFL)*HD/ZMUL
         PRL=ZMUL*CPL/ZKL
         JL=(1.0-XFL)*MFLOW/RHOL

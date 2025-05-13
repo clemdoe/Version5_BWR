@@ -4,8 +4,8 @@
      > FFUEL,ACOOL,HD,PCH,RAD,
      > MAXIT1,MAXITL,ERMAXT,SPEED,TINLET,PINLET,FRACPU,ICONDF,NCONDF,
      > KCONDF,UCONDF,ICONDC,NCONDC,KCONDC,UCONDC,IHGAP,KHGAP,IHCONV,
-     > KHCONV,WTEFF,IFRCDI,ISUBM,FRO,POW,IPRES,TCOMB,DCOOL,TCOOL,TSURF,
-     > HCOOL,PCOOL)
+     > KHCONV,WTEFF,IFRCDI,ISUBM,FRO,POW,IPRES,IDFM,TCOMB,DCOOL,TCOOL,
+     > TSURF,HCOOL,PCOOL)
 
 *-----------------------------------------------------------------------
 *
@@ -90,6 +90,8 @@
 * FCOMP   Composition of the molten salt (e.g. "0.66-0.34")
 * IPRES   flag indicating if pressure is to be computed (0=nonstant/
 *         1=variable).
+* IDFM    flag indicating if the drift flux model is to be used 
+*         (0=HEM1(no drift velocity)/1=EPRI/2=MODEBSTION/3=GERAMP/4=CHEXAL) 
 *
 * Parameters: output
 * TCOMB   averaged fuel temperature distribution in K.
@@ -108,7 +110,7 @@
 *----
       TYPE(C_PTR) MPTHM
       INTEGER IMPX,IX,IY,NZ,NFD,NDTOT,IFLUID,MAXIT1,MAXITL,IHGAP,IGAP,
-     > IFUEL,IPRES
+     > IFUEL,IPRES,IDFM
       REAL XBURN(NZ),VOLXY,HZ(NZ),CFLUX,POROS,FNFU,FCOOL,FFUEL,ACOOL,
      > HD,PCH,RAD(NDTOT-1,NZ),ERMAXT,SPEED,TINLET,PINLET,FRACPU,
      > KCONDF(NCONDF+3),KCONDC(NCONDC+1),KHGAP,KHCONV,WTEFF,FRO(NFD-1),
@@ -230,10 +232,11 @@
           ENDIF
         ENDIF
       ENDDO
+      HMSUP=HINLET
+      SPEED=MFLOW/DCOOL(1)
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL
 *----
-      PRINT *, 'IPRES', IPRES
       IF (IPRES .EQ. 0) GOTO 30
 
       ERRV = 1.0
@@ -251,9 +254,6 @@
 *  CHECK FOR CONVERGENCE
 *----
         IF (I .GT. 1000) GOTO 20
-        PRINT *, 'I = ', I
-        PRINT *, 'ERRV = ', ERRV
-        PRINT *, 'ERRP = ', ERRP
         IF ((ERRP < 1E-3) .AND.(ERRV < 1E-3) .AND. (I .GT. 3)) GOTO 20
 
           I = I + 1
@@ -264,8 +264,6 @@
           CALL THMPV(SPEED, PINLET, VCOOL, DCOOL, 
      >              PCOOL, MUT, XFL, HD, NZ,
      >              HZ, EPS, DLCOOL,DGCOOL, VGJprime)
-          PRINT *, 'THMPV DCOOL = ', DCOOL
-          PRINT *, 'THMPV PCOOL = ', PCOOL
    30 CONTINUE
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
@@ -333,14 +331,6 @@
      >      (DLCOOL(K)/DCOOL(K))*HLV(K)*VGJprime(K))
         ENDIF
         DELTA = DELTA/MFLOW
-        IF (IPRES .EQ. 0) THEN
-          HMSUP=HMSUP + DELTH1
-          DO I1=1,4
-            POINT=(1.0+XS(I1))/2.0
-            ENT(I1)=HMSUPold+POINT*(HMSUP - HMSUPold)
-            PRINT *, 'ENT(I1) IPRES 0', ENT(I1)
-          ENDDO
-        ELSE 
           IF (K.GT.1) THEN
             HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K))
           ENDIF
@@ -348,11 +338,8 @@
           DO I1=1,4
             POINT=(1.0+XS(I1))/2.0
             ENT(I1)=HMSUPold+POINT*(HMSUP - HMSUPold)
-            PRINT *, 'ENT(I1)', ENT(I1)
           ENDDO
-        ENDIF
         ENTLIST(1:4, K) = ENT(1:4)
-        PRINT *, 'ENTLIST(1:4, K)', ENTLIST(1:4, K)
         HCOOL(K)=HMSUP
       ENDDO
 *----
@@ -362,19 +349,17 @@
       DO K=1,NZ
         HMSUP=HCOOL(K)
         ENT(:) =ENTLIST(1:4, K)
-        PRINT *, 'XFL AVANT = ', XFL(K)
         IF (K.GT.1) THEN
           XFL(K)=XFL(K-1)
           EPS(K)=EPS(K-1)
           SLIP(K)=SLIP(K-1)
-        ENDIF
-        PRINT *, 'XFL APRES = ', XFL(K)   
+        ENDIF   
 *CGT
         IF ((IFLUID.EQ.0).OR.(IFLUID.EQ.1)) THEN
           CALL THMH2O(0,IX,IY,K,K0,PCOOL(K),MFLOW,HMSUP,ENT,HD,
      >    IFLUID,IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,VCOOL(K),
-     >    PHI2,XFL(K),EPS(K),SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,RHOL,
-     >    RHOG,TRE11(NDTOT),KWA(K),VGJprime(K), HLV(K))
+     >    IDFM,PHI2,XFL(K),EPS(K),SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,
+     >    RHOL,RHOG,TRE11(NDTOT),KWA(K),VGJprime(K), HLV(K))
 
         ELSEIF (IFLUID.EQ.2) THEN
           CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,STP,
@@ -427,7 +412,6 @@
           TEMPT(K2,K)=TRE11(K2)
         ENDDO
         IF (IPRES .EQ. 0) THEN
-          PRINT *, 'IPRES.EQ.0'
           PCOOL(K)=PINLET
           VCOOL(K)=MFLOW/DCOOL(K)
         ENDIF
@@ -467,7 +451,6 @@
 * IF THE PRESSURE DROP IS COMPUTED, COMPUTE THE 
 * THE PRESSURE AND VELOCITY RESIDUALS
 *----
-      PRINT *, 'IPRES', IPRES
       IF (IPRES .EQ. 0) GOTO 20
       ERRV = 0
       ERRP = 0

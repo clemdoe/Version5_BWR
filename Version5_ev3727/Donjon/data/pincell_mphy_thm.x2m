@@ -24,7 +24,7 @@ REAL   Tfuel := 318.20357 ; (*fuel temperature (K)*)
 REAL   Tcool := 318.15044 ; (*coolant temperature (K)*)
 REAL   Dfuel := 9.7413951 ; (*fuel density (g/cc)*)
 REAL   dens_mod_0 := 0.65 ;
-REAL   powi := Fuelpwr Mass * 1.E3 / 1.2 / ;
+REAL   powi := Fuelpwr Mass * 1.E3 / ;
 ECHO "total reactor power=" powi "MW" ;
 
 *----
@@ -168,8 +168,7 @@ Thm Fmap := THM: Fmap ::
     ASSMB 1 0
     RADIUS 4.55063E-3 4.60169E-3 5.00184E-3 5.00184E-3 (* m *)
     RODMESH 15 20
-    MONO 
-    PDROP 0
+    BOWR
 ;
 
 *--

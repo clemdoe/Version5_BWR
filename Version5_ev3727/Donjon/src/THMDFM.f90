@@ -1,5 +1,5 @@
 !DECK THMDFM
-      SUBROUTINE THMDFM(PCOOL,VCOOL,HMAVG,HD,TL,TSAT,CORREL,EPS,XFL,RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
+      SUBROUTINE THMDFM(PCOOL,VCOOL,HMAVG,HD,TL,TSAT,IDFM,EPS,XFL,RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
 !
 !-----------------------------------------------------------------------
 !
@@ -19,7 +19,8 @@
 ! HD      hydraulic diameter in m
 ! TL      liquid temperature in K
 ! TSAT    saturation temperature in K
-! CORREL  correlation model for the VGJ and C0 computation
+! IDFM    flag indicating if the drift flux model is to be used 
+!         (0=HEM1(no drift velocity)/1=EPRI/2=MODEBSTION/3=GERAMP/4=CHEXAL) 
 ! EPS     input coolant void fraction
 !
 !
@@ -38,8 +39,8 @@
 !----
 !  SUBROUTINE ARGUMENTS
 !----
-      CHARACTER CORREL*10
       REAL PCOOL,VCOOL,HMAVG,HD,TL,TSAT,EPS,XFL,RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV
+      INTEGER IDFM
 !----
 !  LOCAL VARIABLES
 !----
@@ -103,7 +104,7 @@
 !----
 !  COMPUTE VGJ, VGJprime AND C0 AFTER CHOSEN CORRELATION
 !----
-      CALL THMVGJ(VCOOL, RHO, PCOOL, ZMU, XFL, HD, RHOG, RHOL, EPS, CORREL, VGJ, C0)
+      CALL THMVGJ(VCOOL, RHO, PCOOL, ZMU, XFL, HD, RHOG, RHOL, EPS, IDFM, VGJ, C0)
       VGJprime = VGJ + (C0-1)*VCOOL
 
 !----
