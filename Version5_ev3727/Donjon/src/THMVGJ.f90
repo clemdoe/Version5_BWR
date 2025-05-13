@@ -102,7 +102,7 @@ ELSE IF (CORREL.EQ.'MODBESTION') THEN
     C0 = 1.2 - 0.2*(RHOG/RHOL)**0.5
 
 ELSE 
-    PRINT *, 'Unknow correlation model, HEM1 used by default'
+    PRINT *, 'Unknown correlation model, HEM1 used by default'
     VGJ = 0
     C0 = 1
 ENDIF

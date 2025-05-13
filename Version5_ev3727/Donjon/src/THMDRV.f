@@ -333,18 +333,26 @@
      >      (DLCOOL(K)/DCOOL(K))*HLV(K)*VGJprime(K))
         ENDIF
         DELTA = DELTA/MFLOW
-        IF (K.GT.1) THEN
-          HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K))
+        IF (IPRES .EQ. 0) THEN
+          HMSUP=HMSUP + DELTH1
+          DO I1=1,4
+            POINT=(1.0+XS(I1))/2.0
+            ENT(I1)=HMSUPold+POINT*(HMSUP - HMSUPold)
+            PRINT *, 'ENT(I1) IPRES 0', ENT(I1)
+          ENDDO
+        ELSE 
+          IF (K.GT.1) THEN
+            HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K))
+          ENDIF
+          HMSUP = HMSUP + DELTA
+          DO I1=1,4
+            POINT=(1.0+XS(I1))/2.0
+            ENT(I1)=HMSUPold+POINT*(HMSUP - HMSUPold)
+            PRINT *, 'ENT(I1)', ENT(I1)
+          ENDDO
         ENDIF
-        HMSUP = HMSUP + DELTA
-        DO I1=1,4
-          POINT=(1.0+XS(I1))/2.0
-          ENT(I1)=HMSUPold+POINT*(HMSUP - HMSUPold)
-          PRINT *, 'ENT(I1)', ENT(I1)
-        ENDDO
         ENTLIST(1:4, K) = ENT(1:4)
         PRINT *, 'ENTLIST(1:4, K)', ENTLIST(1:4, K)
-        !HMSUP=HMSUP+DELTH1
         HCOOL(K)=HMSUP
       ENDDO
 *----
