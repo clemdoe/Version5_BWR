@@ -1,47 +1,62 @@
-***********************************************************
-* Input file :  pincell_mphy_thm.x2m                      *
-*                                                         *
-* Test of a PWR single pincell                            *
-*                                                         *
-* The aim is to test the THM module of DONJON             *
-***********************************************************
+****************************************************************
+* CLE-2000 / DONJON script                                     *
+* Purpose : validaiton of the THM modul                        *
+* Author : A. Hebert adapted by Clément HUET                   *
+* Date : 13/05/2024                                            *
+* CALL      :                                                  *
+*  Fmap Matex Cpo Track := IniDONJON ;                         *
+*                                                              *
+****************************************************************
 PARAMETER  Fmap Matex Cpo Track THData ::
   ::: LINKED_LIST Fmap Matex Cpo Track THData ; ;
-STRING name_compo ;
-:: >>name_compo<< ;
 
-DOUBLE power ; 
-:: >>power<< ;
-DOUBLE height ; 
-:: >>height<< ;
-DOUBLE pitch ;
-:: >>pitch<< ; 
-DOUBLE fuelRadius ;
-:: >>fuelRadius<< ;
-DOUBLE gapRadius ;
-:: >>gapRadius<< ;
-DOUBLE cladRadius ;
-:: >>cladRadius<< ;
-DOUBLE tInlet ;
-:: >>tInlet<< ;
-DOUBLE pOutlet ;
-:: >>pOutlet<< ;
-DOUBLE massFlow ;
-:: >>massFlow<< ;
-DOUBLE area ;
-:: >>area<< ;
+DOUBLE Dpower ; 
+:: >>Dpower<< ;
+DOUBLE Dheight ; 
+:: >>Dheight<< ;
+DOUBLE Dpitch ;
+:: >>Dpitch<< ; 
+DOUBLE DfuelRadius ;
+:: >>DfuelRadius<< ;
+DOUBLE DgapRadius ;
+:: >>DgapRadius<< ;
+DOUBLE DcladRadius ;
+:: >>DcladRadius<< ;
+DOUBLE DtInlet ;
+:: >>DtInlet<< ;
+DOUBLE DpOutlet ;
+:: >>DpOutlet<< ;
+DOUBLE DmassFlow ;
+:: >>DmassFlow<< ;
+DOUBLE Darea ;
+:: >>Darea<< ;
 
-
-LINKED_LIST Geom Track Flux Cpo Matex Lib MicroF MacroF Macro2 Fmap
+LINKED_LIST Geom Flux Lib MicroF MacroF Macro2
             System Power Burnup Thm DONNEES ;
 MODULE      GEO: RESINI: TRIVAT: TRIVAA: GREP: FIND0: NCR: FLUD: FLPOW:
             MACINI: USPLIT: TINST: UTL: DELETE: ABORT: THM: END: ;
 
-PROCEDURE   assertS ;
 SEQ_ASCII   _ACompo ;
 INTEGER     maxstep := 67 ;
 REAL        Fuelpwr := 30.0796 ; ! W/g ou kW/kg ou MW/t
 REAL        Mass := 6.464E-3 ; ! kg
+
+REAL power := Dpower D_TO_R ;
+REAL height := Dheight D_TO_R ;
+REAL pitch := Dpitch D_TO_R ;
+REAL fuelRadius := DfuelRadius D_TO_R ;
+REAL cladRadius := DcladRadius D_TO_R ;
+REAL gapRadius := DgapRadius D_TO_R ;
+REAL tInlet := DtInlet D_TO_R ;
+REAL pOutlet := DpOutlet D_TO_R ;
+REAL massFlow := DmassFlow D_TO_R ;
+REAL area := Darea D_TO_R ;
+
+EVALUATE height := height 100.0 * ;
+EVALUATE pitch := pitch 100.0 * ;
+
+ECHO "pOutlet" pOutlet "Pa" ;
+ECHO "power" power "MW" ;
 
 *----
 *  Calculation options
@@ -96,7 +111,7 @@ REAL z28 := 186.66666666666663 ;
 REAL z29 := 193.3333333333333 ;
 REAL z30 := 199.99999999999994 ;
 
-REAL Cote      := pitch  ;
+REAL Cote      := pitch ;
 Geom := GEO: :: CAR3D 1 1 30
    X- REFL X+ REFL    Y- REFL Y+ REFL    Z- REFL Z+ REFL
    MESHX 0.0 <<Cote>>
@@ -221,10 +236,10 @@ Thm Fmap := THM: Fmap ::
     EDIT 100
     FLUID H2O
     FPUISS 1.0
-    INLET pOutlet (*Pa*) tInlet (*K*)
-    INLET-Q area (*m2*) massFlow (*inlet mass flow rate kg/s*)
+    INLET <<pOutlet>> (*Pa*) <<tInlet>> (*K*)
+    INLET-Q <<area>> (*m2*) <<massFlow>> (*inlet mass flow rate kg/s*)
     ASSMB 1 0
-    RADIUS fuelRadius gapRadius cladRadius cladRadius (* m *)
+    RADIUS <<fuelRadius>> <<gapRadius>> <<cladRadius>> <<cladRadius>> (* m *)
     RODMESH 8 11
     HGAP 10000.0
     CONDC 0 10.0 KELVIN
@@ -269,7 +284,6 @@ System MacroF Macro2 := DELETE: System MacroF Macro2 ;
 GREP: Flux :: GETVAL 'K-EFFECTIVE' 1 >>keff11<< ;
 ECHO "+++ Burnup= 0.0 Keff=" keff11 ;
 
-*assertS Flux :: 'K-EFFECTIVE' 1 1.354165 ;
 
 ECHO "test pincell_mphy_thm.x2m completed" ;
 END: ;

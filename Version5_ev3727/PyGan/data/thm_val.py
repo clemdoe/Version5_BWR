@@ -82,9 +82,21 @@ n_assmblies = 240 # This value is for the BWRX-300 SMR core, ref : "Status Repor
 full_core_power = 870e6 # W, full core thermal power of the BWRX-300 SMR core, ref : "Status Report – BWRX-300 (GE Hitachi and Hitachi GE Nuclear Energy)"
 
 # Total power of the fuel rod
-power = 0.14 #MW, 0.14 MW for a single fuel rod
+power = 0.038 #MW, 0.14 MW for a single fuel rod
 
 print(f"$$ - BEGIN Thermohydraulic case : Iz1 = {Iz1}, total power = {power} W")
+
+TeffIni = 900 # K, initial effective temperature
+TwaterIni = 270 + 273.15 # K, initial coolant temperature
+rhoIni = 1000 # kg/m3, initial coolant density
+
+# 2.2) Create LCM object to store the TH data to be used in the neutronics solution
+print("Creating initial THData object")
+THData = lcm.new('LCM','THData')
+THData['TFuelList']    = np.array(TeffIni, dtype='f')
+THData['TCoolList'] = np.array(TwaterIni, dtype='f')
+THData['DCoolList'] = np.array(rhoIni/1000, dtype='f')
+THData.close() # close without erasing
 
 # 3.1) construct the Lifo stack for thm_val
 ipLifo1=lifo.new()
@@ -92,6 +104,7 @@ ipLifo1.pushEmpty("Fmap", "LCM") # Fuel Map
 ipLifo1.pushEmpty("Matex", "LCM") # Material Indexation
 ipLifo1.pushEmpty("Cpo", "LCM") # Compo
 ipLifo1.pushEmpty("Track", "LCM") # Tracking data for FEM
+ipLifo1.push(THData) # THData
 #ipLifo1.push(compo_name) # Compo name
 #ipLifo1.push(Fuel_power) # Mass of the fuel
 ipLifo1.push(power) # Total fission power in the fuel rod
