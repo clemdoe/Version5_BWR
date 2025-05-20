@@ -1,7 +1,7 @@
 #!/bin/sh
 if [ $# = 0 ]
    then
-   echo "usage: THM_10_200.access directory" 1>&2
+   echo "usage: THM_55_155.access directory" 1>&2
    exit 1
 fi
 ln -s "$1"/data/pincell_mphy_thm_proc/_ACompo _ACompo

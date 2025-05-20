@@ -1,17 +1,4 @@
-def generate_cle2000_script(num_volumes, total_height):
-    # Calcul de la hauteur de chaque volume
-    segment_height = total_height / num_volumes
-    
-    # Génération des positions des limites des volumes
-    z_positions = []
-    current_height = 0.0
-    for i in range(num_volumes):
-        current_height += segment_height
-        z_positions.append(current_height)
-    
-    # Génération du script CLE-2000
-
-    script = """***********************************************************
+***********************************************************
 * Input file :  pincell_mphy_thm.x2m                      *
 *                                                         *
 * Test of a PWR single pincell                            *
@@ -35,10 +22,10 @@ REAL        Mass := 6.464E-3 ; ! kg
 *----
 STRING Dir := "EDI2B" ;
 REAL   Tfuel := 900.0 ; (*fuel temperature (K)*)
-REAL   Tcool := 550.0 ; (*coolant temperature (K)*)
+REAL   Tcool := 543.15 ; (*coolant temperature (K)*)
 REAL   Dfuel := 9.7413951 ; (*fuel density (g/cc)*)
 REAL   dens_mod_0 := 0.65 ;
-REAL   powi := 0.0591122 ;
+REAL   powi := 0.0038 ;
 ECHO "total reactor power=" powi "MW" ;
 *----
 *  Recover the Multicompo
@@ -50,38 +37,69 @@ INTEGER MaxR := 10000 ;
 INTEGER Iter := 1 ;
 REAL keff11 keff12 keff1n ;
 REAL Y1 Y2 ROOT YNEW ;
-LOGICAL CONV ;"""
-    script += f"""
-REAL maxh := {total_height} ;
-"""
-    for i, z in enumerate(z_positions, start=1):
-        script += f"REAL z{i} := {z} ;\n"
+LOGICAL CONV ;
+REAL maxh := 155.0 ;
+REAL z1 := 6.2 ;
+REAL z2 := 12.4 ;
+REAL z3 := 18.6 ;
+REAL z4 := 24.8 ;
+REAL z5 := 31.0 ;
+REAL z6 := 37.2 ;
+REAL z7 := 43.400000000000006 ;
+REAL z8 := 49.60000000000001 ;
+REAL z9 := 55.80000000000001 ;
+REAL z10 := 62.000000000000014 ;
+REAL z11 := 68.20000000000002 ;
+REAL z12 := 74.40000000000002 ;
+REAL z13 := 80.60000000000002 ;
+REAL z14 := 86.80000000000003 ;
+REAL z15 := 93.00000000000003 ;
+REAL z16 := 99.20000000000003 ;
+REAL z17 := 105.40000000000003 ;
+REAL z18 := 111.60000000000004 ;
+REAL z19 := 117.80000000000004 ;
+REAL z20 := 124.00000000000004 ;
+REAL z21 := 130.20000000000005 ;
+REAL z22 := 136.40000000000003 ;
+REAL z23 := 142.60000000000002 ;
+REAL z24 := 148.8 ;
+REAL z25 := 155.0 ;
 
-
-    script += f"""
 REAL Cote      := 1.295  ;
-Geom := GEO: :: CAR3D 1 1 {num_volumes}
+Geom := GEO: :: CAR3D 1 1 25
    X- REFL X+ REFL    Y- REFL Y+ REFL    Z- REFL Z+ REFL
    MESHX 0.0 <<Cote>>
    MESHY 0.0 <<Cote>>
-   MESHZ 0.0 """
-    
-    for i in range(1, num_volumes + 1):
-        if i%9 == 0:
-            script += f"\n            "
-        if i == num_volumes:
-            script += f"<<z{i}>>"
-        else:
-            script += f"<<z{i}>> "
-    
-    script += """
+   MESHZ 0.0 <<z1>> <<z2>> <<z3>> <<z4>> <<z5>> <<z6>> <<z7>> <<z8>> 
+            <<z9>> <<z10>> <<z11>> <<z12>> <<z13>> <<z14>> <<z15>> <<z16>> <<z17>> 
+            <<z18>> <<z19>> <<z20>> <<z21>> <<z22>> <<z23>> <<z24>> <<z25>>
    MIX
    PLANE 1
-      1"""
-    for i in range(2, num_volumes + 1):
-        script += f"\n   PLANE {i}  SAME 1"
-
-    script += f"""
+      1
+   PLANE 2  SAME 1
+   PLANE 3  SAME 1
+   PLANE 4  SAME 1
+   PLANE 5  SAME 1
+   PLANE 6  SAME 1
+   PLANE 7  SAME 1
+   PLANE 8  SAME 1
+   PLANE 9  SAME 1
+   PLANE 10  SAME 1
+   PLANE 11  SAME 1
+   PLANE 12  SAME 1
+   PLANE 13  SAME 1
+   PLANE 14  SAME 1
+   PLANE 15  SAME 1
+   PLANE 16  SAME 1
+   PLANE 17  SAME 1
+   PLANE 18  SAME 1
+   PLANE 19  SAME 1
+   PLANE 20  SAME 1
+   PLANE 21  SAME 1
+   PLANE 22  SAME 1
+   PLANE 23  SAME 1
+   PLANE 24  SAME 1
+   PLANE 25  SAME 1
 ;
 
 Geom Matex := USPLIT: Geom :: NGRP 2 MAXR <<MaxR>>
@@ -95,29 +113,41 @@ Track := TRIVAT: Geom ::
 * Fuel map definition
 *--
 Fmap Matex := RESINI: Matex ::
-      ::: GEO: CAR3D 1 1 {num_volumes}
+      ::: GEO: CAR3D 1 1 25
                 EDIT  0
                 X- REFL X+ REFL    Y- REFL Y+ REFL    Z- REFL Z+ REFL
    MESHX 0.0 <<Cote>>
    MESHY 0.0 <<Cote>>
-   MESHZ 0.0 """
-    
-    for i in range(1, num_volumes + 1):
-        if i%9 == 0:
-            script += f"\n            "
-        if i == num_volumes:
-            script += f"<<z{i}>>"
-        else:
-            script += f"<<z{i}>> "
-    
-    script += """
+   MESHZ 0.0 <<z1>> <<z2>> <<z3>> <<z4>> <<z5>> <<z6>> <<z7>> <<z8>> 
+            <<z9>> <<z10>> <<z11>> <<z12>> <<z13>> <<z14>> <<z15>> <<z16>> <<z17>> 
+            <<z18>> <<z19>> <<z20>> <<z21>> <<z22>> <<z23>> <<z24>> <<z25>>
    MIX
    PLANE 1
-      1"""
-    for i in range(2, num_volumes + 1):
-        script += f"\n   PLANE {i}  SAME 1"
-
-    script += f"""
+      1
+   PLANE 2  SAME 1
+   PLANE 3  SAME 1
+   PLANE 4  SAME 1
+   PLANE 5  SAME 1
+   PLANE 6  SAME 1
+   PLANE 7  SAME 1
+   PLANE 8  SAME 1
+   PLANE 9  SAME 1
+   PLANE 10  SAME 1
+   PLANE 11  SAME 1
+   PLANE 12  SAME 1
+   PLANE 13  SAME 1
+   PLANE 14  SAME 1
+   PLANE 15  SAME 1
+   PLANE 16  SAME 1
+   PLANE 17  SAME 1
+   PLANE 18  SAME 1
+   PLANE 19  SAME 1
+   PLANE 20  SAME 1
+   PLANE 21  SAME 1
+   PLANE 22  SAME 1
+   PLANE 23  SAME 1
+   PLANE 24  SAME 1
+   PLANE 25  SAME 1
 ;
 !
 NXNAME '01' NYNAME  'A'
@@ -130,18 +160,10 @@ ADD-PARAM PNAME 'D-FUEL' PARKEY 'DFA' GLOBAL
 ADD-PARAM PNAME 'D-COOL' PARKEY 'DCA' GLOBAL
 BTYPE INST-BURN
 INST-BVAL CHAN 0.0
-"""
-
-    chaine = ""
-    for i in range(num_volumes):
-        if i % 10 == 0:
-            chaine += "\n"
-        chaine += "1.0 "
-    chaine = chaine.strip()  # Supprime l'espace final
-
-    script += f"REACTOR-POW <<powi>> AXIAL-PFORM {chaine} \n"
-
-    script += """SET-PARAM 'T-FUEL' <<Tfuel>>
+REACTOR-POW <<powi>> AXIAL-PFORM 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 
+1.0 1.0 1.0 1.0 1.0 
+SET-PARAM 'T-FUEL' <<Tfuel>>
 SET-PARAM 'T-COOL' <<Tcool>>
 SET-PARAM 'D-FUEL' <<Dfuel>>
 SET-PARAM 'D-COOL' <<dens_mod_0>>
@@ -156,16 +178,17 @@ Thm Fmap := THM: Fmap ::
     EDIT 100
     FLUID H2O
     FPUISS 1.0
-    INLET 10.8E6 (*Pa*) 550.0 (*K*)
-    INLET-Q 2.1268E-5 (*m2*) 0.148880 (*inlet mass flow rate kg/s*)
+    INLET 7.2E6 (*Pa*) 543.15 (*K*)
+    INLET-Q 8.47029E-5 (*m2*) 0.084 (*inlet mass flow rate kg/s*)
     ASSMB 1 0
-    RADIUS 5.6E-3 6.14E-3 6.52E-3 7.02E-3 (* m *)
-    RODMESH 8 11
+    RADIUS 4.435E-3 4.520E-3 5.14E-3 5.14E-3 (*m*)
+    RODMESH 8 11  
     HGAP 10000.0
-    CONDC 0 10.0 KELVIN
-    CONDF 0 5.0 KELVIN
+    CONDC 0 21.5 KELVIN
+    CONDF 0 4.18 KELVIN
     BOWR
-    PDROP 1
+    PDROP 1 
+    DFM 1 
 ;
 
 *--
@@ -208,40 +231,3 @@ ECHO "+++ Burnup= 0.0 Keff=" keff11 ;
 
 ECHO "test pincell_mphy_thm.x2m completed" ;
 END: ;
-"""
-    return script
-
-def access(filename):
-    script=f"""#!/bin/sh
-if [ $# = 0 ]
-   then
-   echo "usage: {filename}.access directory" 1>&2
-   exit 1
-fi
-ln -s "$1"/data/pincell_mphy_thm_proc/_ACompo _ACompo
-ls -l
-echo "pincell_mphy_thm access script terminated"
-"""
-    # Écrire le script dans un fichier
-    with open(f"{filename}.access", 'w') as file:
-        file.write(script)
-
-    return script
-# Exemple d'utilisation
-num_volumes = int(input("Combien de volume de contrôle il faut ?"))  # Nombre de volumes de contrôle
-total_height = 155.0  # Hauteur totale en cm
-
-# Générer le script CLE-2000
-cle2000_script = generate_cle2000_script(num_volumes, total_height)
-access_script = access(f"THM_{num_volumes}_{int(total_height)}")
-
-# Nom du fichier de sortie
-output_filename = f"THM_{num_volumes}_{int(total_height)}"
-
-
-# Écrire le script dans un fichier
-with open(f"{output_filename}.x2m", 'w') as file:
-    file.write(f'{cle2000_script}')
-
-print(f"Le script CLE-2000 a été écrit dans le fichier : {output_filename}")
-
