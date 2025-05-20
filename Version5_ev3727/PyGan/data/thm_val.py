@@ -90,42 +90,81 @@ TeffIni = 900 # K, initial effective temperature
 TwaterIni = 270 + 273.15 # K, initial coolant temperature
 rhoIni = 1000 # kg/m3, initial coolant density
 
-# 2.2) Create LCM object to store the TH data to be used in the neutronics solution
-print("Creating initial THData object")
-THData = lcm.new('LCM','THData')
-THData['TFuelList']    = np.array(TeffIni, dtype='f')
-THData['TCoolList'] = np.array(TwaterIni, dtype='f')
-THData['DCoolList'] = np.array(rhoIni/1000, dtype='f')
-THData.close() # close without erasing
+def run_ThmDonjon(pitch, fuelRadius, gapRadius, cladRadius, height, power, tInlet, pOutlet, massFlow, area, TeffIni, TwaterIni, rhoIni):
 
-# 3.1) construct the Lifo stack for thm_val
-ipLifo1=lifo.new()
-ipLifo1.pushEmpty("Fmap", "LCM") # Fuel Map
-ipLifo1.pushEmpty("Matex", "LCM") # Material Indexation
-ipLifo1.pushEmpty("Cpo", "LCM") # Compo
-ipLifo1.pushEmpty("Track", "LCM") # Tracking data for FEM
-ipLifo1.push(THData) # THData
-#ipLifo1.push(compo_name) # Compo name
-#ipLifo1.push(Fuel_power) # Mass of the fuel
-ipLifo1.push(power) # Total fission power in the fuel rod
-ipLifo1.push(height) # Height of the fuel rod
-ipLifo1.push(pitch) # pitch of the fuel assembly/cell
-ipLifo1.push(fuelRadius) # Fuel rod radius
-ipLifo1.push(gapRadius) # Gap radius
-ipLifo1.push(cladRadius) # Clad radius
-ipLifo1.push(tInlet) # Inlet temperature
-ipLifo1.push(pOutlet) # Outlet pressure
-ipLifo1.push(massFlow) # Mass flow rate
-ipLifo1.push(area) # Cross section area
+  # 1) Create LCM object to store the TH data to be used in the neutronics solution
+  print("Creating initial THData object")
+  THData = lcm.new('LCM','THData')
+  THData['TFuelList']    = np.array(TeffIni, dtype='f')
+  THData['TCoolList'] = np.array(TwaterIni, dtype='f')
+  THData['DCoolList'] = np.array(rhoIni/1000, dtype='f')
+  THData.close() # close without erasing
 
+  # 2) construct the Lifo stack for thm_val
+  ipLifo1=lifo.new()
+  ipLifo1.pushEmpty("Fmap", "LCM") # Fuel Map
+  ipLifo1.pushEmpty("Matex", "LCM") # Material Indexation
+  ipLifo1.pushEmpty("Cpo", "LCM") # Compo
+  ipLifo1.pushEmpty("Track", "LCM") # Tracking data for FEM
+  ipLifo1.pushEmpty("Thm", "LCM") # THM data empty
+  ipLifo1.push(THData) # THData
+  #ipLifo1.push(compo_name) # Compo name
+  #ipLifo1.push(Fuel_power) # Mass of the fuel
+  ipLifo1.push(power) # Total fission power in the fuel rod
+  ipLifo1.push(height) # Height of the fuel rod
+  ipLifo1.push(pitch) # pitch of the fuel assembly/cell
+  ipLifo1.push(fuelRadius) # Fuel rod radius
+  ipLifo1.push(gapRadius) # Gap radius
+  ipLifo1.push(cladRadius) # Clad radius
+  ipLifo1.push(tInlet) # Inlet temperature
+  ipLifo1.push(pOutlet) # Outlet pressure
+  ipLifo1.push(massFlow) # Mass flow rate
+  ipLifo1.push(area) # Cross section area
 
-# 3.2) call thm_val Cle-2000 procedure
-thm_val = cle2000.new('thm_val',ipLifo1,1)
-thm_val.exec()
-print("thm_validation execution completed")
+  # 3) call thm_val Cle-2000 procedure
+  thm_val = cle2000.new('thm_val',ipLifo1,1)
+  thm_val.exec()
+  print("thm_validation execution completed")
 
-# recover the output LCM objects
-Fmap = ipLifo1.node("Fmap")
-Matex = ipLifo1.node("Matex")
-Cpo = ipLifo1.node("Cpo")
-Track = ipLifo1.node("Track")
+  # 4) recover the output LCM objects
+  Fmap = ipLifo1.node("Fmap")
+  Matex = ipLifo1.node("Matex")
+  Cpo = ipLifo1.node("Cpo")
+  Track = ipLifo1.node("Track")
+  stateVector = Fmap["STATE-VECTOR"]
+  mylength = stateVector[0]*stateVector[1]
+  npar = stateVector[7]
+
+  # 5) recover thermo-hydraulics information
+  # 5.1) recover the THM data
+  Thm = ipLifo1.node("Thm")
+  THData = ipLifo1.node("THData")
+
+  stationary_info = Thm["HISTORY-DATA"]["TIMESTEP0000"]["CHANNEL"][0]
+  print("stationary_info : ", stationary_info)
+  stationary_info.lib();
+  pinlet=stationary_info["PINLET"][0]
+  print("stationary inlet pressure=", pinlet, "Pa")
+
+  # 5.2) recover the usefull TH data
+  PCOOL = stationary_info["PRESSURE"]
+  VCOOL = stationary_info["VELOCITIES"]
+  TCOOL = stationary_info["COOLANT-TEMP"]
+  TFUEL = stationary_info["CENTER-TEMPS"]
+  EPS = stationary_info["EPSILON"]
+  XFL = stationary_info["XFL"]
+
+  # empty the ipLifo1 Lifo stack
+  while ipLifo1.getMax() > 0:
+    ipLifo1.pop()
+
+  return PCOOL, VCOOL, TCOOL, TFUEL, EPS, XFL, Fmap, Matex, Cpo, Track, Thm
+
+PCOOL, VCOOL, TCOOL, TFUEL, EPS, XFL, Fmap, Matex, Cpo, Track, Thm = run_ThmDonjon(pitch, fuelRadius, gapRadius, cladRadius, height, power, tInlet, pOutlet, massFlow, area, TeffIni, TwaterIni, rhoIni)
+
+print("PCOOL : ", PCOOL)
+print("VCOOL : ", VCOOL)
+print("TCOOL : ", TCOOL)
+print("TFUEL : ", TFUEL)
+print("EPS : ", EPS)
+print("XFL : ", XFL)

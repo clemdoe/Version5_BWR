@@ -1,14 +1,14 @@
 ****************************************************************
 * CLE-2000 / DONJON script                                     *
-* Purpose : validaiton of the THM modul                        *
+* Purpose : validaiton of the THM module                        *
 * Author : A. Hebert adapted by Clément HUET                   *
 * Date : 13/05/2024                                            *
 * CALL      :                                                  *
 *  Fmap Matex Cpo Track := IniDONJON ;                         *
 *                                                              *
 ****************************************************************
-PARAMETER  Fmap Matex Cpo Track THData ::
-  ::: LINKED_LIST Fmap Matex Cpo Track THData ; ;
+PARAMETER  Fmap Matex Cpo Track Thm THData ::
+  ::: LINKED_LIST Fmap Matex Cpo Track Thm THData ; ;
 
 DOUBLE Dpower ; 
 :: >>Dpower<< ;
@@ -32,7 +32,7 @@ DOUBLE Darea ;
 :: >>Darea<< ;
 
 LINKED_LIST Geom Flux Lib MicroF MacroF Macro2
-            System Power Burnup Thm DONNEES ;
+            System Power Burnup DONNEES ;
 MODULE      GEO: RESINI: TRIVAT: TRIVAA: GREP: FIND0: NCR: FLUD: FLPOW:
             MACINI: USPLIT: TINST: UTL: DELETE: ABORT: THM: END: ;
 
@@ -247,42 +247,6 @@ Thm Fmap := THM: Fmap ::
     BOWR
     PDROP 1
 ;
-
-*--
-* Dump THM object
-*--
-UTL: Thm :: DIR DUMP ;
-
-*--
-* Cross-section database interpolation
-*--
-MicroF := NCR: Cpo Fmap ::
-       EDIT 2
-       MICRO LINEAR
-       TABLE Cpo <<Dir>> 'burnup'
-         MIX 1 INST-BURN
-               SET LINEAR 'burnup' MAP
-               SET CUBIC 'DCA' <<dens_mod_0>>
-               SET CUBIC 'DCAH' <<dens_mod_0>>
-               ADD 'DCA' <<dens_mod_0>> MAP
-                        REF 'burnup' SAMEASREF
-                        ENDREF
-         ENDMIX
-  ;
-MacroF := MicroF :: STEP UP 'MACROLIB' ;
-  
-Macro2 Matex := MACINI: Matex MacroF :: FUEL ;
-  
-*--
-* Steady-state diffusion calculation
-*--
-System := TRIVAA: Macro2 Track ;
-
-Flux := FLUD: System Track :: EDIT 1 ADI 4 ACCE 5 3 ;
-System MacroF Macro2 := DELETE: System MacroF Macro2 ;
-
-GREP: Flux :: GETVAL 'K-EFFECTIVE' 1 >>keff11<< ;
-ECHO "+++ Burnup= 0.0 Keff=" keff11 ;
 
 
 ECHO "test pincell_mphy_thm.x2m completed" ;
