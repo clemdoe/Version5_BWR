@@ -1,0 +1,6 @@
+lcmmodule.c
+setup_lcm.py
+Lcm.egg-info/PKG-INFO
+Lcm.egg-info/SOURCES.txt
+Lcm.egg-info/dependency_links.txt
+Lcm.egg-info/top_level.txt

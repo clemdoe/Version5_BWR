@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: Lcm
+Version: 5.0
+Summary: Python interface for the lcm C library API
+Author: Alain Hebert
+Author-email: alain.hebert@polymtl.ca
+License: LGPL
