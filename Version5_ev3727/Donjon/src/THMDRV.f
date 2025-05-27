@@ -1,12 +1,11 @@
 *DECK THMDRV
       SUBROUTINE THMDRV(MPTHM,IMPX,IX,IY,NZ,XBURN,VOLXY,HZ,CFLUX,POROS,
-     > FNFU,NFD,NDTOT,IFLUID,SNAME,SCOMP,IGAP,IFUEL,FNAME,FCOMP,FCOOL,
-     > FFUEL,ACOOL,HD,PCH,RAD,
+     > FNFU,NFD,NDTOT,IFLUID,SNAME,SCOMP,FCOOL,FFUEL,ACOOL,HD,PCH,RAD,
      > MAXIT1,MAXITL,ERMAXT,SPEED,TINLET,PINLET,FRACPU,ICONDF,NCONDF,
      > KCONDF,UCONDF,ICONDC,NCONDC,KCONDC,UCONDC,IHGAP,KHGAP,IHCONV,
-     > KHCONV,WTEFF,IFRCDI,ISUBM,FRO,POW,IPRES,IDFM,TCOMB,DCOOL,TCOOL,
-     > TSURF,HCOOL,PCOOL)
-
+     > KHCONV,WTEFF,IFRCDI,ISUBM,FRO,POW,TCOMB,DCOOL,TCOOL,TSURF,HCOOL,
+     > PCOOL, IPRES)
+*
 *-----------------------------------------------------------------------
 *
 *Purpose:
@@ -17,13 +16,9 @@
 *
 *Author(s): 
 * A. Hebert
-* C. Garrido 
-* 08/2023: Modifications to include Molten Salt heat transfer in coolant
-* C. Garrido 
-* 07/2024: Modifications to include Molten Salt heat transfer in static
-*          fuel
+* 08/2023: CGT. Modifications to include Molten Salt heat transfer
 * C. Huet
-* 02/2025: Modifications to include pressure drop calculation
+* 02/2025: CGT. Modifications to include pressure drop calculation
 *
 *Parameters: input
 * MPTHM   directory of the THM object containing steady-state
@@ -84,44 +79,33 @@
 *         2: Saha- Zuber model).
 * FRO     radial power form factors.
 * POW     power distribution in W.
-* IGAP    Flag indicating if the gap is considered (0=gap/1=no gap)
-* IFUEL   type of fuel (0=UO2/MOX; 1=SALT).
-* FNAME   Name of the molten salt (e.g. "LiF-BeF2")
-* FCOMP   Composition of the molten salt (e.g. "0.66-0.34")
-* IPRES   flag indicating if pressure is to be computed (0=nonstant/
-*         1=variable).
-* IDFM    flag indicating if the drift flux model is to be used 
-*         (0=HEM1(no drift velocity)/1=EPRI/2=MODEBSTION/3=GERAMP/4=CHEXAL) 
 *
-* Parameters: output
+*Parameters: output
 * TCOMB   averaged fuel temperature distribution in K.
 * DCOOL   coolant density distribution in g/cc.
 * TCOOL   coolant temperature distribution in K.
 * TSURF   surface fuel temperature distribution in K.
 * HCOOL   coolant enthalpty distribution in J/kg.
 * PCOOL   coolant pressure distribution in Pa.
+* IPRES   flag indicating if pressure is to be computed (0=CONSTANT/1=NONCONSTANT).
 *
 *-----------------------------------------------------------------------
 *
       USE GANLIB
-      USE t_saltdata
 *----
 *  SUBROUTINE ARGUMENTS
 *----
       TYPE(C_PTR) MPTHM
-      INTEGER IMPX,IX,IY,NZ,NFD,NDTOT,IFLUID,MAXIT1,MAXITL,IHGAP,IGAP,
-     > IFUEL,IPRES,IDFM
+      INTEGER IMPX,IX,IY,NZ,NFD,NDTOT,IFLUID,MAXIT1,MAXITL,IHGAP
       REAL XBURN(NZ),VOLXY,HZ(NZ),CFLUX,POROS,FNFU,FCOOL,FFUEL,ACOOL,
      > HD,PCH,RAD(NDTOT-1,NZ),ERMAXT,SPEED,TINLET,PINLET,FRACPU,
      > KCONDF(NCONDF+3),KCONDC(NCONDC+1),KHGAP,KHCONV,WTEFF,FRO(NFD-1),
-     > POW(NZ),TCOMB(NZ),TCOOL(NZ),TSURF(NZ),HCOOL(NZ),
-     > PCOOL(NZ),MUT(NZ),VCOOL(NZ),DCOOL(NZ), DGCOOL(NZ), XTEMP(NZ),
-     > DLCOOL(NZ),TCENT(NZ),VGJprime(NZ),HLV(NZ),PTEMP(NZ),VTEMP(NZ)
+     > POW(NZ),TCOMB(NZ),DCOOL(NZ),TCOOL(NZ),TSURF(NZ),HCOOL(NZ),
+     > PCOOL(NZ), MUT(NZ)
       CHARACTER UCONDF*12,UCONDC*12
 *----
 *  LOCAL VARIABLES
 *----
-      TYPE(tpdata) STP,FTP
       PARAMETER (KMAXO=100,MAXNPO=40)
       REAL TRE11(MAXNPO),RADD(MAXNPO),ENT(4),MFLOW,TLC(NZ),DELTA
       CHARACTER HSMG*131,SNAME*32,SCOMP*32,FNAME*32,FCOMP*32
@@ -135,18 +119,20 @@
 
       INTEGER I
       REAL ERRV, ERRP
-      REAL, DIMENSION(4, NZ) :: ENTLIST
-
 *----
 *  ALLOCATABLE ARRAYS
 *----
-      REAL, ALLOCATABLE, DIMENSION(:,:) :: TEMPT, A
+      REAL, ALLOCATABLE, DIMENSION(:) :: VCOOL,TCENT,DLCOOL
+      REAL, ALLOCATABLE, DIMENSION(:,:) :: TEMPT
+
+      REAL, ALLOCATABLE, DIMENSION(:) :: PTEMP, VTEMP
+
 *----
 *  SCRATCH STORAGE ALLOCATION
 *----
-      ALLOCATE(TEMPT(NDTOT,NZ))
-      ALLOCATE(A(NZ,NZ+1))
-      FORALL (I=1:NZ, J=1:NZ+1) A(I, J) = 0.0
+      ALLOCATE(VCOOL(NZ),TEMPT(NDTOT,NZ),TCENT(NZ),DLCOOL(NZ))
+      ALLOCATE(PTEMP(NZ), VTEMP(NZ))
+
 *----
 *  COMPUTE THE INLET FLOW ENTHALPY AND VELOCITY
 *----
@@ -157,14 +143,9 @@
          CALL THMHST(PINLET,TSAT)
 *CGT TODO: GET ALSO FREEZING??
       ELSE IF(IFLUID.EQ.2) THEN
-         CALL THMSGT(SNAME,SCOMP,STP,IMPX)
-         CALL THMSST(STP,TSAT,IMPX)
+         CALL THMSST(SNAME,SCOMP,TSAT,IMPX)
 *CGT
       ENDIF
-      IF (IFUEL.EQ.1) THEN
-         CALL THMSGT(FNAME,FCOMP,FTP,IMPX)
-      ENDIF
-
       IF(TINLET.GT.TSAT) THEN
          WRITE(HSMG,'(27HTHMDRV: INLET TEMPERATURE (,1P,E12.4,
      >   40H K) GREATER THAN SATURATION TEMPERATURE.)') TINLET
@@ -175,9 +156,11 @@
       ELSE IF(IFLUID.EQ.1) THEN
         CALL THMHPT(PINLET,TINLET,RHOIN,HINLET,R3,R4,R5)
       ELSE IF(IFLUID.EQ.2) THEN
-        CALL THMSPT(STP,TINLET,RHOIN,HINLET,R3,R4,R5,IMPX)
+        CALL THMSPT(SNAME,SCOMP,TINLET,RHOIN,HINLET,R3,R4,R5,IMPX)
       ENDIF
       MFLOW=SPEED*RHOIN
+      HMSUP=HINLET
+
 *----
 *  INITIALIZE VALUES OF STEAM QUALITIES, VOID FRACTION AND DENSITY
 *  PRESSURE, VELOCITY AND TEMPERATURE OF THE COOLANT ALONG THE CHANNEL.
@@ -187,63 +170,58 @@
          XFL(K)=0.0
          SLIP(K)=1.0
          KWA(K)=0
-         VGJprime(K)=0
-         HLV(K)=0
 
          PCOOL(K)=PINLET
          VCOOL(K)=MFLOW/RHOIN
          DCOOL(K)=RHOIN
          DLCOOL(K)=RHOIN
-         DGCOOL(K)=0
-         HCOOL(K)=HINLET
          TCOOL(K)=TINLET
+
 *----
 *  COMPUTE THE SATURATION TEMPERATURE AND THE THERMODYNAMIC PROPERTIES
 *  IF THE PRESSURE DROP IS COMPUTED
 *---
 
         IF (IPRES.EQ.1) THEN
-          IF(POW(K).EQ.0.0) CYCLE
-          IF(IFLUID.EQ.0) THEN
-            CALL THMSAT(PCOOL(K),TSAT)
-          ELSE IF(IFLUID.EQ.1) THEN
-            CALL THMHST(PCOOL(K),TSAT)
-          ENDIF
+         IF(POW(K).EQ.0.0) CYCLE
+         IF(IFLUID.EQ.0) THEN
+           CALL THMSAT(PCOOL(K),TSAT)
+         ELSE IF(IFLUID.EQ.1) THEN
+           CALL THMHST(PCOOL(K),TSAT)
+         ENDIF
 
-          TB=TSAT-0.1
-          IF(TCOOL(K).LT.TB) THEN
-            IF(IFLUID.EQ.0) THEN
-              CALL THMPT(PCOOL(K),TCOOL(K),RHOIN,H11,K11,MUT(K),
-     > C11)
-            ELSE IF(IFLUID.EQ.1) THEN
-              CALL THMHPT(PCOOL(K),TCOOL(K),RHOIN,H11,K11,MUT(K),
-     > C11)
-            ELSE IF(IFLUID.EQ.2) THEN
-              CALL THMSPT(STP,TCOOL(K),R11,H11,K11,MUT(K),C11,IMPX)
-            ENDIF
-          ELSE
-            IF(IFLUID.EQ.0) THEN
-              CALL THMPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
-            ELSE IF(IFLUID.EQ.1) THEN
-              CALL THMHPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
-            ELSE IF(IFLUID.EQ.2) THEN
-              CALL THMSPT(STP,TB,R11,H11,K11,MUT(K),C11,IMPX)
-            ENDIF
-          ENDIF
+         TB=TSAT-0.1
+         IF(TCOOL(K).LT.TB) THEN
+           IF(IFLUID.EQ.0) THEN
+            CALL THMPT(PCOOL(K),TCOOL(K),RHOIN,H11,K11,MUT(K),C11)
+           ELSE IF(IFLUID.EQ.1) THEN
+            CALL THMHPT(PCOOL(K),TCOOL(K),RHOIN,H11,K11,MUT(K),C11)
+           ELSE IF(IFLUID.EQ.2) THEN
+            CALL THMSPT(STP,TCOOL(K),R11,H11,K11,MUT(K),C11,IMPX)
+           ENDIF
+         ELSE
+           IF(IFLUID.EQ.0) THEN
+            CALL THMPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
+           ELSE IF(IFLUID.EQ.1) THEN
+            CALL THMHPT(PCOOL(K),TB,R11,H11,K11,MUT(K),C11)
+           ELSE IF(IFLUID.EQ.2) THEN
+            CALL THMSPT(STP,TB,R11,H11,K11,MUT(K),C11,IMPX)
+           ENDIF
+         ENDIF
         ENDIF
       ENDDO
-      HMSUP=HINLET
-      SPEED=MFLOW/DCOOL(1)
+
 *----
-*  MAIN LOOP ALONG THE 1D CHANNEL
+*  MAIN LOOP ALONG THE 1D CHANNEL.
 *----
       IF (IPRES .EQ. 0) GOTO 30
 
       ERRV = 1.0
       ERRP = 1.0
       I=0
-   
+
    10 CONTINUE
+
 *----
 *  UPDATE HINLET FUNCTION OF INLET PRESSURE AND TEMPERATURE
 *----
@@ -254,17 +232,17 @@
 *  CHECK FOR CONVERGENCE
 *----
         IF (I .GT. 1000) GOTO 20
-        IF ((ERRP < 1E-3) .AND.(ERRV < 1E-3) .AND. (I .GT. 3)) GOTO 20
+        IF ((ERRP < 1E-3) .AND. (ERRV < 1E-3)) GOTO 20
 
           I = I + 1
 
           PTEMP = PCOOL
           VTEMP = VCOOL
-          XTEMP = XFL
           CALL THMPV(SPEED, PINLET, VCOOL, DCOOL, 
      >              PCOOL, MUT, XFL, HD, NZ,
-     >              HZ, EPS, DLCOOL,DGCOOL, VGJprime)
+     >              HZ)
    30 CONTINUE
+
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
 *----
@@ -287,11 +265,9 @@
 *       volumic power in W/m^3
         QFUEL(K)=POW(K)*FFUEL/DV
         QCOOL(K)=POW(K)*FCOOL/DV
-      ENDDO
 *----
 *  INITIALIZATION OF PINCELL TEMPERATURES
 *----
-      DO K=1,NZ
         IF(POW(K).EQ.0.0) CYCLE
         IF(IMPX.GT.4) WRITE(6,190) K
         DO L=1,NDTOT
@@ -308,83 +284,50 @@
         IF(PHI2.GT.CFLUX) THEN
           WRITE(HSMG,'(23HTHMDRV: THE HEAT FLUX (,1P,E12.4,5H) IS ,
      >    37HGREATER THAN THE CRITICAL HEAT FLUX (,E12.4,2H).)')
-     >    PHI2,CFLUX 
+     >    PHI2,CFLUX
           CALL XABORT(HSMG)
         ENDIF
-      ENDDO
 *----
 *  COMPUTE FOUR VALUES OF ENTHALPY IN J/KG TO BE USED IN GAUSSIAN
 *  INTEGRATION. DELTH1 IS THE ENTHALPY INCREASE IN EACH AXIAL MESH.
 *----
-      DO K=1,NZ
-        HMSUPold=HMSUP
         DELTH1=(PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)/MFLOW
-        DELTA = (PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)
-
-        IF (K.GT.1) THEN
-          DELTA = DELTA + ((VCOOL(K-1) + EPS(K-1)*(DLCOOL(K-1)-
-     >      DGCOOl(K-1))/DCOOL(K-1)*VGJprime(K-1))
-     >      + (VCOOL(K) + EPS(K)*(DLCOOL(K)-DGCOOl(K))/
-     >      DCOOL(K)*VGJprime(K)))/2*(PCOOL(K-1)-PCOOL(K))
-          DELTA = DELTA +(EPS(K-1)*DGCOOL(K-1)*(DLCOOL(K-1)/
-     >      DCOOL(K-1))*HLV(K-1)*VGJprime(K-1))-(EPS(K)*DGCOOL(K)*
-     >      (DLCOOL(K)/DCOOL(K))*HLV(K)*VGJprime(K))
-        ENDIF
-        DELTA = DELTA/MFLOW
-          IF (K.GT.1) THEN
-            HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K))
-          ENDIF
-          HMSUP = HMSUP + DELTA
-          DO I1=1,4
-            POINT=(1.0+XS(I1))/2.0
-            ENT(I1)=HMSUPold+POINT*(HMSUP - HMSUPold)
-          ENDDO
-        ENTLIST(1:4, K) = ENT(1:4)
-        HCOOL(K)=HMSUP
-      ENDDO
+        DO I1=1,4
+          POINT=(1.0+XS(I1))/2.0
+          ENT(I1)=HMSUP+POINT*DELTH1
+        ENDDO
+        HMSUP=HMSUP+DELTH1
 *----
 *  COMPUTE THE VALUE OF THE DENSITY
 *  AND THE CLAD-COOLANT HEAT TRANSFER COEFFICIENT
 *----
-      DO K=1,NZ
-        HMSUP=HCOOL(K)
-        ENT(:) =ENTLIST(1:4, K)
-        IF (K.GT.1) THEN
+        IF(K.GT.1) THEN
           XFL(K)=XFL(K-1)
           EPS(K)=EPS(K-1)
           SLIP(K)=SLIP(K-1)
-        ENDIF   
+        ENDIF
 *CGT
         IF ((IFLUID.EQ.0).OR.(IFLUID.EQ.1)) THEN
-          CALL THMH2O(0,IX,IY,K,K0,PCOOL(K),MFLOW,HMSUP,ENT,HD,
-     >    IFLUID,IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,VCOOL(K),
-     >    IDFM,PHI2,XFL(K),EPS(K),SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,
-     >    RHOL,RHOG,TRE11(NDTOT),KWA(K),VGJprime(K), HLV(K))
-
+          CALL THMH2O(0,IX,IY,K,K0,PCOOL(K),MFLOW,HMSUP,ENT,HD,IFLUID,
+     >    IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),EPS(K),
+     >    SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,
+     >RHOL,TRE11(NDTOT),KWA(K))
         ELSEIF (IFLUID.EQ.2) THEN
-          CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,STP,
-     >    IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),
-     >    EPS(K),SLIP(K),HZ(K),TCALO,RHO,RHOL,TRE11(NDTOT),
-     >    KWA(K))
+          CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,SNAME,
+     >    SCOMP,IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),
+     >    EPS(K),SLIP(K),HZ(K),TCALO,RHO,
+     >RHOL,TRE11(NDTOT),KWA(K))
         ENDIF
-        
-
 *CGT
 *----
 *  STEADY-STATE SOLUTION OF THE CONDUCTION EQUATIONS IN A FUEL PIN.
 *----
         DTINV=0.0
-        IF(IGAP.EQ.0) THEN
-          CALL THMROD(IMPX,NFD,NDTOT-1,MAXIT1,MAXITL,ERMAXT,DTINV,RADD,  
-     >    TRE11,TRE11,QFUEL(K),FRO,TRE11(NDTOT),POWLIN,XBURN(K),
-     >    POROS,FRACPU,ICONDF,NCONDF,KCONDF,UCONDF,ICONDC,NCONDC,
-     >    KCONDC,UCONDC,IHGAP,KHGAP,IFRCDI,TC1,XX2,XX3,ZF)
-        ELSE
-          CALL THMRNG(IMPX,NFD,NDTOT-1,MAXIT1,MAXITL,ERMAXT,DTINV,RADD,
-     >    TRE11,TRE11,QFUEL(K),FRO,TRE11(NDTOT),XBURN(K),
-     >    POROS,FRACPU,ICONDF,NCONDF,KCONDF,UCONDF,ICONDC,NCONDC,
-     >    KCONDC,UCONDC,IFRCDI,IFUEL,FTP,TC1,XX2,XX3,ZF)
-        ENDIF
+        CALL THMROD(IMPX,NFD,NDTOT-1,MAXIT1,MAXITL,ERMAXT,DTINV,RADD,
+     >  TRE11,TRE11,QFUEL(K),FRO,TRE11(NDTOT),POWLIN,XBURN(K),
+     >  POROS,FRACPU,ICONDF,NCONDF,KCONDF,UCONDF,ICONDC,NCONDC,
+     >  KCONDC,UCONDC,IHGAP,KHGAP,IFRCDI,TC1,XX2,XX3,ZF)
+*
         DO K1=1,NDTOT-1
           TRE11(K1)=XX2(K1)+TRE11(NDTOT)*XX3(K1)
         ENDDO
@@ -395,13 +338,12 @@
 *----  
         TCOMB(K)=(1.0-WTEFF)*TC1+WTEFF*TRE11(NFD)
         TCENT(K)=TC1
+        TSURF(K)=TRE11(NFD)
+        TCLAD(K)=TRE11(NDTOT)
         TCOOL(K)=TCALO
         DCOOL(K)=RHO
         DLCOOL(K)=RHOL
-        DGCOOL(K)=RHOG
-        TSURF(K)=TRE11(NFD)
-        TCLAD(K)=TRE11(NDTOT) 
-        !HCOOL(K)=HMSUP
+        HCOOL(K)=HMSUP
         !PCOOL(K)=PINLET
         PC(K)=PINLET
         TP(K)=TCLAD(K)
@@ -446,7 +388,9 @@
             ENDIF
           ENDIF
          ENDIF
+
       ENDDO
+
 *----
 * IF THE PRESSURE DROP IS COMPUTED, COMPUTE THE 
 * THE PRESSURE AND VELOCITY RESIDUALS
@@ -460,8 +404,13 @@
       ENDDO
       ERRV = ERRV/NZ
       ERRP = ERRP/NZ
-      GOTO 10
-* Ne rien écrire ici
+
+      PRINT *, 'I:', I
+      PRINT *, 'ERRV:', ERRV
+      PRINT *, 'ERRP:', ERRP
+
+      GO TO 10
+
    20 CONTINUE
 
       IF (I == 1000) THEN
@@ -481,7 +430,6 @@
       PRINT *, 'XFL:', XFL
       PRINT *, 'TSAT:', TBUL
       PRINT *, 'MUT:', MUT
-      PRINT *, 'HCOOL:', HCOOL
 *----
 *  PRINT THE OUTLET THERMOHYDRAULICAL PARAMETERS
 *----
@@ -536,8 +484,6 @@
       CALL LCMPUT(MPTHM,'LIQUID-DENS',NZ,2,DLCOOL)
       CALL LCMPUT(MPTHM,'ENTHALPY',NZ,2,HCOOL)
       CALL LCMPUT(MPTHM,'VELOCITIES',NZ,2,VCOOL)
-      CALL LCMPUT(MPTHM,'EPSILON',NZ,2,EPS)
-      CALL LCMPUT(MPTHM,'XFL',NZ,2,XFL)
       CALL LCMPUT(MPTHM,'CENTER-TEMPS',NZ,2,TCENT)
       CALL LCMPUT(MPTHM,'COOLANT-TEMP',NZ,2,TCOOL)
       CALL LCMPUT(MPTHM,'POWER',NZ,2,POW)
@@ -550,8 +496,8 @@
 *----
 *  SCRATCH STORAGE DEALLOCATION
 *----
-      DEALLOCATE(TEMPT,A)
-
+      DEALLOCATE(DLCOOL,TCENT,TEMPT,VCOOL)
+      DEALLOCATE(PTEMP, VTEMP)
       RETURN
 *
   190 FORMAT(/21H THMDRV: AXIAL SLICE=,I5)

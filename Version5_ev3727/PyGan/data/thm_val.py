@@ -11,6 +11,7 @@ import lifo
 import lcm
 import cle2000
 from assertS import *
+import pandas as pd
 
 import time
 
@@ -90,6 +91,29 @@ TeffIni = 900 # K, initial effective temperature
 TwaterIni = 270 + 273.15 # K, initial coolant temperature
 rhoIni = 1000 # kg/m3, initial coolant density
 
+# Charger le fichier Excel (remplace 'chemin_du_fichier.xlsx' par le chemin réel)
+chemin_fichier = 'BFBT.xlsx'
+def chargement_excel(chemin_fichier):
+  df = pd.read_excel(chemin_fichier)
+
+  # Extraire les 7 premières colonnes
+  colonnes = df.columns[:7]  # Sélectionne les noms des 7 premières colonnes
+
+  # Mettre chaque colonne dans une liste
+  listes = [df[colonne].tolist() for colonne in colonnes]
+
+  powerList = listes[3]
+  pressureList = listes[1]
+  temperatureList = listes[4]
+  flowList = listes[2]
+  testNumber = listes[0]
+  densityResult = listes[5]
+  voidResult = listes[6]
+
+  return powerList, pressureList, temperatureList, flowList, testNumber, densityResult, voidResult
+
+
+
 def run_ThmDonjon(pitch, fuelRadius, gapRadius, cladRadius, height, power, tInlet, pOutlet, massFlow, area, TeffIni, TwaterIni, rhoIni):
 
   # 1) Create LCM object to store the TH data to be used in the neutronics solution
@@ -161,6 +185,9 @@ def run_ThmDonjon(pitch, fuelRadius, gapRadius, cladRadius, height, power, tInle
   return PCOOL, VCOOL, TCOOL, TFUEL, EPS, XFL, Fmap, Matex, Cpo, Track, Thm
 
 PCOOL, VCOOL, TCOOL, TFUEL, EPS, XFL, Fmap, Matex, Cpo, Track, Thm = run_ThmDonjon(pitch, fuelRadius, gapRadius, cladRadius, height, power, tInlet, pOutlet, massFlow, area, TeffIni, TwaterIni, rhoIni)
+
+powerList, pressureList, temperatureList, flowList, testNumber, densityResult, voidResult = chargement_excel(chemin_fichier)
+
 
 print("PCOOL : ", PCOOL)
 print("VCOOL : ", VCOOL)
