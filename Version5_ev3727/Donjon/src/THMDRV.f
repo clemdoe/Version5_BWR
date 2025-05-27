@@ -210,7 +210,6 @@
          ENDIF
         ENDIF
       ENDDO
-
 *----
 *  MAIN LOOP ALONG THE 1D CHANNEL.
 *----
