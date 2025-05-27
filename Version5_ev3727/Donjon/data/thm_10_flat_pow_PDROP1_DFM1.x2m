@@ -129,6 +129,7 @@ Thm Fmap := THM: Fmap ::
     CONDF 0 4.18 KELVIN
     BOWR 
     PDROP 0
+    DFM 0
 ;
 
 ECHO "test thm_10_flat_pow_PDROP1_DFM1.x2m completed" ;

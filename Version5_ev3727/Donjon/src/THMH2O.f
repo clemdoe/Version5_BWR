@@ -1,7 +1,7 @@
 *DECK THMH2O
       SUBROUTINE THMH2O(ITIME,I,J,K,K0,PINLET,MFLOW,HMAVG,ENT,HD,IFLUID,
-     > IHCONV,KHCONV,ISUBM,RADCL,ZF,PHI,XFL,EPS,SLIP,ACOOL,PCH,DZ,TCALO,
-     > RHO,RHOLAV,TSCLAD,KWA)
+     > IHCONV,KHCONV,ISUBM,RADCL,ZF,VCOOL,IDFM,PHI,XFL,EPS,SLIP,ACOOL,
+     > PCH,DZ,TCALO,RHO,RHOLAV,RHOG,TSCLAD,KWA,VGJprime,HLV)
 *
 *-----------------------------------------------------------------------
 *
@@ -42,6 +42,9 @@
 * ACOOL   coolant cross section area in m^2.
 * PCH     heating perimeter in m.
 * DZ      axial mesh width in m.
+* VCOOL   local coolant velocity
+* IDFM    flag indicating if the drift flux model is to be used 
+*         (0=HEM1(no drift velocity)/1=EPRI/2=MODEBSTION/3=GERAMP/4=CHEXAL) 
 *
 *Parameters: output
 * PHI     heat flow exchanged between clad and fluid in W/m^2.
@@ -52,22 +55,26 @@
 * TCALO   coolant temperature in K
 * RHO     coolant density in Kg/m^3
 * RHOLAV  liquid density in kg/m^3
+* RHOG    vapour density in kg/m^3
 * TSCLAD  clad temperature in K
 * KWA     flow regime (=0: single-phase; =1: subcooled; =2: nucleate
 *         boiling; =3 superheated steam)
+* VGJ     drift velocity in m/s
+* VGJprime 
+* HLV     delta between liquid and vapour enthalpies
 *
 *-----------------------------------------------------------------------
 *
 *----
 *  SUBROUTINE ARGUMENTS
 *----
-      INTEGER I,J,K,K0,IFLUID,IHCONV,ISUBM,KWA
+      INTEGER I,J,K,K0,IFLUID,IHCONV,ISUBM,KWA,IDFM
       REAL PINLET,MFLOW,HMAVG,ENT(4),HD,KHCONV,RADCL,ZF(2),PHI,TCALO,
-     > RHO,RHOLAV,TSCLAD,XFL,EPS,SLIP,ACOOL,PCH,DZ
+     > RHO,RHOLAV,TSCLAD,XFL,EPS,SLIP,ACOOL,PCH,DZ,VCOOL,VGJprime
 *----
 *  LOCAL VARIABLES
 *----
-      REAL W(4),HL(4),JL,JG
+      REAL W(4),HL(4),JL,JG, REL, PRL, VGJ
       CHARACTER HSMG*131
       LOGICAL LFIRST
 *----
@@ -180,6 +187,7 @@
             PR=PINLET/10**6
             SIGM=-7.2391E-6*PR**3+2.8345E-4*PR**2-5.1566E-3*PR+4.2324E-2
             VGJ=1.18*((SIGM*9.81*(RHOL-RHOG))/RHOL**2)**0.25
+            PRINT *, 'THMH2O: VGJ=', VGJ
             F4=CO*((XFL*RHOL)+((1.0-XFL)*RHOG))+(RHOL*RHOG*VGJ/MFLOW)
             EPS=(XFL*RHOL)/F4
             JL=(1.0-XFL)*MFLOW/RHOL
@@ -220,13 +228,24 @@
         PRL=ZMUONE*CPONE/ZKONE
       ELSE IF(HMAVG.LT.HGSAT) THEN
 *       Two-phase flow
+        IF((IFLUID.EQ.0) .AND. (IDFM.GT.0)) THEN
+        CALL THMDFM(PINLET,VCOOL,HMAVG,HD,TL,TSAT,IDFM,EPS,XFL,
+     >  RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
+        PRINT *, 'THMDFM CALLED'
+        ENDIF
         TCALO=EPS*TSAT+(1.0-EPS)*TL
         ZKONE=ZKL
         CPONE=CPL
-        RHO=EPS*RHOG+(1.0-EPS)*RHOL
+        RHO=EPS*RHOG+(1.0-EPS)*RHOL 
         REL=MFLOW*(1.0-XFL)*HD/ZMUL
         PRL=ZMUL*CPL/ZKL
+        JL=(1.0-XFL)*MFLOW/RHOL
+        JG=XFL*MFLOW/RHOG
+        IF(EPS.NE.0) THEN
+        SLIP=JG*(1.0-EPS)/(JL*EPS) 
+        ENDIF
       ELSE
+      PRINT *, 'THMH2O: SUPERHEATED STEAM'
 *       superheated steam
         RHO=RHOG
         REL=MFLOW*HD/ZMUG

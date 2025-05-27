@@ -136,7 +136,6 @@
       INTEGER I
       REAL ERRV, ERRP
       REAL, DIMENSION(4, NZ) :: ENTLIST
-
 *----
 *  ALLOCATABLE ARRAYS
 *----
@@ -334,11 +333,11 @@
           IF (K.GT.1) THEN
             HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K))
           ENDIF
-          HMSUP = HMSUP + DELTA
-          DO I1=1,4
-            POINT=(1.0+XS(I1))/2.0
-            ENT(I1)=HMSUPold+POINT*(HMSUP - HMSUPold)
-          ENDDO
+        HMSUP = HMSUP + DELTA
+        DO I1=1,4
+          POINT=(1.0+XS(I1))/2.0
+          ENT(I1)=HMSUPold+POINT*(HMSUP - HMSUPold)
+        ENDDO
         ENTLIST(1:4, K) = ENT(1:4)
         HCOOL(K)=HMSUP
       ENDDO
@@ -360,7 +359,6 @@
      >    IFLUID,IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,VCOOL(K),
      >    IDFM,PHI2,XFL(K),EPS(K),SLIP(K),ACOOL,PCH,HZ(K),TCALO,RHO,
      >    RHOL,RHOG,TRE11(NDTOT),KWA(K),VGJprime(K), HLV(K))
-
         ELSEIF (IFLUID.EQ.2) THEN
           CALL THMSAL(IMPX,0,IX,IY,K,K0,MFLOW,HMSUP,ENT,HD,STP,
      >    IHCONV,KHCONV,ISUBM,RAD(NDTOT-1,K),ZF,PHI2,XFL(K),
