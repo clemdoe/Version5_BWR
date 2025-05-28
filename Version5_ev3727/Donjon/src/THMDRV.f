@@ -317,6 +317,7 @@
 *----
       DO K=1,NZ
         HMSUPold=HMSUP
+        PHI2=0.5*QFUEL(K)*RAD(NFD,K)**2/RAD(NDTOT-1,K)
         !DELTH1=(PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)/MFLOW
         DELTA = (PCH/ACOOL*PHI2+QCOOL(K))*HZ(K)
         PRINT *, 'K = ', K, ' IDFM = ', IDFM
@@ -330,9 +331,9 @@
      >      (DLCOOL(K)/DCOOL(K))*HLV(K)*VGJprime(K))
         ENDIF
         DELTA = DELTA/MFLOW
-          IF (K.GT.1) THEN
-            HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K))
-          ENDIF
+        IF (K.GT.1) THEN
+          HMSUP = HMSUP*DCOOL(K-1)*VCOOL(K-1)/(VCOOL(K)*DCOOL(K))
+        ENDIF
         HMSUP = HMSUP + DELTA
         DO I1=1,4
           POINT=(1.0+XS(I1))/2.0
