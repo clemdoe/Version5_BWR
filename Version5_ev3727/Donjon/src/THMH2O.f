@@ -187,7 +187,6 @@
             PR=PINLET/10**6
             SIGM=-7.2391E-6*PR**3+2.8345E-4*PR**2-5.1566E-3*PR+4.2324E-2
             VGJ=1.18*((SIGM*9.81*(RHOL-RHOG))/RHOL**2)**0.25
-            PRINT *, 'THMH2O: VGJ=', VGJ
             F4=CO*((XFL*RHOL)+((1.0-XFL)*RHOG))+(RHOL*RHOG*VGJ/MFLOW)
             EPS=(XFL*RHOL)/F4
             JL=(1.0-XFL)*MFLOW/RHOL
@@ -231,7 +230,6 @@
         IF((IFLUID.EQ.0) .AND. (IDFM.GT.0)) THEN
         CALL THMDFM(PINLET,VCOOL,HMAVG,HD,TL,TSAT,IDFM,EPS,XFL,
      >  RHO,RHOL,RHOG, VGJ, VGJprime, C0, HLV)
-        PRINT *, 'THMDFM CALLED'
         ENDIF
         TCALO=EPS*TSAT+(1.0-EPS)*TL
         ZKONE=ZKL
@@ -245,7 +243,6 @@
         SLIP=JG*(1.0-EPS)/(JL*EPS) 
         ENDIF
       ELSE
-      PRINT *, 'THMH2O: SUPERHEATED STEAM'
 *       superheated steam
         RHO=RHOG
         REL=MFLOW*HD/ZMUG

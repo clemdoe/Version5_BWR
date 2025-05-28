@@ -54,7 +54,6 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ,EPS, R
     ALLOCATE(A(2*NZ,2*NZ+1))
     FORALL (I=1:2*NZ, J=1:2*NZ+1) A(I, J) = 0.0
 
-    PRINT *, 'INSIDE THMPV VGJ', VGJ 
 
 !----
 !   MATRIX FILLING FOR THE PRESSURE AND VELOCITY CALCULATION
@@ -85,7 +84,6 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ,EPS, R
             ELSE
                 DELTA = 0
             ENDIF
-            PRINT *, 'INSIDE THMPV DELTA', DELTA
             A(K+NZ,K) = - (VCOOL(K)*DCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
             A(K+NZ,K+1) = (VCOOL(K+1)*DCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
             A(K+NZ, 2*NZ+1) =  - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2 + DELTA
@@ -140,7 +138,6 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ,EPS, R
             ELSE
                 DELTA = 0.0
             ENDIF
-            PRINT *, 'INSIDE THMPV DELTA', DELTA
             A(K+NZ,K) = - (DCOOL(K)*VCOOL(K))*(1.0 - (TPMULT0*FRIC0*HZ(K))/(2.0*HD))
             A(K+NZ,K+1) = (DCOOL(K+1)*VCOOL(K+1))*(1.0 + (TPMULT*FRIC*HZ(K))/(2.0*HD))
             A(K+NZ, 2*NZ+1) = - ((DCOOL(K+1)* HZ(K+1) + DCOOL(K)* HZ(K)) * g ) /2 + DELTA
@@ -162,10 +159,6 @@ SUBROUTINE THMPV(SPEED, POULET, VCOOL, DCOOL, PCOOL, MUT, XFL, HD, NZ, HZ,EPS, R
         VCOOL(K) = REAL(A(K, 2*NZ+1))
         PCOOL(K) = REAL(A(K+NZ, 2*NZ+1))
     END DO
-
-    PRINT *, 'INSIDE THMPV VCOOL', VCOOL
-    PRINT *, 'INSIDE THMPV PCOOL', PCOOL
-    
 
     DEALLOCATE(A)
     
