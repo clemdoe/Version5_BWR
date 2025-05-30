@@ -91,7 +91,8 @@
 * IPRES   flag indicating if pressure is to be computed (0=nonstant/
 *         1=variable).
 * IDFM    flag indicating if the drift flux model is to be used 
-*         (0=HEM1(no drift velocity)/1=EPRI/2=MODEBSTION/3=GERAMP/4=CHEXAL) 
+*         (0=Without modifications(Chexal correlation for epsilon, no drift flux model in the Navier-Stokes equations)
+*           /1=EPRI/2=MODEBSTION/3=GERAMP/4=HEM1(VGJ=0)) 
 *
 * Parameters: output
 * TCOMB   averaged fuel temperature distribution in K.
