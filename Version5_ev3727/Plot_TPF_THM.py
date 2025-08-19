@@ -5,6 +5,7 @@ import pandas as pd
 #Marie Bellier, 2025
 #extract TPF data from csv files and plot 
 #requires updating in file paths, and to copy/paste THM data from THM results
+#physical test geometry is described in the internship report
 
 
 def readTPF(file_path):
